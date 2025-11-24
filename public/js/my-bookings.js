@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/api/bookings", {
+        const response = await fetch(`${API_BASE}/bookings`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,

@@ -91,6 +91,7 @@
   <!-- Scripts -->
   <script src="vender/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="js/script.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
 
   <script>
@@ -138,7 +139,7 @@
       };
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/bookings", {
+        const response = await fetch(`${API_BASE}/bookings`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

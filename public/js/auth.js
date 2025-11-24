@@ -1,7 +1,3 @@
-// ====== CONFIG ======
-const API_BASE = "http://127.0.0.1:8000/api";
-
-
 // ====== ALERT (rimane fisso) ======
 function showAlert(message, type = "danger") {
     const alertBox = document.getElementById("alertBox");
