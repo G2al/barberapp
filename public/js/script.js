@@ -211,3 +211,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+/* ============================
+   8️⃣ Refresh App Function
+============================= */
+function refreshApp() {
+    // Clear all caches
+    if ('caches' in window) {
+        caches.keys().then(names => {
+            names.forEach(name => {
+                caches.delete(name);
+            });
+        });
+    }
+
+    // Hard refresh the page (bypass cache)
+    window.location.href = window.location.href;
+}
