@@ -1,0 +1,32 @@
+{
+  "name": "BarberApp - Prenota il tuo barbiere",
+  "short_name": "BarberApp",
+  "description": "App per prenotare servizi di barbiere online",
+  "start_url": "/login.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
