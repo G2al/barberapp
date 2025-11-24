@@ -4,7 +4,10 @@
       "Bash(dir:*)",
       "Bash(php artisan:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nImplement dynamic API configuration for multi-environment support\n\n- Create public/js/config.js with dynamic API_BASE using window.location.origin\n- Update all HTML files to import config.js before auth.js\n- Remove hardcoded localhost URL from public/js/auth.js\n- Replace hardcoded API URLs in my-bookings.html and my-bookings.js with dynamic variable\n- This configuration automatically works in both local (http://127.0.0.1:8000) and production (https://alettabarber2k24.it) environments without requiring manual changes per environment\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nImplement dynamic API configuration for multi-environment support\n\n- Create public/js/config.js with dynamic API_BASE using window.location.origin\n- Update all HTML files to import config.js before auth.js\n- Remove hardcoded localhost URL from public/js/auth.js\n- Replace hardcoded API URLs in my-bookings.html and my-bookings.js with dynamic variable\n- This configuration automatically works in both local (http://127.0.0.1:8000) and production (https://alettabarber2k24.it) environments without requiring manual changes per environment\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nImplement PWA (Progressive Web App) for fullscreen app experience\n\n- Create manifest.json with PWA configuration for app installation\n- Add service-worker.js for PWA registration\n- Update all HTML files with PWA manifest links and meta tags\n- Add service worker registration script to all pages\n- Enable \"Add to Home Screen\" feature for iOS and Android\n- Fullscreen display when opened as installed app\n- No offline functionality or notifications yet (minimal PWA)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
