@@ -388,19 +388,18 @@ a {
 
 .bottom-nav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
     background-color: var(--surface);
     display: flex;
     justify-content: space-around;
     padding: 12px 0 8px 0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     max-width: 480px;
     margin: 0 auto;
     z-index: 1000;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+    border-radius: 16px;
 }
 
 .nav-item {
