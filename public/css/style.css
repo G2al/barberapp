@@ -174,12 +174,9 @@ a {
     height: 100vh;
     background-color: var(--surface);
     z-index: 1001;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
-    border-radius: 0 20px 20px 0;
-    margin-top: 0;
-    margin-left: 8px;
 }
 
 .sidebar.active {
@@ -189,8 +186,7 @@ a {
 .sidebar-header {
     background: linear-gradient( 135deg, var(--primary-color), var(--primary-light));
     color: white;
-    padding: 30px 20px 20px 20px;
-    border-radius: 0 20px 0 0;
+    padding: 20px;
 }
 
 .sidebar-menu {
