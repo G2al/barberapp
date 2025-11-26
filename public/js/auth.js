@@ -25,6 +25,25 @@ function setButtonLoading(button, isLoading) {
 
 
 
+// ====== TRANSLATE ERROR MESSAGES ======
+function translateErrorMessage(message) {
+    const translations = {
+        "The email has already been taken.": "Questa email è già stata utilizzata.",
+        "The phone has already been taken.": "Questo numero di telefono è già stato utilizzato.",
+        "The password must be at least 6 characters.": "La password deve contenere almeno 6 caratteri.",
+        "Email or password invalid": "Email o password non validi",
+        "The name field is required.": "Il campo nome è obbligatorio.",
+        "The surname field is required.": "Il campo cognome è obbligatorio.",
+        "The email field is required.": "Il campo email è obbligatorio.",
+        "The phone field is required.": "Il campo telefono è obbligatorio.",
+        "The password field is required.": "Il campo password è obbligatorio."
+    };
+
+    return translations[message] || message;
+}
+
+
+
 // ====== TOKEN ======
 function saveToken(token) {
     localStorage.setItem("token", token);
@@ -152,27 +171,27 @@ async function submitRegister() {
     if (res.errors) {
 
         if (res.errors.email) {
-            showAlert(res.errors.email[0], "danger");
+            showAlert(translateErrorMessage(res.errors.email[0]), "danger");
             return;
         }
 
         if (res.errors.phone) {
-            showAlert(res.errors.phone[0], "danger");
+            showAlert(translateErrorMessage(res.errors.phone[0]), "danger");
             return;
         }
 
         if (res.errors.password) {
-            showAlert(res.errors.password[0], "danger");
+            showAlert(translateErrorMessage(res.errors.password[0]), "danger");
             return;
         }
 
         if (res.errors.name) {
-            showAlert(res.errors.name[0], "danger");
+            showAlert(translateErrorMessage(res.errors.name[0]), "danger");
             return;
         }
 
         if (res.errors.surname) {
-            showAlert(res.errors.surname[0], "danger");
+            showAlert(translateErrorMessage(res.errors.surname[0]), "danger");
             return;
         }
 

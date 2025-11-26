@@ -1310,10 +1310,8 @@ a {
 }
 
 .app-logo-img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50px;
-    object-fit: cover;
+    max-width: 150px;
+    height: auto;
     display: block;
     margin: 0 auto;
 }

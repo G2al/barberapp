@@ -145,6 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 5️⃣ CONFERMA PRENOTAZIONE
 // ===========================
 async function confirmBooking() {
+    const confirmBtn = document.getElementById("confirmBtn");
     const serviceSelect = document.getElementById("serviceSelect");
     const barberSelect = document.getElementById("barberSelect");
     const dateSelect = document.getElementById("dateSelect");
@@ -164,6 +165,8 @@ async function confirmBooking() {
     console.log("Token:", getToken());
     console.log("Booking data:", { serviceId, barberId, date, time });
 
+    setButtonLoading(confirmBtn, true);
+
     const bookingData = {
         staff_id: parseInt(barberId),
         service_id: parseInt(serviceId),
@@ -173,6 +176,8 @@ async function confirmBooking() {
     };
 
     const response = await apiPost("/bookings", bookingData);
+
+    setButtonLoading(confirmBtn, false);
 
     if (response.status === false) {
         showAlert(response.message || "Errore durante la prenotazione", "danger");
