@@ -11,6 +11,20 @@ function showAlert(message, type = "danger") {
 
 
 
+// ====== BUTTON LOADING STATE ======
+function setButtonLoading(button, isLoading) {
+    if (isLoading) {
+        button.disabled = true;
+        button.dataset.originalText = button.innerHTML;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Caricamento...';
+    } else {
+        button.disabled = false;
+        button.innerHTML = button.dataset.originalText || button.innerHTML;
+    }
+}
+
+
+
 // ====== TOKEN ======
 function saveToken(token) {
     localStorage.setItem("token", token);
@@ -120,6 +134,8 @@ async function apiPost(url, data) {
 
 // ====== SUBMIT REGISTER ======
 async function submitRegister() {
+    const submitBtn = document.getElementById("submitBtn");
+
     const data = {
         name: document.getElementById("name").value.trim(),
         surname: document.getElementById("surname").value.trim(),
@@ -128,7 +144,9 @@ async function submitRegister() {
         password: document.getElementById("password").value.trim()
     };
 
+    setButtonLoading(submitBtn, true);
     const res = await registerUser(data);
+    setButtonLoading(submitBtn, false);
 
     // ERRORI DI VALIDAZIONE (email / telefono / altro)
     if (res.errors) {
@@ -171,12 +189,12 @@ async function submitRegister() {
     // REGISTRAZIONE OK
     if (res.status === true && res.token) {
         saveToken(res.token);
-        
+
         // Salva anche i dati utente
         if (res.user) {
             saveUser(res.user);
         }
-        
+
         showAlert("Registrazione completata!", "success");
 
         setTimeout(() => {
@@ -195,12 +213,16 @@ async function submitRegister() {
 
 // ====== SUBMIT LOGIN ======
 async function submitLogin() {
+    const submitBtn = document.getElementById("submitBtn");
+
     const data = {
         email: document.getElementById("email").value.trim(),
         password: document.getElementById("password").value.trim()
     };
 
+    setButtonLoading(submitBtn, true);
     const res = await loginUser(data);
+    setButtonLoading(submitBtn, false);
 
     // LOGIN FALLITO
     if (res.status === false) {
@@ -211,12 +233,12 @@ async function submitLogin() {
     // LOGIN OK
     if (res.token) {
         saveToken(res.token);
-        
+
         // Salva anche i dati utente
         if (res.user) {
             saveUser(res.user);
         }
-        
+
         showAlert("Accesso effettuato!", "success");
 
         setTimeout(() => {
