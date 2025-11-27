@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Homepage (opzionale)
+// App Login/Welcome Page
 Route::get('/', function () {
-    return view('welcome');
+    return file_get_contents(public_path('index.html'));
 });
