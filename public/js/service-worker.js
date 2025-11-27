@@ -1,7 +1,7 @@
 // Service Worker Minimalista per PWA
 // Solo registrazione e fullscreen, niente offline
 
-const CACHE_NAME = 'barberapp-v1';
+const CACHE_NAME = 'alettabarber-v1';
 
 // Installazione
 self.addEventListener('install', (event) => {

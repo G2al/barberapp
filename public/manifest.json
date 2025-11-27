@@ -1,6 +1,6 @@
 {
-  "name": "BarberApp - Prenota il tuo barbiere",
-  "short_name": "BarberApp",
+  "name": "Aletta Barber - Prenota il tuo barbiere",
+  "short_name": "Aletta Barber",
   "description": "App per prenotare servizi di barbiere online",
   "start_url": "/login.html",
   "scope": "/",
