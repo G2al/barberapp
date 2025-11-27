@@ -10,7 +10,8 @@
       "Bash(git commit:*)",
       "Bash(copy \"C:\\Users\\giomm\\Desktop\\barberapp\\logo.jpg\" \"C:\\Users\\giomm\\Desktop\\barberapp\\public\\images\\logo.jpg\")",
       "Bash(cp:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(php test_booking_time.php:*)"
     ],
     "deny": [],
     "ask": []

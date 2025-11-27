@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Staff;
 use App\Models\Service;
 use App\Notifications\NewBookingNotification;
+use App\Notifications\BookingConfirmedNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -132,6 +133,9 @@ class BookingController extends Controller
         // 📱 Invia notifica Telegram all'admin
         Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
             ->notify(new NewBookingNotification($booking));
+
+        // 📧 Invia email di conferma all'utente
+        $user->notify(new BookingConfirmedNotification($booking));
 
         return response()->json([
             'status' => true,
