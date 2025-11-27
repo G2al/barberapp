@@ -481,116 +481,44 @@ a {
     color: white;
 }
 
-/* PWA Guide Styles */
-.pwa-guide-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: flex-end;
-    z-index: 2000;
-    animation: slideInGuide 0.3s ease-out;
+/* PWA Guide - Simple Styles */
+.pwa-guide-simple {
+    padding: 16px 12px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    margin: 0 16px;
 }
 
-@keyframes slideInGuide {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.pwa-guide-card {
-    background: white;
-    width: 100%;
-    border-radius: 20px 20px 0 0;
-    padding: 20px 16px 30px 16px;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-    max-height: 90vh;
-    overflow-y: auto;
-    animation: slideUpCard 0.3s ease-out;
-}
-
-@keyframes slideUpCard {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
-}
-
-.pwa-guide-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.pwa-guide-title {
+.pwa-guide-title-simple {
     display: flex;
     align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 16px;
+}
+
+.pwa-guide-title-simple i {
     font-size: 20px;
-    font-weight: 700;
-    color: var(--primary-color);
 }
 
-.pwa-guide-title i {
-    font-size: 24px;
-}
-
-.btn-close-guide {
-    background: transparent;
-    border: none;
-    font-size: 24px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0;
-    width: 40px;
-    height: 40px;
+.pwa-steps-simple {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.btn-close-guide:hover {
-    background: #f0f0f0;
-    color: var(--primary-color);
-}
-
-.pwa-guide-subtitle {
-    color: var(--text-secondary);
-    font-size: 14px;
-    margin-bottom: 24px;
-    text-align: center;
-}
-
-.pwa-steps-container {
-    margin-bottom: 24px;
-}
-
-.pwa-step {
+.pwa-step-simple {
     display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #f0f0f0;
+    gap: 12px;
+    align-items: flex-start;
 }
 
-.pwa-step:last-of-type {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.pwa-step-number {
-    min-width: 44px;
-    height: 44px;
+.step-num {
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
     color: white;
@@ -598,91 +526,55 @@ a {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 14px;
     flex-shrink: 0;
 }
 
-.pwa-step-final .pwa-step-number {
-    background: linear-gradient(135deg, #4caf50, #45a049);
-    font-size: 20px;
-}
-
-.pwa-step-content {
+.step-info {
     flex: 1;
 }
 
-.pwa-step-title {
-    font-weight: 600;
-    color: var(--primary-color);
-    font-size: 15px;
-    margin-bottom: 4px;
-}
-
-.pwa-step-desc {
-    color: var(--text-secondary);
+.step-text {
     font-size: 13px;
-    margin-bottom: 12px;
+    font-weight: 500;
+    color: var(--primary-color);
+    margin-bottom: 8px;
 }
 
-.pwa-step-image {
+.step-img {
     width: 100%;
     height: auto;
-    border-radius: 12px;
+    border-radius: 8px;
+    max-height: 200px;
     object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.pwa-guide-actions {
-    display: flex;
-    gap: 12px;
-}
-
-.btn-guide-primary {
-    flex: 1;
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-    color: white;
-    border: none;
-    border-radius: 9px;
-    padding: 12px 20px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 8px rgba(7, 7, 7, 0.2);
-}
-
-.btn-guide-primary:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 4px rgba(7, 7, 7, 0.2);
 }
 
 /* Responsive */
 @media (max-width: 576px) {
-    .pwa-guide-card {
-        padding: 16px 12px 24px 12px;
+    .pwa-guide-simple {
+        padding: 12px 10px;
+        margin: 0 10px;
     }
 
-    .pwa-guide-title {
-        font-size: 18px;
+    .pwa-guide-title-simple {
+        font-size: 15px;
+        margin-bottom: 12px;
     }
 
-    .pwa-step {
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-    .pwa-step-number {
-        min-width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-
-    .pwa-step-title {
-        font-size: 14px;
-    }
-
-    .pwa-step-desc {
+    .step-num {
+        min-width: 28px;
+        width: 28px;
+        height: 28px;
         font-size: 12px;
+    }
+
+    .step-text {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .step-img {
+        max-height: 150px;
     }
 }
 
