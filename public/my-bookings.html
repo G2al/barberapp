@@ -63,6 +63,12 @@
   <!-- MAIN CONTENT -->
   <div class="content-area">
     <div class="page-content">
+      <!-- Welcome Message -->
+      <div class="mb-3">
+        <h5 class="fw-bold text-primary-color">Ciao, <span id="welcomeName">Utente</span>! 👋</h5>
+        <p class="text-muted small">Qui puoi visualizzare tutte le tue prenotazioni</p>
+      </div>
+
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-semibold text-primary-color m-0">Prenotazioni recenti</h6>
       </div>
@@ -223,6 +229,12 @@
           </div>`;
       }
     });
+
+    // Update welcome message with user name
+    const user = getUser();
+    if (user && user.name) {
+      document.getElementById('welcomeName').textContent = user.name;
+    }
 
     // Registra il Service Worker per PWA
     if ('serviceWorker' in navigator) {
