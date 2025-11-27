@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const loadingMsg = document.getElementById("loadingMsg");
 
     if (!token) {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
         return;
     }
 
