@@ -96,55 +96,71 @@
         </div>
 
         <!-- PWA Installation Guide (solo quando accedi via URL) -->
-        <div id="pwaGuide" class="mt-5">
-            <div class="alert alert-light border-2 border-primary-color p-4 rounded-3">
-                <div class="mb-3">
-                    <h5 class="fw-bold text-primary-color mb-3">
-                        <i class="bi bi-phone me-2"></i>Aggiungi l'app alla tua Home Screen
-                    </h5>
-                    <p class="text-muted small mb-0">Segui questi semplici step per avere l'app sempre a portata di mano</p>
-                </div>
-
-                <!-- Step 1 -->
-                <div class="mb-4 pb-3 border-bottom">
-                    <div class="d-flex mb-2">
-                        <span class="badge bg-primary-color text-white me-2">1</span>
-                        <span class="fw-semibold">Clicca il pulsante di condivisione</span>
+        <div id="pwaGuide" class="pwa-guide-container">
+            <div class="pwa-guide-card">
+                <!-- Header -->
+                <div class="pwa-guide-header">
+                    <div class="pwa-guide-title">
+                        <i class="bi bi-download me-2"></i>
+                        <span>Scarica l'App</span>
                     </div>
-                    <img src="/images/1.jpeg" alt="Step 1" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
+                    <button class="btn-close-guide" onclick="document.getElementById('pwaGuide').style.display='none'">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
 
-                <!-- Step 2 -->
-                <div class="mb-4 pb-3 border-bottom">
-                    <div class="d-flex mb-2">
-                        <span class="badge bg-primary-color text-white me-2">2</span>
-                        <span class="fw-semibold">Seleziona "Aggiungi alla schermata Home"</span>
+                <!-- Subtitle -->
+                <div class="pwa-guide-subtitle">
+                    Aggiungi Aletta Barber alla tua Home Screen in pochi tap
+                </div>
+
+                <!-- Steps Container -->
+                <div class="pwa-steps-container">
+                    <!-- Step 1 -->
+                    <div class="pwa-step">
+                        <div class="pwa-step-number">1</div>
+                        <div class="pwa-step-content">
+                            <div class="pwa-step-title">Clicca il pulsante Condividi</div>
+                            <div class="pwa-step-desc">Cerca l'icona di condivisione in basso a destra</div>
+                            <img src="/images/1.jpeg" alt="Step 1" class="pwa-step-image">
+                        </div>
                     </div>
-                    <img src="/images/2.jpeg" alt="Step 2" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
-                </div>
 
-                <!-- Step 3 -->
-                <div class="mb-4 pb-3 border-bottom">
-                    <div class="d-flex mb-2">
-                        <span class="badge bg-primary-color text-white me-2">3</span>
-                        <span class="fw-semibold">Clicca il bottone blu "Aggiungi"</span>
+                    <!-- Step 2 -->
+                    <div class="pwa-step">
+                        <div class="pwa-step-number">2</div>
+                        <div class="pwa-step-content">
+                            <div class="pwa-step-title">Seleziona "Aggiungi alla schermata Home"</div>
+                            <div class="pwa-step-desc">Scorri il menu e trova questa opzione</div>
+                            <img src="/images/2.jpeg" alt="Step 2" class="pwa-step-image">
+                        </div>
                     </div>
-                    <img src="/images/3.jpeg" alt="Step 3" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
-                </div>
 
-                <!-- Step 4 -->
-                <div class="mb-3">
-                    <div class="d-flex mb-2">
-                        <span class="badge bg-primary-color text-white me-2">4</span>
-                        <span class="fw-semibold">Fatto! L'app è sulla tua Home Screen</span>
+                    <!-- Step 3 -->
+                    <div class="pwa-step">
+                        <div class="pwa-step-number">3</div>
+                        <div class="pwa-step-content">
+                            <div class="pwa-step-title">Clicca "Aggiungi"</div>
+                            <div class="pwa-step-desc">Conferma il nome dell'app e procedi</div>
+                            <img src="/images/3.jpeg" alt="Step 3" class="pwa-step-image">
+                        </div>
                     </div>
-                    <img src="/images/4.jpeg" alt="Step 4" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
-                    <p class="text-muted small mt-2 mb-0">D'ora in poi accedi direttamente da lì - l'app sarà sempre disponibile senza aprire il browser 🎉</p>
+
+                    <!-- Step 4 -->
+                    <div class="pwa-step pwa-step-final">
+                        <div class="pwa-step-number">✓</div>
+                        <div class="pwa-step-content">
+                            <div class="pwa-step-title">Fatto! L'app è sulla tua Home Screen</div>
+                            <div class="pwa-step-desc">D'ora in poi accedi rapidamente da qui. L'app funziona anche offline!</div>
+                            <img src="/images/4.jpeg" alt="Step 4" class="pwa-step-image">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-3 text-center">
-                    <button class="btn btn-sm btn-outline-primary-color" onclick="document.getElementById('pwaGuide').style.display='none'">
-                        Ho capito, chiudi questa guida
+                <!-- Action Buttons -->
+                <div class="pwa-guide-actions">
+                    <button class="btn-guide-primary" onclick="document.getElementById('pwaGuide').style.display='none'">
+                        Ho capito
                     </button>
                 </div>
             </div>
