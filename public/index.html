@@ -94,6 +94,61 @@
             </div>
 
         </div>
+
+        <!-- PWA Installation Guide (solo quando accedi via URL) -->
+        <div id="pwaGuide" class="mt-5">
+            <div class="alert alert-light border-2 border-primary-color p-4 rounded-3">
+                <div class="mb-3">
+                    <h5 class="fw-bold text-primary-color mb-3">
+                        <i class="bi bi-phone me-2"></i>Aggiungi l'app alla tua Home Screen
+                    </h5>
+                    <p class="text-muted small mb-0">Segui questi semplici step per avere l'app sempre a portata di mano</p>
+                </div>
+
+                <!-- Step 1 -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex mb-2">
+                        <span class="badge bg-primary-color text-white me-2">1</span>
+                        <span class="fw-semibold">Clicca il pulsante di condivisione</span>
+                    </div>
+                    <img src="/images/1.jpeg" alt="Step 1" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
+                </div>
+
+                <!-- Step 2 -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex mb-2">
+                        <span class="badge bg-primary-color text-white me-2">2</span>
+                        <span class="fw-semibold">Seleziona "Aggiungi alla schermata Home"</span>
+                    </div>
+                    <img src="/images/2.jpeg" alt="Step 2" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
+                </div>
+
+                <!-- Step 3 -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex mb-2">
+                        <span class="badge bg-primary-color text-white me-2">3</span>
+                        <span class="fw-semibold">Clicca il bottone blu "Aggiungi"</span>
+                    </div>
+                    <img src="/images/3.jpeg" alt="Step 3" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
+                </div>
+
+                <!-- Step 4 -->
+                <div class="mb-3">
+                    <div class="d-flex mb-2">
+                        <span class="badge bg-primary-color text-white me-2">4</span>
+                        <span class="fw-semibold">Fatto! L'app è sulla tua Home Screen</span>
+                    </div>
+                    <img src="/images/4.jpeg" alt="Step 4" class="img-fluid rounded-2" style="max-height: 300px; object-fit: cover;">
+                    <p class="text-muted small mt-2 mb-0">D'ora in poi accedi direttamente da lì - l'app sarà sempre disponibile senza aprire il browser 🎉</p>
+                </div>
+
+                <div class="mt-3 text-center">
+                    <button class="btn btn-sm btn-outline-primary-color" onclick="document.getElementById('pwaGuide').style.display='none'">
+                        Ho capito, chiudi questa guida
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap -->
@@ -114,6 +169,22 @@
             icon.classList.add("bi-eye");
         }
     }
+
+    // Mostra la guida PWA solo se accedi via URL (non dalla PWA installata)
+    function checkPWAMode() {
+        const pwaGuide = document.getElementById('pwaGuide');
+
+        // Se l'app è in modalità PWA (standalone), nascondi la guida
+        if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+            pwaGuide.style.display = 'none';
+        } else {
+            // Se accedi via browser URL, mostra la guida
+            pwaGuide.style.display = 'block';
+        }
+    }
+
+    // Verifica al caricamento della pagina
+    checkPWAMode();
 
     // Registra il Service Worker per PWA
     if ('serviceWorker' in navigator) {
