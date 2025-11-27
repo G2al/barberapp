@@ -10,7 +10,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('bookings:complete-expired')->everyMinute();
-        $schedule->command('bookings:send-reminders')->everyThreeHours();
+        $schedule->command('bookings:send-reminders')->everyThirtyMinutes();
     }
 
     protected function commands()

@@ -49,8 +49,8 @@ class SendBookingReminders extends Command
                 // Calcola minuti fino alla prenotazione
                 $minutesUntilBooking = $now->diffInMinutes($bookingDateTime);
 
-                // Invia reminder quando mancano ESATTAMENTE 60 minuti (±5 minuti di tolleranza)
-                if ($minutesUntilBooking >= 55 && $minutesUntilBooking <= 65) {
+                // Invia reminder quando mancano approssimativamente 60 minuti (±15 minuti di tolleranza per garantire catch di tutti gli slot)
+                if ($minutesUntilBooking >= 45 && $minutesUntilBooking <= 75) {
 
                     $this->info("Invio reminder per prenotazione #{$booking->id}: mancano {$minutesUntilBooking} minuti");
 
