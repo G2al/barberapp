@@ -9,7 +9,8 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nImplement PWA (Progressive Web App) for fullscreen app experience\n\n- Create manifest.json with PWA configuration for app installation\n- Add service-worker.js for PWA registration\n- Update all HTML files with PWA manifest links and meta tags\n- Add service worker registration script to all pages\n- Enable \"Add to Home Screen\" feature for iOS and Android\n- Fullscreen display when opened as installed app\n- No offline functionality or notifications yet (minimal PWA)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git commit:*)",
       "Bash(copy \"C:\\Users\\giomm\\Desktop\\barberapp\\logo.jpg\" \"C:\\Users\\giomm\\Desktop\\barberapp\\public\\images\\logo.jpg\")",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
