@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BookingResource\Pages;
 use App\Models\Booking;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -122,6 +123,26 @@ class BookingResource extends Resource
                     ->label('Stato'),
             ])
             ->filters([
+                Tables\Filters\Filter::make('today')
+                    ->query(fn ($query) => $query->whereDate('date', Carbon::today()))
+                    ->toggle()
+                    ->label('Oggi'),
+
+                Tables\Filters\Filter::make('tomorrow')
+                    ->query(fn ($query) => $query->whereDate('date', Carbon::tomorrow()))
+                    ->toggle()
+                    ->label('Domani'),
+
+                Tables\Filters\Filter::make('saturday')
+                    ->query(fn ($query) => $query->whereDate('date', Carbon::today()->next(Carbon::SATURDAY)))
+                    ->toggle()
+                    ->label('Sabato'),
+
+                Tables\Filters\Filter::make('this_week')
+                    ->query(fn ($query) => $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]))
+                    ->toggle()
+                    ->label('Questa settimana'),
+
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'pending' => 'In sospeso',
@@ -135,6 +156,10 @@ class BookingResource extends Resource
                 Tables\Filters\SelectFilter::make('staff_id')
                     ->relationship('staff', 'first_name')
                     ->label('Barbiere'),
+
+                Tables\Filters\SelectFilter::make('service_id')
+                    ->relationship('service', 'name')
+                    ->label('Servizio'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
