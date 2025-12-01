@@ -60,6 +60,7 @@ Version: 0.1
     --text-primary: #212121;
     --text-secondary: #757575;
     --text-hint: #9e9e9e;
+    --primary-color-rgb: 7, 7, 7;
     --warning: #ffc107;
     --success: #4caf50;
     --danger: #f44336;
@@ -454,15 +455,15 @@ a {
 }
 
 .form-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     margin-bottom: 2px;
     color: var(--text-secondary);
 }
 
 .btn-app {
-    background: linear-gradient( 90deg, var(--primary-color), var(--primary-light));
-    color: white;
+    background: linear-gradient(90deg, #f4dda0, #f4dda0);
+    color: #171717;
     border-radius: 9px;
     border: none;
     width: 100%;

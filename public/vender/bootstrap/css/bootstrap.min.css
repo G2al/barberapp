@@ -9192,7 +9192,7 @@ fieldset:disabled .btn {
 
 .bg-transparent {
     --bs-bg-opacity: 1;
-    background-color: transparent !important
+    background-color: #ffffff !important;
 }
 
 .bg-body-secondary {
