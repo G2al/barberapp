@@ -58,6 +58,7 @@ class AvailabilityController extends Controller
 
         $bookings = Booking::where('staff_id', $staffId)
             ->where('date', $date)
+            ->whereIn('status', ['pending', 'confirmed'])
             ->orderBy('time')
             ->get();
 

@@ -61,6 +61,7 @@ class BookingController extends Controller
         $hasOverlap = false;
         $bookings = Booking::where('staff_id', $staffId)
             ->where('date', $date)
+            ->whereIn('status', ['pending', 'confirmed'])
             ->get();
 
         foreach ($bookings as $booking) {
@@ -182,6 +183,63 @@ class BookingController extends Controller
         return response()->json([
             'status' => true,
             'bookings' => $bookings
+        ]);
+    }
+
+    /**
+     * POST /api/bookings/{id}/cancel
+     * Annulla una prenotazione dell'utente, liberando lo slot
+     */
+    public function cancel(Request $request, $id)
+    {
+        $user = $request->user();
+
+        $booking = Booking::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        // Consenti cancellazione solo se ancora attiva
+        if (!in_array($booking->status, ['pending', 'confirmed'])) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Questa prenotazione non può essere annullata.',
+            ], 400);
+        }
+
+        // Blocca cancellazioni su prenotazioni già passate
+        try {
+            $bookingDate = $booking->date instanceof \Carbon\Carbon
+                ? $booking->date->format('Y-m-d')
+                : $booking->date;
+
+            $bookingDateTime = Carbon::parse("{$bookingDate} {$booking->time}");
+
+            if ($bookingDateTime->isPast()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Non puoi annullare una prenotazione già trascorsa.',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Errore parsing data/ora in cancellazione booking', [
+                'id' => $booking->id,
+                'date' => $booking->date,
+                'time' => $booking->time,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        $booking->update(['status' => 'cancelled']);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Prenotazione annullata con successo.',
+            'booking' => [
+                'id' => $booking->id,
+                'status' => $booking->status,
+                'date' => $booking->date,
+                'time' => $booking->time,
+            ],
         ]);
     }
 }

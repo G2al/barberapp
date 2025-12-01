@@ -93,6 +93,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Leggi prenotazioni dell'utente
     Route::get('/bookings', [BookingController::class, 'index']);
+
+    // Annulla una prenotazione dell'utente
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
 });
 
 

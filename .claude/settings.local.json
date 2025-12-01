@@ -11,7 +11,9 @@
       "Bash(copy \"C:\\Users\\giomm\\Desktop\\barberapp\\logo.jpg\" \"C:\\Users\\giomm\\Desktop\\barberapp\\public\\images\\logo.jpg\")",
       "Bash(cp:*)",
       "Bash(git rm:*)",
-      "Bash(php test_booking_time.php:*)"
+      "Bash(php test_booking_time.php:*)",
+      "Bash(Shampoo + Taglio: 1\")\n- Show staff workload distribution (e.g., \"Luigi: 3)",
+      "Bash(Marco: 2\")\n- Add advanced filters: Today, Tomorrow, Saturday, This Week\n- Add service filter to bookings table\n- Update reminder scheduler to run every 30 minutes for better coverage\n- Adjust reminder window from ±5 to ±15 minutes (45-75 min range) to catch all booking slots\n- Dashboard visible in cima alla lista prenotazioni with color-coded cards\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
