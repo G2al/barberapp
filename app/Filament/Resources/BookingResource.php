@@ -83,6 +83,11 @@ class BookingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query
+                ->whereDate('date', '>=', Carbon::today())
+                ->orderBy('date')
+                ->orderBy('time')
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('user.email')
                     ->searchable()
@@ -142,6 +147,18 @@ class BookingResource extends Resource
                     ->query(fn ($query) => $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]))
                     ->toggle()
                     ->label('Questa settimana'),
+
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('from')->label('Dal'),
+                        Forms\Components\DatePicker::make('to')->label('Al'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['from'] ?? null, fn ($q, $date) => $q->whereDate('date', '>=', $date))
+                            ->when($data['to'] ?? null, fn ($q, $date) => $q->whereDate('date', '<=', $date));
+                    })
+                    ->label('Intervallo date'),
 
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
