@@ -462,8 +462,8 @@ a {
 }
 
 .btn-app {
-    background: linear-gradient(90deg, #f4dda0, #f4dda0);
-    color: #171717;
+    background: linear-gradient(90deg, #212121, #070707);
+    color: white;
     border-radius: 9px;
     border: none;
     width: 100%;
