@@ -14,64 +14,57 @@ class BookingStatsWidget extends BaseWidget
         $today = Carbon::today();
         $tomorrow = Carbon::tomorrow();
         $saturday = Carbon::today()->next(Carbon::SATURDAY);
+        $weekStart = Carbon::now()->startOfWeek();
+        $weekEnd = Carbon::now()->endOfWeek();
 
-        // Prenotazioni per giorno
+        // Contatori base
         $bookingsToday = Booking::whereDate('date', $today)->count();
         $bookingsTomorrow = Booking::whereDate('date', $tomorrow)->count();
         $bookingsSaturday = Booking::whereDate('date', $saturday)->count();
+        $bookingsWeek = Booking::whereBetween('date', [$weekStart, $weekEnd])->count();
 
-        // Totale servizi per giorno
-        $servicesMap = [
-            'Barba classica' => 0,
-            'Barba con punto luce' => 0,
-            'Barba + Colore' => 0,
-            'Shampoo + Taglio Uomo' => 0,
-            'Shampoo + Taglio Bambino' => 0,
-            'Shampoo + Taglio + Barba' => 0,
-            'Colore' => 0,
-            'Colpi di Sole' => 0,
-            'Total White' => 0,
-            'Permanente' => 0,
-            'Stiratura' => 0,
-            'Shampoo + Piega' => 0,
-            'Sopracciglia' => 0,
-            'Black Mask' => 0,
-            'Colpi di sole - White' => 0,
-        ];
-
-        $bookingsTodayDetails = Booking::whereDate('date', $today)
-            ->with('service')
+        // Top servizi oggi (aggregato, niente hardcode)
+        $servicesToday = Booking::selectRaw('service_id, count(*) as total')
+            ->whereDate('date', $today)
+            ->groupBy('service_id')
+            ->with('service:id,name')
+            ->orderByDesc('total')
+            ->limit(3)
             ->get()
-            ->groupBy('service.name');
+            ->map(function ($row) {
+                $name = $row->service->name ?? 'N/D';
+                return "{$name}: {$row->total}";
+            })
+            ->implode(' | ');
 
-        $servicesMapToday = $servicesMap;
-        foreach ($bookingsTodayDetails as $serviceName => $bookings) {
-            if (isset($servicesMapToday[$serviceName])) {
-                $servicesMapToday[$serviceName] = count($bookings);
-            }
-        }
-
-        // Per barbieri
-        $staffBookings = Booking::whereDate('date', $today)
-            ->with('staff')
+        // Top barbieri oggi
+        $staffToday = Booking::selectRaw('staff_id, count(*) as total')
+            ->whereDate('date', $today)
+            ->groupBy('staff_id')
+            ->with('staff:id,first_name')
+            ->orderByDesc('total')
+            ->limit(3)
             ->get()
-            ->groupBy('staff.first_name');
+            ->map(function ($row) {
+                $name = $row->staff->first_name ?? 'N/D';
+                return "{$name}: {$row->total}";
+            })
+            ->implode(' | ');
 
-        $staffSummary = [];
-        foreach ($staffBookings as $staffName => $bookings) {
-            $staffSummary[] = "{$staffName}: " . count($bookings);
-        }
-
-        // Formatta i servizi di oggi
-        $servicesText = collect($servicesMapToday)
-            ->filter(fn($count) => $count > 0)
-            ->map(fn($count, $name) => "{$name}: {$count}")
+        // Stati odierni
+        $statusToday = Booking::selectRaw('status, count(*) as total')
+            ->whereDate('date', $today)
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->map(function ($count, $status) {
+                return "{$status}: {$count}";
+            })
             ->values()
             ->implode(' | ');
 
         return [
             Stat::make('Oggi', $bookingsToday)
-                ->description($servicesText ?: 'Nessuna prenotazione')
+                ->description($servicesToday ?: 'Nessuna prenotazione')
                 ->descriptionIcon('heroicon-o-calendar')
                 ->color('success'),
 
@@ -85,10 +78,20 @@ class BookingStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-o-calendar')
                 ->color('warning'),
 
-            Stat::make('Per Barbiere (Oggi)', implode(' | ', $staffSummary) ?: 'Nessuno')
-                ->description("Distribuzione del lavoro")
+            Stat::make('Questa settimana', $bookingsWeek)
+                ->description($weekStart->format('d/m') . ' - ' . $weekEnd->format('d/m'))
+                ->descriptionIcon('heroicon-o-calendar-days')
+                ->color('primary'),
+
+            Stat::make('Top barbieri (Oggi)', $staffToday ?: 'Nessuno')
+                ->description('Distribuzione del lavoro')
                 ->descriptionIcon('heroicon-o-users')
                 ->color('primary'),
+
+            Stat::make('Stati oggi', $statusToday ?: 'Nessuna prenotazione')
+                ->description('pending/confirmed/cancelled')
+                ->descriptionIcon('heroicon-o-rectangle-stack')
+                ->color('gray'),
         ];
     }
 }

@@ -35,11 +35,11 @@ class StaffAvailabilityResource extends Resource
                 Forms\Components\Select::make('weekday')
                     ->options([
                         0 => 'Domenica',
-                        1 => 'Lunedì',
-                        2 => 'Martedì',
-                        3 => 'Mercoledì',
-                        4 => 'Giovedì',
-                        5 => 'Venerdì',
+                        1 => 'Lunedi',
+                        2 => 'Martedi',
+                        3 => 'Mercoledi',
+                        4 => 'Giovedi',
+                        5 => 'Venerdi',
                         6 => 'Sabato',
                     ])
                     ->required()
@@ -74,11 +74,11 @@ class StaffAvailabilityResource extends Resource
                     ->label('Giorno')
                     ->formatStateUsing(fn ($state) => [
                         0 => 'Domenica',
-                        1 => 'Lunedì',
-                        2 => 'Martedì',
-                        3 => 'Mercoledì',
-                        4 => 'Giovedì',
-                        5 => 'Venerdì',
+                        1 => 'Lunedi',
+                        2 => 'Martedi',
+                        3 => 'Mercoledi',
+                        4 => 'Giovedi',
+                        5 => 'Venerdi',
                         6 => 'Sabato',
                     ][$state] ?? $state)
                     ->sortable(),

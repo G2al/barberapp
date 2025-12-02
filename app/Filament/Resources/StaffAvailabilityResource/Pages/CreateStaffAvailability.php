@@ -25,11 +25,11 @@ class CreateStaffAvailability extends CreateRecord
             Forms\Components\Select::make('weekdays')
                 ->options([
                     0 => 'Domenica',
-                    1 => 'Lunedì',
-                    2 => 'Martedì',
-                    3 => 'Mercoledì',
-                    4 => 'Giovedì',
-                    5 => 'Venerdì',
+                    1 => 'Lunedi',
+                    2 => 'Martedi',
+                    3 => 'Mercoledi',
+                    4 => 'Giovedi',
+                    5 => 'Venerdi',
                     6 => 'Sabato',
                 ])
                 ->multiple()
