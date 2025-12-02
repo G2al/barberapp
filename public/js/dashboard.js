@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         barberSelect.innerHTML = `<option value="">Caricamento...</option>`;
         timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
+        // reset avatar
+        const avatarWrap = document.getElementById("barberAvatar");
+        if (avatarWrap) avatarWrap.style.display = "none";
 
         if (!serviceId) {
             barberSelect.innerHTML = `<option value="">Seleziona un servizio prima</option>`;
@@ -52,11 +55,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         barberSelect.innerHTML = `<option value="">Seleziona barbiere</option>`;
 
         staff.forEach(b => {
-            barberSelect.innerHTML += `
-                <option value="${b.id}">
-                    ${b.first_name} ${b.last_name}
-                </option>
-            `;
+            const image = b.image_url ? b.image_url : '';
+            const option = document.createElement('option');
+            option.value = b.id;
+            option.textContent = `${b.first_name} ${b.last_name}`;
+            if (image) option.dataset.image = image;
+            barberSelect.appendChild(option);
         });
     });
 
@@ -107,6 +111,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const date = dateSelect.value;
         const barberId = barberSelect.value;
         const serviceId = serviceSelect.value;
+
+        const selectedOption = barberSelect.options[barberSelect.selectedIndex];
+        const avatarWrap = document.getElementById("barberAvatar");
+        const avatarImg = document.getElementById("barberAvatarImg");
+        if (avatarWrap && avatarImg && selectedOption && selectedOption.dataset.image) {
+            avatarImg.src = selectedOption.dataset.image;
+            avatarWrap.style.display = 'block';
+        } else if (avatarWrap) {
+            avatarWrap.style.display = 'none';
+        }
 
         timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
 

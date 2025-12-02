@@ -41,6 +41,15 @@ class StaffResource extends Resource
                 Forms\Components\TextInput::make('phone')
                     ->label('Telefono'),
 
+                Forms\Components\FileUpload::make('image')
+                    ->label('Foto')
+                    ->image()
+                    ->directory('staff')
+                    ->imageEditor()
+                    ->imagePreviewHeight('150')
+                    ->downloadable()
+                    ->nullable(),
+
                 Forms\Components\Toggle::make('is_active')
                     ->label('Attivo')
                     ->default(true),
@@ -59,6 +68,12 @@ class StaffResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Foto')
+                    ->circular()
+                    ->size(48)
+                    ->defaultImageUrl(null),
+
                 Tables\Columns\TextColumn::make('full_name')
                     ->label('Nome')
                     ->searchable()

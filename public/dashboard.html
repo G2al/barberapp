@@ -91,9 +91,14 @@
         <label class="form-label fw-bold">
           <i class="bi bi-person-workspace me-1 text-secondary-color"></i>Barbiere
         </label>
-        <select class="form-select" id="barberSelect">
+        <div class="d-flex align-items-center gap-2">
+          <div id="barberAvatar" class="rounded-circle bg-light border" style="width:48px;height:48px;overflow:hidden;display:none;">
+            <img id="barberAvatarImg" src="" alt="Avatar" style="width:48px;height:48px;object-fit:cover;">
+          </div>
+          <select class="form-select" id="barberSelect">
           <option value="">Seleziona barbiere</option>
         </select>
+        </div>
       </div>
 
       <!-- Data -->

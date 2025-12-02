@@ -216,11 +216,16 @@
           const item = document.createElement("div");
           item.className = "list-item mb-3 p-3 bg-white rounded-3 shadow-sm";
 
+          const avatar = booking.staff_image ? `<img src="${booking.staff_image}" alt="Barbiere" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;">` : '';
+
           item.innerHTML = `
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <div>
-                <div class="fw-semibold text-primary-color">${booking.service}</div>
-                <div class="small text-muted">${booking.staff}</div>
+              <div class="d-flex align-items-center">
+                ${avatar}
+                <div>
+                  <div class="fw-semibold text-primary-color">${booking.service}</div>
+                  <div class="small text-muted">${booking.staff}</div>
+                </div>
               </div>
               <span class="badge ${badgeClass}">${translatedStatus}</span>
             </div>

@@ -14,7 +14,11 @@ class StaffController extends Controller
     {
         return Staff::where('is_active', true)
             ->orderBy('first_name')
-            ->get(['id', 'first_name', 'last_name', 'role', 'phone']);
+            ->get(['id', 'first_name', 'last_name', 'role', 'phone', 'image'])
+            ->map(function ($staff) {
+                $staff->image_url = $staff->image ? \Illuminate\Support\Facades\Storage::url($staff->image) : null;
+                return $staff;
+            });
     }
 
     /**
@@ -27,6 +31,10 @@ class StaffController extends Controller
                 $q->where('services.id', $serviceId);
             })
             ->orderBy('first_name')
-            ->get(['id', 'first_name', 'last_name', 'role', 'phone']);
+            ->get(['id', 'first_name', 'last_name', 'role', 'phone', 'image'])
+            ->map(function ($staff) {
+                $staff->image_url = $staff->image ? \Illuminate\Support\Facades\Storage::url($staff->image) : null;
+                return $staff;
+            });
     }
 }

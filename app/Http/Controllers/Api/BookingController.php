@@ -171,6 +171,7 @@ class BookingController extends Controller
                     'id' => $booking->id,
                     'staff' => $booking->staff->first_name . ' ' . $booking->staff->last_name,
                     'staff_phone' => $booking->staff->phone,
+                    'staff_image' => $booking->staff->image ? \Illuminate\Support\Facades\Storage::url($booking->staff->image) : null,
                     'service' => $booking->service->name,
                     'date' => $booking->date,
                     'time' => $booking->time,
