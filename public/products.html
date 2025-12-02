@@ -14,17 +14,20 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 300px;
+      width: 88vw;
+      max-width: 340px;
       height: 100vh;
       background: var(--surface);
       box-shadow: 2px 0 12px rgba(0,0,0,0.15);
-      padding: 16px;
+      padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 16px 16px;
       transform: translateX(-100%);
       opacity: 0;
       transition: transform 0.25s ease, opacity 0.25s ease;
       z-index: 2000;
       overflow-y: auto;
       display: none;
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
     .favorites-sidebar.open {
       display: block;
@@ -34,7 +37,7 @@
     .favorites-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.35);
       display: none;
       z-index: 1500;
       opacity: 0;
@@ -43,6 +46,9 @@
     .favorites-overlay.show {
       display: block;
       opacity: 1;
+    }
+    .favorites-header {
+      padding-top: env(safe-area-inset-top, 0px);
     }
   </style>
 </head>
