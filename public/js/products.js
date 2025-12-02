@@ -69,10 +69,7 @@ async function loadFavorites() {
         }));
         renderProducts();
 
-        if (favoritesCount) {
-            favoritesCount.textContent = favorites.length;
-            favoritesCount.style.display = favorites.length ? 'inline-block' : 'none';
-        }
+        updateFavoritesCount(favorites.length);
 
         if (!favorites.length) {
             favoritesList.innerHTML = `<div class="text-muted small">Nessun preferito.</div>`;
@@ -100,6 +97,10 @@ async function loadFavorites() {
                     if (item) item.remove();
                     if (!favoritesList.querySelector('.fav-item')) {
                         favoritesList.innerHTML = `<div class="text-muted small">Nessun preferito.</div>`;
+                        updateFavoritesCount(0);
+                    } else {
+                        const current = parseInt(favoritesCount?.textContent || '0', 10);
+                        updateFavoritesCount(Math.max(0, current - 1));
                     }
                 } catch (err) {
                     console.error(err);
@@ -214,6 +215,8 @@ function renderProducts() {
                     btn.classList.remove('text-muted');
                     btn.classList.add('text-warning');
                     openFavorites();
+                    const current = parseInt(favoritesCount?.textContent || '0', 10);
+                    updateFavoritesCount(current + 1);
                 }
                 // update state in allProducts and favorites list
                 allProducts = allProducts.map(p => p.id == productId ? {...p, is_favorite: !isActive} : p);
@@ -231,3 +234,9 @@ function renderProducts() {
 
 document.addEventListener('DOMContentLoaded', loadProducts);
 document.addEventListener('DOMContentLoaded', setupFavoritesUI);
+
+function updateFavoritesCount(n) {
+    if (!favoritesCount) return;
+    favoritesCount.textContent = n;
+    favoritesCount.style.display = n ? 'inline-block' : 'none';
+}
