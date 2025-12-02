@@ -89,9 +89,12 @@ class BookingResource extends Resource
                 ->orderBy('time')
             )
             ->columns([
-                Tables\Columns\TextColumn::make('user.email')
-                    ->searchable()
-                    ->label('Utente'),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Cliente')
+                    ->formatStateUsing(fn ($state, $record) => trim(($record->user->name ?? '') . ' ' . ($record->user->surname ?? '')))
+                    ->description(fn ($record) => $record->user->email ?? '')
+                    ->searchable(['users.name', 'users.surname', 'users.email'])
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('staff.first_name')
                     ->searchable()

@@ -86,6 +86,17 @@ async function registerUser(data) {
     return await res.json();
 }
 
+// ====== PROTECTED DELETE ======
+async function apiDelete(url) {
+    const res = await fetch(`${API_BASE}${url}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${getToken()}`,
+            "Accept": "application/json"
+        }
+    });
+    return await res.json();
+}
 
 
 // ====== API LOGIN ======

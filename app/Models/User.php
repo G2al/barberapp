@@ -47,4 +47,9 @@ class User extends Authenticatable implements FilamentUser
 {
     return $this->hasMany(Booking::class);
 }
+
+    public function productFavorites()
+    {
+        return $this->belongsToMany(Product::class, 'product_favorites')->withTimestamps();
+    }
 }

@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\ClosedSlotController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\FavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +74,16 @@ Route::get('/staff', [StaffController::class, 'index']);
 
 // Staff filtrato per servizio (barbieri che fanno quel servizio)
 Route::get('/staff/by-service/{serviceId}', [StaffController::class, 'byService']);
+
+/* =========================
+   �Y"� PRODUCTS & FAVORITES (Protette)
+========================= */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites/{product}', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{product}', [FavoriteController::class, 'destroy']);
+});
 
 
 /* =========================
