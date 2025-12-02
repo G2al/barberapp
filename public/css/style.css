@@ -133,6 +133,7 @@ a {
 .app-header {
     background: linear-gradient( 90deg, var(--primary-color), var(--primary-light));
     padding: 15px;
+    padding-top: calc(15px + env(safe-area-inset-top, 0px));
     color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: sticky;
