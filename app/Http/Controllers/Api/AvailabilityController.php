@@ -8,6 +8,8 @@ use App\Models\Booking;
 use App\Models\ClosedSlot;
 use App\Models\Service;
 use App\Models\Staff;
+use App\Models\StaffAvailability;
+use App\Models\SpecialOpening;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -43,16 +45,39 @@ class AvailabilityController extends Controller
         $carbonDate = Carbon::parse($date);
         $weekday = $carbonDate->dayOfWeek;
 
-        $availabilities = Availability::where('weekday', $weekday)
+        // 1) Orari speciali per data (salone)
+        $specialOpenings = SpecialOpening::whereDate('date', $date)
             ->where('is_active', true)
             ->orderBy('start_time')
             ->get();
 
-        if ($availabilities->isEmpty()) {
+        // 2) Orari settimanali per staff specifico
+        $staffAvailabilities = StaffAvailability::where('staff_id', $staffId)
+            ->where('weekday', $weekday)
+            ->where('is_active', true)
+            ->orderBy('start_time')
+            ->get();
+
+        // 3) Orari salone di default
+        $salonAvailabilities = Availability::where('weekday', $weekday)
+            ->where('is_active', true)
+            ->orderBy('start_time')
+            ->get();
+
+        // Ordine di precedenza: special -> staff -> salone
+        if ($specialOpenings->isNotEmpty()) {
+            $timeSlots = $specialOpenings;
+        } elseif ($staffAvailabilities->isNotEmpty()) {
+            $timeSlots = $staffAvailabilities;
+        } else {
+            $timeSlots = $salonAvailabilities;
+        }
+
+        if ($timeSlots->isEmpty()) {
             return response()->json([
                 'status' => true,
                 'slots' => [],
-                'message' => 'Salone chiuso questo giorno'
+                'message' => 'Nessun orario disponibile per questo giorno'
             ]);
         }
 
@@ -71,9 +96,9 @@ class AvailabilityController extends Controller
         $allSlots = [];
 
         // Genera tutti gli slot disponibili
-        foreach ($availabilities as $availability) {
-            $startTime = Carbon::createFromFormat('H:i:s', $availability->start_time);
-            $endTime = Carbon::createFromFormat('H:i:s', $availability->end_time);
+        foreach ($timeSlots as $slot) {
+            $startTime = Carbon::createFromFormat('H:i:s', $slot->start_time);
+            $endTime = Carbon::createFromFormat('H:i:s', $slot->end_time);
 
             $currentTime = $startTime->copy();
 
