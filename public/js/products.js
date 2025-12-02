@@ -7,6 +7,7 @@ const favoritesToggle = document.getElementById('favoritesToggle');
 const favoritesSidebar = document.getElementById('favoritesSidebar');
 const favoritesOverlay = document.getElementById('favoritesOverlay');
 const favoritesList = document.getElementById('favoritesList');
+const favoritesCount = document.getElementById('favoritesCount');
 
 let allProducts = [];
 let activeCategory = 'all';
@@ -67,6 +68,12 @@ async function loadFavorites() {
             is_favorite: favIds.includes(p.id),
         }));
         renderProducts();
+
+        if (favoritesCount) {
+            favoritesCount.textContent = favorites.length;
+            favoritesCount.style.display = favorites.length ? 'inline-block' : 'none';
+        }
+
         if (!favorites.length) {
             favoritesList.innerHTML = `<div class="text-muted small">Nessun preferito.</div>`;
             return;
@@ -206,6 +213,7 @@ function renderProducts() {
                     await apiPost(`/favorites/${productId}`, {});
                     btn.classList.remove('text-muted');
                     btn.classList.add('text-warning');
+                    openFavorites();
                 }
                 // update state in allProducts and favorites list
                 allProducts = allProducts.map(p => p.id == productId ? {...p, is_favorite: !isActive} : p);

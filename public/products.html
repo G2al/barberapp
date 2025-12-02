@@ -49,9 +49,10 @@
 <body class="bg-light">
   <div class="app-header d-flex justify-content-between align-items-center">
     <h5 class="fw-bold text-white mb-0">Prodotti</h5>
-    <div class="d-flex gap-2">
-      <button id="favoritesToggle" class="btn header-btn" title="Preferiti">
+    <div class="d-flex gap-2 align-items-center">
+      <button id="favoritesToggle" class="btn header-btn position-relative" title="Preferiti">
         <i class="bi bi-star"></i>
+        <span id="favoritesCount" class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle rounded-pill" style="display:none;">0</span>
       </button>
       <a href="dashboard.html" class="btn header-btn" title="Prenota">
         <i class="bi bi-arrow-left text-white"></i>
@@ -71,7 +72,7 @@
         </div>
         <div>
           <h6 class="mb-1">Scopri i prodotti del salone</h6>
-          <p class="mb-0 small">Filtra per categoria e scorri le card per trovare ciò che ti serve. (Test aggiornamento PWA)</p>
+          <p class="mb-0 small">Filtra per categoria e scorri le card per trovare ciò che ti serve.</p>
         </div>
       </div>
     </div>
