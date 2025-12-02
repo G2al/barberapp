@@ -1,22 +1,59 @@
-// Service Worker Minimalista per PWA
-// Solo registrazione e fullscreen, niente offline
+// Service Worker con cache aggiornata per invalidare versioni precedenti
+const CACHE_NAME = 'alettabarber-v3';
+const ASSETS = [
+  '/',
+  '/index.html',
+  '/dashboard.html',
+  '/my-bookings.html',
+  '/products.html',
+  '/register.html',
+  '/css/style.css',
+  '/js/auth.js',
+  '/js/config.js',
+  '/js/dashboard.js',
+  '/js/products.js',
+  '/js/script.js',
+  '/js/service-worker.js',
+  '/vender/bootstrap/css/bootstrap.min.css',
+  '/vender/bootstrap/js/bootstrap.bundle.min.js',
+];
 
-const CACHE_NAME = 'alettabarber-v1';
-
-// Installazione
 self.addEventListener('install', (event) => {
-  console.log('Service Worker installato');
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
   self.skipWaiting();
 });
 
-// Attivazione
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker attivato');
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      )
+    )
+  );
   self.clients.claim();
 });
 
-// Fetch (se in futuro vuoi aggiungere caching)
 self.addEventListener('fetch', (event) => {
-  // Lasciamo che il browser gestisca normalmente le richieste
-  // Niente offline, tutto passa al network
+  const req = event.request;
+  const url = new URL(req.url);
+
+  if (req.method !== 'GET' || url.origin !== location.origin) {
+    return;
+  }
+
+  // Preferisci network, fallback a cache
+  event.respondWith(
+    fetch(req)
+      .then((response) => {
+        const respClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, respClone));
+        return response;
+      })
+      .catch(() => caches.match(req))
+  );
 });
