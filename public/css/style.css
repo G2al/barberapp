@@ -133,11 +133,10 @@ a {
 .app-header {
     background: linear-gradient( 90deg, var(--primary-color), var(--primary-light));
     padding: 15px;
-    padding-top: calc(15px + env(safe-area-inset-top, 0px));
     color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: sticky;
-    top: env(safe-area-inset-top, 0px);
+    top: 0;
     z-index: 100;
 }
 
@@ -2026,5 +2025,9 @@ a {
  } 
  . f a v o r i t e s - o v e r l a y . s h o w   { 
          d i s p l a y :   b l o c k ; 
+ }  
+ 
+b o d y   { 
+         p a d d i n g - t o p :   e n v ( s a f e - a r e a - i n s e t - t o p ,   0 p x ) ; 
  }  
  
