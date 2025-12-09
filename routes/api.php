@@ -47,6 +47,8 @@ Route::prefix('auth')->group(function () {
     // Login & Register
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login',    [AuthController::class, 'login']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
+    Route::post('/reset-password',  [AuthController::class, 'resetPassword']);
 
     // Authenticated routes
     Route::middleware('auth:sanctum')->group(function () {

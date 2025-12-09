@@ -110,6 +110,28 @@ async function loginUser(data) {
     return await res.json();
 }
 
+// ====== FORGOT PASSWORD ======
+async function requestPasswordReset(email) {
+    const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+    });
+
+    return await res.json();
+}
+
+// ====== RESET PASSWORD ======
+async function resetPassword(data) {
+    const res = await fetch(`${API_BASE}/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    return await res.json();
+}
+
 
 
 // ====== API LOGOUT ======
@@ -280,4 +302,94 @@ async function submitLogin() {
 
     // ERRORE GENERICO
     showAlert("Errore durante il login.", "danger");
+}
+
+
+
+// ====== SUBMIT FORGOT PASSWORD ======
+async function submitForgot() {
+    const submitBtn = document.getElementById("submitBtn");
+    const email = document.getElementById("email").value.trim();
+
+    if (!email) {
+        showAlert("Inserisci la tua email.", "danger");
+        return;
+    }
+
+    setButtonLoading(submitBtn, true);
+    const res = await requestPasswordReset(email);
+    setButtonLoading(submitBtn, false);
+
+    if (res.errors) {
+        if (res.errors.email) {
+            showAlert(res.errors.email[0], "danger");
+            return;
+        }
+    }
+
+    if (res.status === false) {
+        showAlert(res.message || "Errore durante la richiesta di reset.", "danger");
+        return;
+    }
+
+    showAlert(res.message || "Se l'email è registrata, ti abbiamo inviato il link di reset.", "success");
+}
+
+
+
+// ====== SUBMIT RESET PASSWORD ======
+async function submitReset() {
+    const submitBtn = document.getElementById("submitBtn");
+
+    const data = {
+        email: document.getElementById("email").value.trim(),
+        token: document.getElementById("token").value.trim(),
+        password: document.getElementById("password").value.trim(),
+        password_confirmation: document.getElementById("password_confirmation").value.trim(),
+    };
+
+    if (!data.email || !data.token) {
+        showAlert("Link non valido. Richiedi un nuovo reset.", "danger");
+        return;
+    }
+
+    if (!data.password || !data.password_confirmation) {
+        showAlert("Inserisci e conferma la nuova password.", "danger");
+        return;
+    }
+
+    setButtonLoading(submitBtn, true);
+    const res = await resetPassword(data);
+    setButtonLoading(submitBtn, false);
+
+    if (res.errors) {
+        if (res.errors.password) {
+            showAlert(res.errors.password[0], "danger");
+            return;
+        }
+
+        if (res.errors.email) {
+            showAlert(res.errors.email[0], "danger");
+            return;
+        }
+
+        if (res.errors.token) {
+            showAlert(res.errors.token[0], "danger");
+            return;
+        }
+
+        showAlert("Errore di validazione.", "danger");
+        return;
+    }
+
+    if (res.status === false) {
+        showAlert(res.message || "Reset fallito. Richiedi un nuovo link.", "danger");
+        return;
+    }
+
+    showAlert("Password aggiornata! Ora puoi accedere.", "success");
+
+    setTimeout(() => {
+        window.location.href = "/index.html";
+    }, 1200);
 }

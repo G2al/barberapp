@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -124,5 +127,87 @@ class AuthController extends Controller
             'status' => true,
             'message' => 'Logout effettuato.',
         ]);
+    }
+
+    /**
+     * FORGOT PASSWORD (invio link reset)
+     */
+    public function forgotPassword(Request $request)
+    {
+        $validator = \Validator::make(
+            $request->all(),
+            ['email' => 'required|email']
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Invia il link (risposta generica per non esporre la presenza dell'email)
+        Password::sendResetLink($request->only('email'));
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Se l\'email è registrata, ti abbiamo inviato il link di reset.',
+        ]);
+    }
+
+    /**
+     * RESET PASSWORD (usa token email)
+     */
+    public function resetPassword(Request $request)
+    {
+        $validator = \Validator::make(
+            $request->all(),
+            [
+                'token'                 => 'required',
+                'email'                 => 'required|email',
+                'password'              => 'required|min:6|confirmed',
+            ],
+            [
+                'password.confirmed' => 'Le password non coincidono.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user) use ($request) {
+                $user->forceFill([
+                    'password' => Hash::make($request->password),
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                // Revoca eventuali token API attivi per sicurezza
+                if (method_exists($user, 'tokens')) {
+                    $user->tokens()->delete();
+                }
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Password reimpostata con successo. Ora puoi accedere con la nuova password.',
+            ]);
+        }
+
+        // Token scaduto o non valido
+        return response()->json([
+            'status' => false,
+            'message' => 'Link non valido o scaduto. Richiedi un nuovo reset.',
+        ], 400);
     }
 }
