@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'alettabarber-v4';
+const CACHE_NAME = 'alettabarber-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -15,7 +15,7 @@ const ASSETS = [
   '/js/dashboard.js',
   '/js/products.js',
   '/js/script.js',
-  '/js/service-worker.js',
+  '/service-worker.js',
   '/vender/bootstrap/css/bootstrap.min.css',
   '/vender/bootstrap/js/bootstrap.bundle.min.js',
 ];

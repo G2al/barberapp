@@ -148,13 +148,13 @@
     }
 
     // Registra il Service Worker per PWA
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/js/service-worker.js').then((registration) => {
-            console.log('Service Worker registrato:', registration);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+          console.log('Service Worker registrato:', registration);
         }).catch((error) => {
-            console.log('Service Worker registrazione fallita:', error);
+          console.log('Service Worker registrazione fallita:', error);
         });
-    }
+      }
     </script>
 
 
