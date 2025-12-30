@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 
 class BookingResource extends Resource
 {
@@ -84,7 +85,6 @@ class BookingResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query
-                ->whereDate('date', '>=', Carbon::today())
                 ->orderBy('date')
                 ->orderBy('time')
             )
@@ -131,6 +131,25 @@ class BookingResource extends Resource
                     ->label('Stato'),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('period')
+                    ->label('Periodo')
+                    ->options([
+                        'future' => 'Solo future',
+                        'recent_past' => 'Ultimi 30 giorni',
+                        'all' => 'Tutte',
+                    ])
+                    ->default('future')
+                    ->query(function ($query, array $data) {
+                        return match ($data['value'] ?? null) {
+                            'future' => $query->whereDate('date', '>=', Carbon::today()),
+                            'recent_past' => $query->whereBetween('date', [
+                                Carbon::today()->subDays(30),
+                                Carbon::today(),
+                            ]),
+                            default => $query,
+                        };
+                    }),
+
                 Tables\Filters\Filter::make('today')
                     ->query(fn ($query) => $query->whereDate('date', Carbon::today()))
                     ->toggle()
@@ -187,6 +206,25 @@ class BookingResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('change_status')
+                        ->label('Cambia stato')
+                        ->form([
+                            Forms\Components\Select::make('status')
+                                ->options([
+                                    'pending' => 'In sospeso',
+                                    'confirmed' => 'Confermata',
+                                    'completed' => 'Completata',
+                                    'cancelled' => 'Annullata',
+                                    'no_show' => 'Non presentato',
+                                ])
+                                ->required()
+                                ->label('Nuovo stato'),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            $records->each->update(['status' => $data['status']]);
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
