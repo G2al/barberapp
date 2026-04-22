@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'salvatore-nappa-v11';
+const CACHE_NAME = 'salvatore-nappa-v12';
 const ASSETS = [
   '/',
   '/index.html',
@@ -16,6 +16,7 @@ const ASSETS = [
   '/js/products.js',
   '/js/script.js',
   '/images/sfondo.jpg',
+  '/images/logo_barberia.png',
   '/images/logo-192x192.png',
   '/images/logo-512x512.png',
   '/images/maskable-icon-192x192.png',
