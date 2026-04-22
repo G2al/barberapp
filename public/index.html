@@ -45,6 +45,122 @@
         body.login-page .auth-form .text-primary-color {
             color: var(--primary-color) !important;
         }
+
+        body.login-page .install-guide {
+            width: 100%;
+            max-width: 420px;
+            margin: 16px auto 0;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+        }
+
+        body.login-page .install-guide-title {
+            color: var(--primary-color);
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        body.login-page .install-guide p,
+        body.login-page .install-guide .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        body.login-page .browser-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        body.login-page .browser-tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 42px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fff;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        body.login-page .browser-tab.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        body.login-page .browser-tab:active {
+            transform: scale(0.98);
+        }
+
+        body.login-page .browser-icon-img {
+            width: 20px;
+            height: 20px;
+        }
+
+        body.login-page .guide-steps {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        body.login-page .guide-steps.active {
+            display: flex;
+        }
+
+        body.login-page .guide-step {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            background: #f7f7f7;
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        body.login-page .guide-step i {
+            color: var(--primary-color);
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        body.login-page .install-faq {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        body.login-page .install-faq details {
+            border: 1px solid #e7e7e7;
+            border-radius: 10px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        body.login-page .install-faq summary {
+            cursor: pointer;
+            padding: 10px 12px;
+            color: var(--primary-color);
+            font-weight: 600;
+            list-style-position: inside;
+        }
+
+        body.login-page .install-faq details p {
+            margin: 0;
+            padding: 0 12px 12px;
+            font-size: 13px;
+            line-height: 1.45;
+        }
     </style>
 
     <!-- Icons Bootstrap -->
@@ -139,49 +255,59 @@
 
         </div>
 
-        <!-- PWA Installation Guide (solo quando accedi via URL) -->
-        <div id="pwaGuide" class="pwa-guide-simple mt-5">
-            <div class="pwa-guide-title-simple">
-                <i class="bi bi-download"></i>
-                <span>Aggiungi l'App</span>
+        <!-- Install Guide (solo quando accedi via browser) -->
+        <div class="install-guide" id="installGuide">
+            <div class="install-guide-title">Come installare la nostra App</div>
+            <div class="text-muted small mb-2">Con quale browser hai aperto labarberia-salvatorenappa.it?</div>
+
+            <div class="browser-tabs" id="browserTabs">
+                <button type="button" class="browser-tab active" data-guide="chrome">
+                    <img src="/images/chrome.svg" alt="Chrome" class="browser-icon-img">Chrome
+                </button>
+                <button type="button" class="browser-tab" data-guide="edge">
+                    <img src="/images/edge.svg" alt="Edge" class="browser-icon-img">Edge
+                </button>
+                <button type="button" class="browser-tab" data-guide="safari">
+                    <img src="/images/safari.svg" alt="Safari" class="browser-icon-img">Safari
+                </button>
             </div>
 
-            <div class="pwa-steps-simple">
-                <!-- Step 1 -->
-                <div class="pwa-step-simple">
-                    <div class="step-num">1</div>
-                    <div class="step-info">
-                        <div class="step-text">Clicca il pulsante Condividi</div>
-                        <img src="/images/1.jpeg" alt="Step 1" class="step-img">
-                    </div>
-                </div>
+            <div class="guide-steps active" id="guide-chrome">
+                <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Tocca Condividi in alto a destra</div>
+                <div class="guide-step"><i class="bi bi-plus-square"></i> Seleziona "Aggiungi alla schermata Home"</div>
+                <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
+            </div>
 
-                <!-- Step 2 -->
-                <div class="pwa-step-simple">
-                    <div class="step-num">2</div>
-                    <div class="step-info">
-                        <div class="step-text">Seleziona "Aggiungi alla schermata Home"</div>
-                        <img src="/images/2.jpeg" alt="Step 2" class="step-img">
-                    </div>
-                </div>
+            <div class="guide-steps" id="guide-edge">
+                <div class="guide-step"><i class="bi bi-list"></i> Tocca il menu in basso a destra</div>
+                <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Seleziona "Condividi"</div>
+                <div class="guide-step"><i class="bi bi-plus-square"></i> Scegli "Aggiungi alla schermata Home"</div>
+                <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
+            </div>
 
-                <!-- Step 3 -->
-                <div class="pwa-step-simple">
-                    <div class="step-num">3</div>
-                    <div class="step-info">
-                        <div class="step-text">Clicca il bottone "Aggiungi"</div>
-                        <img src="/images/3.jpeg" alt="Step 3" class="step-img">
-                    </div>
-                </div>
+            <div class="guide-steps" id="guide-safari">
+                <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Tocca Condividi in basso al centro</div>
+                <div class="guide-step"><i class="bi bi-plus-square"></i> Scegli "Aggiungi alla schermata Home"</div>
+                <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
+            </div>
 
-                <!-- Step 4 -->
-                <div class="pwa-step-simple">
-                    <div class="step-num">✓</div>
-                    <div class="step-info">
-                        <div class="step-text">L'app è sulla tua Home Screen!</div>
-                        <img src="/images/4.jpeg" alt="Step 4" class="step-img">
-                    </div>
-                </div>
+            <div class="install-faq">
+                <details>
+                    <summary>Cos'e un browser?</summary>
+                    <p>E l'app che usi per aprire un sito internet, per esempio Safari, Chrome o Edge.</p>
+                </details>
+                <details>
+                    <summary>Perche installare da qui e non dallo store?</summary>
+                    <p>Questa e una PWA: si installa dal browser, occupa poco spazio ed e sempre aggiornata.</p>
+                </details>
+                <details>
+                    <summary>La PWA e un'app vera?</summary>
+                    <p>Si. Una volta aggiunta alla schermata Home si apre come un'app normale.</p>
+                </details>
+                <details>
+                    <summary>Devo aggiornarla manualmente?</summary>
+                    <p>No. Ogni volta che la apri usa gia la versione piu recente disponibile.</p>
+                </details>
             </div>
         </div>
     </div>
@@ -207,19 +333,37 @@
 
     // Mostra la guida PWA solo se accedi via URL (non dalla PWA installata)
     function checkPWAMode() {
-        const pwaGuide = document.getElementById('pwaGuide');
+        const installGuide = document.getElementById('installGuide');
+        if (!installGuide) return;
 
         // Se l'app è in modalità PWA (standalone), nascondi la guida
         if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
-            pwaGuide.style.display = 'none';
+            installGuide.style.display = 'none';
         } else {
             // Se accedi via browser URL, mostra la guida
-            pwaGuide.style.display = 'block';
+            installGuide.style.display = 'block';
         }
     }
 
     // Verifica al caricamento della pagina
     checkPWAMode();
+
+    (function () {
+        const tabs = document.querySelectorAll('.browser-tab');
+        const guides = document.querySelectorAll('.guide-steps');
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                tabs.forEach((t) => t.classList.remove('active'));
+                guides.forEach((g) => g.classList.remove('active'));
+
+                tab.classList.add('active');
+
+                const target = document.getElementById(`guide-${tab.dataset.guide}`);
+                if (target) target.classList.add('active');
+            });
+        });
+    })();
 
     // Registra il Service Worker per PWA
     if ('serviceWorker' in navigator) {
