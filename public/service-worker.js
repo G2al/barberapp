@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'salvatore-nappa-v9';
+const CACHE_NAME = 'salvatore-nappa-v10';
 const ASSETS = [
   '/',
   '/index.html',
@@ -16,6 +16,14 @@ const ASSETS = [
   '/js/products.js',
   '/js/script.js',
   '/images/sfondo.jpg',
+  '/images/logo-192x192.png',
+  '/images/logo-512x512.png',
+  '/images/maskable-icon-192x192.png',
+  '/images/maskable-icon-512x512.png',
+  '/images/apple-touch-icon.png',
+  '/images/favicon-32x32.png',
+  '/images/favicon-16x16.png',
+  '/favicon.ico',
   '/service-worker.js',
   '/vender/bootstrap/css/bootstrap.min.css',
   '/vender/bootstrap/js/bootstrap.bundle.min.js',
