@@ -1,6 +1,6 @@
 {
-  "name": "Aletta Barber - Prenota il tuo barbiere",
-  "short_name": "Aletta Barber",
+  "name": "La Barberia Salvatore Nappa - Prenota il tuo barbiere",
+  "short_name": "Salvatore Nappa",
   "description": "App per prenotare servizi di barbiere online",
   "start_url": "/index.html",
   "scope": "/",
