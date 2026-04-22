@@ -166,7 +166,6 @@ async function apiGet(url) {
 // ====== PROTECTED POST ======
 async function apiPost(url, data) {
     const token = getToken();
-    console.log("apiPost - Token being sent:", token);
     
     const res = await fetch(`${API_BASE}${url}`, {
         method: "POST",
@@ -178,7 +177,6 @@ async function apiPost(url, data) {
         body: JSON.stringify(data)
     });
 
-    console.log("apiPost - Response status:", res.status);
     return await res.json();
 }
 

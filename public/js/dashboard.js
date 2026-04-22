@@ -175,10 +175,6 @@ async function confirmBooking() {
         return;
     }
 
-    // DEBUG
-    console.log("Token:", getToken());
-    console.log("Booking data:", { serviceId, barberId, date, time });
-
     setButtonLoading(confirmBtn, true);
 
     const bookingData = {

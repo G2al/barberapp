@@ -10,6 +10,7 @@ use App\Notifications\NewBookingNotification;
 use App\Notifications\BookingConfirmedNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class BookingController extends Controller
@@ -132,11 +133,26 @@ class BookingController extends Controller
         ]);
 
         // 📱 Invia notifica Telegram all'admin
-        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
-            ->notify(new NewBookingNotification($booking));
+        try {
+            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
+                ->notify(new NewBookingNotification($booking));
+        } catch (\Throwable $e) {
+            Log::error('Booking Telegram notification failed', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         // 📧 Invia email di conferma all'utente
-        $user->notify(new BookingConfirmedNotification($booking));
+        try {
+            $user->notify(new BookingConfirmedNotification($booking));
+        } catch (\Throwable $e) {
+            Log::error('Booking confirmation notification failed', [
+                'booking_id' => $booking->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'status' => true,
