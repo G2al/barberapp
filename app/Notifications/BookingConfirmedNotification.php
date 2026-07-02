@@ -52,7 +52,7 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
             ->line('Ti aspettiamo!')
             ->line('')
             ->line('Cordiali saluti,')
-            ->line('Aletta Barber');
+            ->line('La Barberia Di Salvatore Napp');
     }
 
     /**

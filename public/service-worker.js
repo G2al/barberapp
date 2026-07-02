@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'salvatore-nappa-v12';
+const CACHE_NAME = 'salvatore-napp-v12';
 const ASSETS = [
   '/',
   '/index.html',

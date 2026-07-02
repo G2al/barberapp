@@ -52,7 +52,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
             ->line('Presentati puntuale.')
             ->line('')
             ->line('Cordiali saluti,')
-            ->line('Aletta Barber');
+            ->line('La Barberia Di Salvatore Napp');
     }
 
     /**
