@@ -356,23 +356,33 @@ async function submitReset() {
         return;
     }
 
+    if (data.password.length < 6) {
+        showAlert("La password deve contenere almeno 6 caratteri.", "danger");
+        return;
+    }
+
+    if (data.password !== data.password_confirmation) {
+        showAlert("Le password non coincidono.", "danger");
+        return;
+    }
+
     setButtonLoading(submitBtn, true);
     const res = await resetPassword(data);
     setButtonLoading(submitBtn, false);
 
     if (res.errors) {
         if (res.errors.password) {
-            showAlert(res.errors.password[0], "danger");
+            showAlert(translateErrorMessage(res.errors.password[0]), "danger");
             return;
         }
 
         if (res.errors.email) {
-            showAlert(res.errors.email[0], "danger");
+            showAlert(translateErrorMessage(res.errors.email[0]), "danger");
             return;
         }
 
         if (res.errors.token) {
-            showAlert(res.errors.token[0], "danger");
+            showAlert(translateErrorMessage(res.errors.token[0]), "danger");
             return;
         }
 
