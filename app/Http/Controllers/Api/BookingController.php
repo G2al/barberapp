@@ -8,6 +8,7 @@ use App\Models\Staff;
 use App\Models\Service;
 use App\Notifications\NewBookingNotification;
 use App\Notifications\BookingConfirmedNotification;
+use App\Notifications\BookingCancelledNotification;
 use App\Services\BookingReminderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -267,6 +268,16 @@ class BookingController extends Controller
         }
 
         $booking->update(['status' => 'cancelled']);
+
+        try {
+            $user->notify(new BookingCancelledNotification($booking));
+        } catch (\Throwable $e) {
+            Log::error('Booking cancellation notification failed', [
+                'booking_id' => $booking->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'status' => true,
