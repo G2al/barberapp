@@ -19,7 +19,7 @@
                         <td style="padding:34px 34px 10px;">
                             <div style="display:inline-block; padding:7px 12px; border-radius:999px; background:#1f1a17; color:#f6e4c8; font-size:12px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">Reminder</div>
                             <h1 style="margin:16px 0 12px; font-size:28px; line-height:1.2; color:#1f1a17;">{{ $title }}</h1>
-                            <p style="margin:0; font-size:16px; line-height:1.7; color:#5d5148;">Ciao {{ $name }}, {!! $message !!}</p>
+                            <p style="margin:0; font-size:16px; line-height:1.7; color:#5d5148;">Ciao {{ $name }}, {!! $reminderText !!}</p>
                         </td>
                     </tr>
                     <tr>
