@@ -39,27 +39,32 @@ class BookingReminderNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $date = $this->booking->date->format('d/m');
-        $time = substr($this->booking->time, 0, 5);
-        $service = $this->booking->service->name ?? 'N/A';
-        $staff = $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name;
+        $this->booking->loadMissing(['staff', 'service']);
+
+        $title = match ($this->type) {
+            '24h' => 'Ci vediamo domani',
+            '3h' => 'Mancano meno di 3 ore',
+            default => 'Manca meno di 1 ora',
+        };
+
         $message = match ($this->type) {
-            '24h' => "Promemoria: la tua prenotazione e' domani.",
-            '3h' => "Promemoria: la tua prenotazione e' tra meno di 3 ore.",
-            default => "Promemoria: la tua prenotazione e' tra meno di 1 ora.",
+            '24h' => 'La tua prenotazione e&apos; prevista per domani. Ti aspettiamo in barberia.',
+            '3h' => 'La tua prenotazione e&apos; in arrivo: mancano meno di 3 ore.',
+            default => 'La tua prenotazione e&apos; molto vicina: mancano meno di 1 ora.',
         };
 
         return (new MailMessage)
-            ->greeting("Ciao {$notifiable->name},")
-            ->line($message)
-            ->line("**Data:** {$date}")
-            ->line("**Ora:** {$time}")
-            ->line("**Servizio:** {$service}")
-            ->line("**Staff:** {$staff}")
-            ->line('Presentati puntuale.')
-            ->line('')
-            ->line('Cordiali saluti,')
-            ->line('La Barberia Di Salvatore Nappa');
+            ->subject("Reminder prenotazione - {$title}")
+            ->view('emails.booking-reminder', [
+                'name' => $notifiable->name,
+                'title' => $title,
+                'message' => $message,
+                'date' => $this->booking->date->format('d/m/Y'),
+                'time' => substr($this->booking->time, 0, 5),
+                'service' => $this->booking->service->name ?? 'N/A',
+                'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
+                'heroImage' => asset('images/sfondo.jpg'),
+            ]);
     }
 
     /**
