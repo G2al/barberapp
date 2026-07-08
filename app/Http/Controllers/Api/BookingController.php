@@ -8,8 +8,11 @@ use App\Models\Staff;
 use App\Models\Service;
 use App\Notifications\NewBookingNotification;
 use App\Notifications\BookingConfirmedNotification;
+use App\Notifications\BookingCancelledNotification;
+use App\Services\BookingReminderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class BookingController extends Controller
@@ -132,11 +135,45 @@ class BookingController extends Controller
         ]);
 
         // 📱 Invia notifica Telegram all'admin
-        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
-            ->notify(new NewBookingNotification($booking));
+        try {
+            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
+                ->notify(new NewBookingNotification($booking));
+        } catch (\Throwable $e) {
+            Log::error('Booking Telegram notification failed', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         // 📧 Invia email di conferma all'utente
-        $user->notify(new BookingConfirmedNotification($booking));
+        try {
+            $user->notify(new BookingConfirmedNotification($booking));
+        } catch (\Throwable $e) {
+            Log::error('Booking confirmation notification failed', [
+                'booking_id' => $booking->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Invia subito il reminder se la prenotazione nasce gia' dentro una fascia utile.
+        try {
+            $reminderType = app(BookingReminderService::class)->sendDueReminder($booking);
+
+            if ($reminderType !== null) {
+                Log::info('Immediate booking reminder sent', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $user->id,
+                    'type' => $reminderType,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Immediate booking reminder failed', [
+                'booking_id' => $booking->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'status' => true,
@@ -231,6 +268,16 @@ class BookingController extends Controller
         }
 
         $booking->update(['status' => 'cancelled']);
+
+        try {
+            $user->notify(new BookingCancelledNotification($booking));
+        } catch (\Throwable $e) {
+            Log::error('Booking cancellation notification failed', [
+                'booking_id' => $booking->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'status' => true,

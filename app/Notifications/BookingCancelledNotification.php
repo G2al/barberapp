@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class BookingConfirmedNotification extends Notification implements ShouldQueue
+class BookingCancelledNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -40,8 +40,8 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
         $this->booking->loadMissing(['staff', 'service']);
 
         return (new MailMessage)
-            ->subject('Prenotazione confermata')
-            ->view('emails.booking-confirmed', [
+            ->subject('Prenotazione annullata')
+            ->view('emails.booking-cancelled', [
                 'name' => $notifiable->name,
                 'date' => $this->booking->date->format('d/m/Y'),
                 'time' => substr($this->booking->time, 0, 5),
@@ -60,7 +60,7 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
     {
         return [
             'booking_id' => $this->booking->id,
-            'type' => 'booking_confirmed',
+            'type' => 'booking_cancelled',
         ];
     }
 }

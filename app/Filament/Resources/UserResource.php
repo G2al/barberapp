@@ -108,6 +108,12 @@ class UserResource extends Resource
             ])
 
             ->actions([
+                Tables\Actions\Action::make('call')
+                    ->label('Chiama')
+                    ->icon('heroicon-o-phone')
+                    ->color('success')
+                    ->url(fn (User $record) => 'tel:' . preg_replace('/\s+/', '', $record->phone))
+                    ->visible(fn (User $record) => filled($record->phone)),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(), // 👈 AGGIUNGI QUESTO
             ])

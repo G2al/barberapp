@@ -12,14 +12,16 @@ class BookingReminderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $booking;
+    public Booking $booking;
+    public string $type;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Booking $booking)
+    public function __construct(Booking $booking, string $type = '1h')
     {
         $this->booking = $booking;
+        $this->type = $type;
     }
 
     /**
@@ -37,22 +39,32 @@ class BookingReminderNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $date = $this->booking->date->format('d/m');
-        $time = substr($this->booking->time, 0, 5);
-        $service = $this->booking->service->name ?? 'N/A';
-        $staff = $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name;
+        $this->booking->loadMissing(['staff', 'service']);
+
+        $title = match ($this->type) {
+            '24h' => 'Ci vediamo domani',
+            '3h' => 'Mancano meno di 3 ore',
+            default => 'Manca meno di 1 ora',
+        };
+
+        $reminderText = match ($this->type) {
+            '24h' => 'La tua prenotazione e&apos; prevista per domani. Ti aspettiamo da Aletta Barber 2k24.',
+            '3h' => 'La tua prenotazione e&apos; in arrivo: mancano meno di 3 ore.',
+            default => 'La tua prenotazione e&apos; molto vicina: mancano meno di 1 ora.',
+        };
 
         return (new MailMessage)
-            ->greeting("Ciao {$notifiable->name},")
-            ->line('La tua prenotazione è tra 1 ora!')
-            ->line("**Data:** {$date}")
-            ->line("**Ora:** {$time}")
-            ->line("**Servizio:** {$service}")
-            ->line("**Staff:** {$staff}")
-            ->line('Presentati puntuale.')
-            ->line('')
-            ->line('Cordiali saluti,')
-            ->line('Aletta Barber');
+            ->subject("Reminder prenotazione - {$title}")
+            ->view('emails.booking-reminder', [
+                'name' => $notifiable->name,
+                'title' => $title,
+                'reminderText' => $reminderText,
+                'date' => $this->booking->date->format('d/m/Y'),
+                'time' => substr($this->booking->time, 0, 5),
+                'service' => $this->booking->service->name ?? 'N/A',
+                'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
+                'heroImage' => asset('images/temamail.jpeg'),
+            ]);
     }
 
     /**
@@ -65,6 +77,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         return [
             'booking_id' => $this->booking->id,
             'type' => 'booking_reminder',
+            'reminder_type' => $this->type,
         ];
     }
 }
