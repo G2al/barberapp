@@ -25,8 +25,10 @@ class ResetPasswordLink extends Notification
 
         return (new MailMessage)
             ->subject('Reimposta la tua password')
-            ->line('Hai richiesto di reimpostare la password per il tuo account.')
-            ->action('Reimposta password', $url)
-            ->line('Se non hai richiesto tu questo reset, ignora questa email.');
+            ->view('emails.reset-password', [
+                'name' => $notifiable->name,
+                'resetUrl' => $url,
+                'heroImage' => asset('images/sfondo.jpg'),
+            ]);
     }
 }
