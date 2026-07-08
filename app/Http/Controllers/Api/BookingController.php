@@ -8,6 +8,7 @@ use App\Models\Staff;
 use App\Models\Service;
 use App\Notifications\NewBookingNotification;
 use App\Notifications\BookingConfirmedNotification;
+use App\Services\BookingReminderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -148,6 +149,25 @@ class BookingController extends Controller
             $user->notify(new BookingConfirmedNotification($booking));
         } catch (\Throwable $e) {
             Log::error('Booking confirmation notification failed', [
+                'booking_id' => $booking->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Invia subito il reminder se la prenotazione nasce gia' dentro una fascia utile.
+        try {
+            $reminderType = app(BookingReminderService::class)->sendDueReminder($booking);
+
+            if ($reminderType !== null) {
+                Log::info('Immediate booking reminder sent', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $user->id,
+                    'type' => $reminderType,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Immediate booking reminder failed', [
                 'booking_id' => $booking->id,
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),

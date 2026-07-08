@@ -14,11 +14,17 @@ class Booking extends Model
         'date',
         'time',
         'status',
+        'reminder_24h_sent',
+        'reminder_3h_sent',
+        'reminder_1h_sent',
     ];
 
     protected $casts = [
         'date' => 'date',
         'time' => 'string',
+        'reminder_24h_sent' => 'boolean',
+        'reminder_3h_sent' => 'boolean',
+        'reminder_1h_sent' => 'boolean',
     ];
 
 

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Booking;
-use App\Notifications\BookingReminderNotification;
+use App\Services\BookingReminderService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -21,7 +21,7 @@ class SendBookingReminders extends Command
      *
      * @var string
      */
-    protected $description = 'Invia reminder notifiche 3 ore prima della prenotazione';
+    protected $description = 'Invia reminder prenotazioni a 24 ore, 3 ore e meno di 1 ora';
 
     /**
      * Execute the console command.
@@ -29,10 +29,11 @@ class SendBookingReminders extends Command
     public function handle()
     {
         $now = Carbon::now();
+        $reminders = app(BookingReminderService::class);
 
-        // Cerca TUTTE le prenotazioni confermate senza reminder
+        // Cerca le prenotazioni confermate future; il servizio decide quale reminder inviare.
         $bookings = Booking::where('status', 'confirmed')
-            ->where('reminder_sent', false)
+            ->whereDate('date', '>=', $now->format('Y-m-d'))
             ->get();
 
         $this->info("Prenotazioni trovate nel DB: {$bookings->count()}");
@@ -40,22 +41,10 @@ class SendBookingReminders extends Command
 
         foreach ($bookings as $booking) {
             try {
-                // Converti date a Y-m-d format (è una Carbon instance a causa del casting)
-                $dateString = $booking->date instanceof \Carbon\Carbon ? $booking->date->format('Y-m-d') : $booking->date;
+                $type = $reminders->sendDueReminder($booking, $now);
 
-                // Parse la data e ora della prenotazione
-                $bookingDateTime = Carbon::createFromFormat('Y-m-d H:i:s', "$dateString {$booking->time}");
-
-                // Calcola minuti fino alla prenotazione
-                $minutesUntilBooking = $now->diffInMinutes($bookingDateTime);
-
-                // Invia reminder quando mancano approssimativamente 60 minuti (±15 minuti di tolleranza per garantire catch di tutti gli slot)
-                if ($minutesUntilBooking >= 45 && $minutesUntilBooking <= 75) {
-
-                    $this->info("Invio reminder per prenotazione #{$booking->id}: mancano {$minutesUntilBooking} minuti");
-
-                    $booking->user->notify(new BookingReminderNotification($booking));
-                    $booking->update(['reminder_sent' => true]);
+                if ($type !== null) {
+                    $this->info("Invio reminder {$type} per prenotazione #{$booking->id}");
                     $sent++;
                 }
             } catch (\Exception $e) {
@@ -63,6 +52,6 @@ class SendBookingReminders extends Command
             }
         }
 
-        $this->info("Reminders inviati: {$sent}");
+        $this->info("Reminder inviati: {$sent}");
     }
 }

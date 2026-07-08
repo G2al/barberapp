@@ -12,14 +12,16 @@ class BookingReminderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $booking;
+    public Booking $booking;
+    public string $type;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Booking $booking)
+    public function __construct(Booking $booking, string $type = '1h')
     {
         $this->booking = $booking;
+        $this->type = $type;
     }
 
     /**
@@ -41,10 +43,15 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         $time = substr($this->booking->time, 0, 5);
         $service = $this->booking->service->name ?? 'N/A';
         $staff = $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name;
+        $message = match ($this->type) {
+            '24h' => "Promemoria: la tua prenotazione e' domani.",
+            '3h' => "Promemoria: la tua prenotazione e' tra meno di 3 ore.",
+            default => "Promemoria: la tua prenotazione e' tra meno di 1 ora.",
+        };
 
         return (new MailMessage)
             ->greeting("Ciao {$notifiable->name},")
-            ->line('La tua prenotazione è tra 1 ora!')
+            ->line($message)
             ->line("**Data:** {$date}")
             ->line("**Ora:** {$time}")
             ->line("**Servizio:** {$service}")
@@ -52,7 +59,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
             ->line('Presentati puntuale.')
             ->line('')
             ->line('Cordiali saluti,')
-            ->line('La Barberia Di Salvatore Napp');
+            ->line('La Barberia Di Salvatore Nappa');
     }
 
     /**
@@ -65,6 +72,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         return [
             'booking_id' => $this->booking->id,
             'type' => 'booking_reminder',
+            'reminder_type' => $this->type,
         ];
     }
 }
