@@ -201,6 +201,12 @@ class BookingResource extends Resource
                     ->label('Servizio'),
             ])
             ->actions([
+                Tables\Actions\Action::make('call_user')
+                    ->label('Chiama')
+                    ->icon('heroicon-o-phone')
+                    ->color('success')
+                    ->url(fn (Booking $record) => 'tel:' . preg_replace('/\s+/', '', $record->user?->phone ?? ''))
+                    ->visible(fn (Booking $record) => filled($record->user?->phone)),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
