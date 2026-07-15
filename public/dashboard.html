@@ -24,7 +24,7 @@
     body.booking-page {
       min-height: 100vh;
       margin: 0;
-      padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
       background:
         linear-gradient(180deg, rgba(5, 5, 5, 0.22), rgba(5, 5, 5, 0.96) 430px),
         #090909;
@@ -34,8 +34,8 @@
 
     .booking-hero {
       position: relative;
-      min-height: 360px;
-      padding: calc(24px + env(safe-area-inset-top, 0px)) 22px 86px;
+      min-height: 310px;
+      padding: calc(18px + env(safe-area-inset-top, 0px)) 22px 68px;
       overflow: hidden;
       background:
         linear-gradient(90deg, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.18)),
@@ -46,7 +46,7 @@
     .hero-top {
       display: flex;
       align-items: flex-start;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 16px;
     }
 
@@ -54,80 +54,30 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
+      gap: 0;
       color: #fff;
     }
 
     .brand-lockup img {
-      width: 92px;
+      width: min(38vw, 150px);
       height: auto;
       object-fit: contain;
       filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.48));
-    }
-
-    .brand-name {
-      margin: 0;
-      color: #e8c477;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 27px;
-      line-height: 1;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .brand-subtitle {
-      margin: 4px 0 0;
-      color: #f1d48a;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .notification-btn {
-      width: 52px;
-      height: 52px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.34);
-      color: #fff;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
-      position: relative;
-    }
-
-    .notification-btn::after {
-      content: "";
-      position: absolute;
-      right: 8px;
-      top: 7px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gc-gold-light), var(--gc-gold));
-    }
-
-    .notification-btn i {
-      position: relative;
-      z-index: 1;
-      font-size: 25px;
     }
 
     .hero-copy {
       position: absolute;
       left: 22px;
       right: 22px;
-      bottom: 34px;
+      bottom: 26px;
       z-index: 2;
-      max-width: 520px;
+      max-width: 360px;
     }
 
     .hero-copy h1 {
       margin: 0;
-      font-size: clamp(32px, 8vw, 46px);
-      line-height: 1.05;
+      font-size: clamp(25px, 6.3vw, 34px);
+      line-height: 1.08;
       font-weight: 900;
       color: #fff;
     }
@@ -137,23 +87,23 @@
     }
 
     .hero-copy p {
-      margin: 12px 0 0;
+      margin: 10px 0 0;
       color: rgba(255, 255, 255, 0.72);
-      font-size: 19px;
+      font-size: 15px;
       line-height: 1.35;
     }
 
     .profile-portrait {
       position: absolute;
-      right: 18px;
-      bottom: -45px;
-      z-index: 3;
-      width: min(34vw, 150px);
+      right: 30px;
+      top: -62px;
+      z-index: 8;
+      width: min(30vw, 124px);
       aspect-ratio: 1;
       border-radius: 50%;
       overflow: hidden;
       background: #f1f1f1;
-      border: 7px solid rgba(255, 255, 255, 0.92);
+      border: 6px solid rgba(255, 255, 255, 0.92);
       box-shadow: 0 22px 44px rgba(0, 0, 0, 0.42);
     }
 
@@ -166,9 +116,9 @@
     .booking-shell {
       position: relative;
       z-index: 4;
-      width: min(100%, 820px);
-      margin: -20px auto 0;
-      padding: 0 16px;
+      width: min(100%, 760px);
+      margin: -30px auto 0;
+      padding: 0 14px;
     }
 
     #alertBox {
@@ -176,8 +126,9 @@
     }
 
     .booking-card {
-      padding: 26px 24px 28px;
-      border-radius: 24px;
+      position: relative;
+      padding: 26px 20px 22px;
+      border-radius: 22px;
       background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
         rgba(18, 18, 18, 0.88);
@@ -187,13 +138,13 @@
     }
 
     .booking-step {
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
     .step-label {
-      margin: 0 0 14px;
+      margin: 0 0 11px;
       color: #fff;
-      font-size: 18px;
+      font-size: 15px;
       line-height: 1.2;
       font-weight: 900;
       text-transform: uppercase;
@@ -205,12 +156,12 @@
 
     .premium-select-card {
       display: grid;
-      grid-template-columns: 78px 1fr 34px;
+      grid-template-columns: 54px 1fr 24px;
       align-items: center;
-      gap: 16px;
-      min-height: 104px;
-      padding: 10px 16px 10px 10px;
-      border-radius: 20px;
+      gap: 12px;
+      min-height: 76px;
+      padding: 8px 12px 8px 8px;
+      border-radius: 17px;
       background: rgba(255, 255, 255, 0.045);
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -230,12 +181,12 @@
 
     .select-icon,
     .barber-avatar-large {
-      width: 70px;
-      height: 70px;
+      width: 52px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 18px;
+      border-radius: 14px;
       background:
         linear-gradient(145deg, rgba(213, 161, 61, 0.18), rgba(213, 161, 61, 0.05)),
         rgba(255, 255, 255, 0.04);
@@ -244,7 +195,7 @@
     }
 
     .select-icon i {
-      font-size: 34px;
+      font-size: 25px;
     }
 
     .barber-avatar-large {
@@ -272,22 +223,22 @@
     .select-copy strong {
       display: block;
       color: #fff;
-      font-size: 21px;
+      font-size: 17px;
       line-height: 1.2;
       font-weight: 900;
     }
 
     .select-copy span {
       display: block;
-      margin-top: 7px;
+      margin-top: 5px;
       color: rgba(255, 255, 255, 0.66);
-      font-size: 17px;
+      font-size: 13px;
       line-height: 1.25;
     }
 
     .select-chevron {
       color: #fff;
-      font-size: 30px;
+      font-size: 23px;
       z-index: 1;
     }
 
@@ -301,8 +252,8 @@
 
     .date-strip {
       display: grid;
-      grid-template-columns: repeat(7, minmax(78px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(7, minmax(58px, 1fr));
+      gap: 9px;
       overflow-x: auto;
       padding-bottom: 4px;
       scrollbar-width: none;
@@ -313,10 +264,10 @@
     }
 
     .date-pill {
-      min-width: 78px;
-      min-height: 104px;
+      min-width: 58px;
+      min-height: 70px;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 18px;
+      border-radius: 13px;
       background: rgba(255, 255, 255, 0.045);
       color: #fff;
       text-align: center;
@@ -325,16 +276,16 @@
 
     .date-pill strong {
       display: block;
-      font-size: 30px;
+      font-size: 22px;
       line-height: 1;
       font-weight: 900;
     }
 
     .date-pill span {
       display: block;
-      margin-top: 10px;
+      margin-top: 7px;
       color: rgba(255, 255, 255, 0.68);
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
     }
@@ -357,16 +308,16 @@
     .time-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 9px;
     }
 
     .time-slot {
-      min-height: 64px;
+      min-height: 48px;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
+      border-radius: 13px;
       background: rgba(255, 255, 255, 0.045);
       color: #fff;
-      font-size: 21px;
+      font-size: 16px;
       font-weight: 800;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
@@ -380,7 +331,7 @@
     .time-empty {
       grid-column: 1 / -1;
       margin: 0;
-      padding: 18px;
+      padding: 15px;
       border-radius: 14px;
       background: rgba(255, 255, 255, 0.045);
       color: rgba(255, 255, 255, 0.68);
@@ -388,39 +339,39 @@
     }
 
     .confirm-booking-btn {
-      min-height: 78px;
+      min-height: 60px;
       width: 100%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 12px;
       border: 0;
-      border-radius: 16px;
+      border-radius: 15px;
       background: linear-gradient(135deg, var(--gc-gold), var(--gc-gold-light));
       color: #fff;
-      font-size: 20px;
+      font-size: 15px;
       font-weight: 900;
       text-transform: uppercase;
       box-shadow: 0 18px 40px rgba(213, 161, 61, 0.28);
     }
 
     .confirm-booking-btn i {
-      font-size: 32px;
+      font-size: 24px;
     }
 
     .bottom-nav {
       position: fixed;
-      left: 16px;
-      right: 16px;
-      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      left: 18px;
+      right: 18px;
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
       z-index: 50;
-      height: 88px;
+      height: 72px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       align-items: center;
-      max-width: 820px;
+      max-width: 760px;
       margin: 0 auto;
-      border-radius: 24px;
+      border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035)),
@@ -434,17 +385,19 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 5px;
       min-width: 0;
       height: 100%;
       color: rgba(255, 255, 255, 0.48);
       text-decoration: none;
-      font-size: 13px;
+      font-size: 11px;
+      line-height: 1.15;
       font-weight: 700;
+      text-align: center;
     }
 
     .bottom-nav .nav-item i {
-      font-size: 25px;
+      font-size: 21px;
     }
 
     .bottom-nav .nav-item.active {
@@ -453,62 +406,64 @@
 
     @media (min-width: 860px) {
       .booking-hero {
-        min-height: 430px;
-        padding-left: calc((100vw - 820px) / 2);
-        padding-right: calc((100vw - 820px) / 2);
+        min-height: 380px;
+        padding-left: calc((100vw - 760px) / 2);
+        padding-right: calc((100vw - 760px) / 2);
       }
 
       .hero-copy {
-        left: calc((100vw - 820px) / 2);
+        left: calc((100vw - 760px) / 2);
       }
 
       .profile-portrait {
-        right: calc((100vw - 820px) / 2);
+        right: calc((100vw - 760px) / 2 + 28px);
       }
     }
 
     @media (max-width: 520px) {
       .booking-hero {
-        min-height: 310px;
-        padding-left: 18px;
-        padding-right: 18px;
+        min-height: 275px;
+        padding-left: 16px;
+        padding-right: 16px;
       }
 
       .brand-lockup img {
-        width: 74px;
-      }
-
-      .brand-name {
-        font-size: 22px;
+        width: 136px;
       }
 
       .hero-copy {
-        left: 18px;
-        right: 18px;
+        left: 16px;
+        right: 16px;
       }
 
       .hero-copy p {
-        max-width: 270px;
-        font-size: 16px;
+        max-width: 235px;
+        font-size: 14px;
       }
 
       .booking-card {
-        padding: 22px 18px;
-        border-radius: 22px;
+        padding: 24px 15px 18px;
+        border-radius: 21px;
       }
 
       .profile-portrait {
-        width: 128px;
-        right: 14px;
-        bottom: -38px;
+        width: 106px;
+        right: 20px;
+        top: -54px;
+        border-width: 6px;
       }
 
       .date-strip {
-        grid-template-columns: repeat(7, 88px);
+        grid-template-columns: repeat(7, 64px);
       }
 
       .time-slot {
-        font-size: 19px;
+        font-size: 15px;
+      }
+
+      .confirm-booking-btn {
+        gap: 10px;
+        font-size: 14px;
       }
     }
   </style>
@@ -526,15 +481,7 @@
     <div class="hero-top">
       <div class="brand-lockup">
         <img src="/images/logo.png" alt="Giovanni Cerino">
-        <div>
-          <h2 class="brand-name">Giovanni Cerino</h2>
-          <p class="brand-subtitle">Barber Shop</p>
-        </div>
       </div>
-
-      <button class="notification-btn" type="button" onclick="refreshApp()" title="Aggiorna">
-        <i class="bi bi-bell"></i>
-      </button>
     </div>
 
     <div class="hero-copy">
@@ -542,13 +489,14 @@
       <p>Prenota il tuo prossimo appuntamento</p>
     </div>
 
-    <div class="profile-portrait">
-      <img src="/images/logo.jpg" alt="Giovanni Cerino Hair Stylist">
-    </div>
   </header>
 
   <main class="booking-shell">
     <div id="alertBox"></div>
+
+    <div class="profile-portrait">
+      <img id="heroBarberImg" src="/images/logo.jpg" alt="Barbiere selezionato">
+    </div>
 
     <section class="booking-card">
       <div class="booking-step">

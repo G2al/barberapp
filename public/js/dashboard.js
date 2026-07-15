@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const barberCardMeta = document.getElementById("barberCardMeta");
     const barberAvatar = document.getElementById("barberAvatar");
     const barberAvatarImg = document.getElementById("barberAvatarImg");
+    const heroBarberImg = document.getElementById("heroBarberImg");
 
     const dayLabels = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
 
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             barberCardMeta.textContent = "Giovanni Cerino Hair Stylist";
             barberAvatar.classList.remove("has-image");
             barberAvatarImg.removeAttribute("src");
+            if (heroBarberImg) heroBarberImg.src = "/images/logo.jpg";
             return;
         }
 
@@ -52,10 +54,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (option.dataset.image) {
             barberAvatarImg.src = option.dataset.image;
+            if (heroBarberImg) heroBarberImg.src = option.dataset.image;
             barberAvatar.classList.add("has-image");
         } else {
             barberAvatar.classList.remove("has-image");
             barberAvatarImg.removeAttribute("src");
+            if (heroBarberImg) heroBarberImg.src = "/images/logo.jpg";
         }
     };
 
