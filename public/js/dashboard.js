@@ -5,43 +5,202 @@ document.addEventListener("DOMContentLoaded", async () => {
     const barberSelect = document.getElementById("barberSelect");
     const dateSelect = document.getElementById("dateSelect");
     const timeSelect = document.getElementById("timeSelect");
+    const dateStrip = document.getElementById("dateStrip");
+    const timeGrid = document.getElementById("timeGrid");
+    const serviceCardTitle = document.getElementById("serviceCardTitle");
+    const serviceCardMeta = document.getElementById("serviceCardMeta");
+    const barberCardTitle = document.getElementById("barberCardTitle");
+    const barberCardMeta = document.getElementById("barberCardMeta");
+    const barberAvatar = document.getElementById("barberAvatar");
+    const barberAvatarImg = document.getElementById("barberAvatarImg");
 
-    // ===========================
-    // 0️⃣ IMPOSTA DATA MINIMA (OGGI)
-    // ===========================
-    const today = new Date().toISOString().split('T')[0];
+    const dayLabels = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
+
+    const toIsoDate = (date) => date.toISOString().split("T")[0];
+
+    const formatPrice = (price) => {
+        const value = Number(price || 0);
+        return `EUR ${value.toFixed(2)}`;
+    };
+
+    const updateServiceCard = () => {
+        const option = serviceSelect.options[serviceSelect.selectedIndex];
+
+        if (!serviceSelect.value || !option) {
+            serviceCardTitle.textContent = "Scegli servizio";
+            serviceCardMeta.textContent = "Durata e prezzo";
+            return;
+        }
+
+        serviceCardTitle.textContent = option.dataset.name || option.textContent.trim();
+        serviceCardMeta.textContent = `${option.dataset.duration || "-"} min  -  ${formatPrice(option.dataset.price)}`;
+    };
+
+    const updateBarberCard = () => {
+        const option = barberSelect.options[barberSelect.selectedIndex];
+
+        if (!barberSelect.value || !option) {
+            barberCardTitle.textContent = "Scegli barbiere";
+            barberCardMeta.textContent = "Giovanni Cerino Hair Stylist";
+            barberAvatar.classList.remove("has-image");
+            barberAvatarImg.removeAttribute("src");
+            return;
+        }
+
+        barberCardTitle.textContent = option.textContent.trim();
+        barberCardMeta.textContent = "Senior Barber";
+
+        if (option.dataset.image) {
+            barberAvatarImg.src = option.dataset.image;
+            barberAvatar.classList.add("has-image");
+        } else {
+            barberAvatar.classList.remove("has-image");
+            barberAvatarImg.removeAttribute("src");
+        }
+    };
+
+    const renderDateStrip = () => {
+        const start = new Date();
+        dateStrip.innerHTML = "";
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(start);
+            date.setDate(start.getDate() + i);
+            const value = toIsoDate(date);
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "date-pill";
+            button.dataset.date = value;
+            button.innerHTML = `<strong>${String(date.getDate()).padStart(2, "0")}</strong><span>${dayLabels[date.getDay()]}</span>`;
+            button.addEventListener("click", async () => {
+                dateSelect.value = value;
+                highlightDate();
+                await loadAvailableTimes();
+            });
+
+            dateStrip.appendChild(button);
+        }
+    };
+
+    const highlightDate = () => {
+        document.querySelectorAll(".date-pill").forEach((button) => {
+            button.classList.toggle("active", button.dataset.date === dateSelect.value);
+        });
+    };
+
+    const renderTimeButtonsFromSelect = () => {
+        timeGrid.innerHTML = "";
+
+        const options = Array.from(timeSelect.options).filter((option) => option.value && !option.disabled);
+
+        if (options.length === 0) {
+            const message = timeSelect.options[0]?.textContent || "Nessun orario disponibile";
+            timeGrid.innerHTML = `<p class="time-empty">${message}</p>`;
+            return;
+        }
+
+        options.forEach((option) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "time-slot";
+            button.textContent = option.value;
+            button.dataset.time = option.value;
+            button.addEventListener("click", () => {
+                timeSelect.value = option.value;
+                highlightTime();
+            });
+
+            timeGrid.appendChild(button);
+        });
+
+        highlightTime();
+    };
+
+    const highlightTime = () => {
+        document.querySelectorAll(".time-slot").forEach((button) => {
+            button.classList.toggle("active", button.dataset.time === timeSelect.value);
+        });
+    };
+
+    const resetTimes = (message = "Scegli servizio, barbiere e data.") => {
+        timeSelect.innerHTML = `<option value="">${message}</option>`;
+        timeGrid.innerHTML = `<p class="time-empty">${message}</p>`;
+    };
+
+    const loadAvailableTimes = async () => {
+        const date = dateSelect.value;
+        const barberId = barberSelect.value;
+        const serviceId = serviceSelect.value;
+
+        resetTimes("Caricamento orari...");
+
+        if (!date || !barberId || !serviceId) {
+            resetTimes("Scegli servizio, barbiere e data.");
+            return;
+        }
+
+        const response = await apiGet(`/availability/${barberId}?date=${date}&serviceId=${serviceId}`);
+
+        if (response.closed_slots && response.closed_slots.length > 0) {
+            const closedDay = response.closed_slots.find(cs => cs.time === null);
+            if (closedDay) {
+                resetTimes(`Giorno chiuso: ${closedDay.reason || ""}`.trim());
+                return;
+            }
+        }
+
+        if (!response.slots || response.slots.length === 0) {
+            resetTimes("Nessun orario disponibile");
+            return;
+        }
+
+        timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
+
+        response.slots.forEach(slot => {
+            const closedSlot = response.closed_slots?.find(cs => cs.time && cs.time.substring(0, 5) === slot);
+            const label = closedSlot ? `${slot} - chiuso (${closedSlot.reason || ""})` : slot;
+            timeSelect.innerHTML += `<option value="${slot}" ${closedSlot ? "disabled" : ""}>${label}</option>`;
+        });
+
+        renderTimeButtonsFromSelect();
+    };
+
+    const today = toIsoDate(new Date());
     dateSelect.min = today;
-    dateSelect.value = today; // Imposta oggi come default
+    dateSelect.value = today;
+    renderDateStrip();
+    highlightDate();
+    resetTimes();
 
-    // ===========================
-    // 1️⃣ CARICA SERVIZI
-    // ===========================
     const services = await apiGet("/services");
 
     serviceSelect.innerHTML = `<option value="">Seleziona servizio</option>`;
 
     services.forEach(s => {
-        serviceSelect.innerHTML += `
-            <option value="${s.id}">
-                ${s.name} — €${s.price} (${s.duration} min)
-            </option>
-        `;
+        const option = document.createElement("option");
+        option.value = s.id;
+        option.textContent = `${s.name} - ${formatPrice(s.price)} (${s.duration} min)`;
+        option.dataset.name = s.name;
+        option.dataset.price = s.price;
+        option.dataset.duration = s.duration;
+        serviceSelect.appendChild(option);
     });
 
-    // ===========================
-    // 2️⃣ QUANDO CAMBIO SERVIZIO → CARICA STAFF
-    // ===========================
+    updateServiceCard();
+    updateBarberCard();
+
     serviceSelect.addEventListener("change", async () => {
         const serviceId = serviceSelect.value;
 
+        updateServiceCard();
         barberSelect.innerHTML = `<option value="">Caricamento...</option>`;
-        timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
-        // reset avatar
-        const avatarWrap = document.getElementById("barberAvatar");
-        if (avatarWrap) avatarWrap.style.display = "none";
+        updateBarberCard();
+        resetTimes();
 
         if (!serviceId) {
             barberSelect.innerHTML = `<option value="">Seleziona un servizio prima</option>`;
+            updateBarberCard();
             return;
         }
 
@@ -49,115 +208,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (staff.length === 0) {
             barberSelect.innerHTML = `<option value="">Nessun barbiere disponibile</option>`;
+            updateBarberCard();
             return;
         }
 
         barberSelect.innerHTML = `<option value="">Seleziona barbiere</option>`;
 
         staff.forEach(b => {
-            const image = b.image_url ? b.image_url : '';
-            const option = document.createElement('option');
+            const option = document.createElement("option");
             option.value = b.id;
             option.textContent = `${b.first_name} ${b.last_name}`;
-            if (image) option.dataset.image = image;
+            if (b.image_url) option.dataset.image = b.image_url;
             barberSelect.appendChild(option);
         });
+
+        updateBarberCard();
     });
 
-    // ===========================
-    // 3️⃣ QUANDO CAMBIO DATA → CARICA ORARI
-    // ===========================
-    dateSelect.addEventListener("change", async () => {
-        const date = dateSelect.value;
-        const barberId = barberSelect.value;
-        const serviceId = serviceSelect.value;
-
-        timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
-
-        if (!date || !barberId || !serviceId) {
-            return;
-        }
-
-        const response = await apiGet(`/availability/${barberId}?date=${date}&serviceId=${serviceId}`);
-
-        // 🆕 Controlla se il giorno intero è chiuso
-        if (response.closed_slots && response.closed_slots.length > 0) {
-            const closedDay = response.closed_slots.find(cs => cs.time === null);
-            if (closedDay) {
-                timeSelect.innerHTML = `<option value="">📅 Giorno chiuso: ${closedDay.reason}</option>`;
-                return;
-            }
-        }
-
-        if (!response.slots || response.slots.length === 0) {
-            timeSelect.innerHTML = `<option value="">Nessun orario disponibile</option>`;
-            return;
-        }
-
-        timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
-
-        response.slots.forEach(slot => {
-            // 🆕 Controlla se questo orario specifico è chiuso
-            const closedSlot = response.closed_slots?.find(cs => cs.time && cs.time.substring(0, 5) === slot);
-            const label = closedSlot ? `${slot} ⛔ (${closedSlot.reason})` : slot;
-            timeSelect.innerHTML += `<option value="${slot}" ${closedSlot ? 'disabled' : ''}>${label}</option>`;
-        });
-    });
-
-    // ===========================
-    // 4️⃣ QUANDO CAMBIO BARBIERE → RICARICARE ORARI
-    // ===========================
     barberSelect.addEventListener("change", async () => {
-        const date = dateSelect.value;
-        const barberId = barberSelect.value;
-        const serviceId = serviceSelect.value;
-
-        const selectedOption = barberSelect.options[barberSelect.selectedIndex];
-        const avatarWrap = document.getElementById("barberAvatar");
-        const avatarImg = document.getElementById("barberAvatarImg");
-        if (avatarWrap && avatarImg && selectedOption && selectedOption.dataset.image) {
-            avatarImg.src = selectedOption.dataset.image;
-            avatarWrap.style.display = 'block';
-        } else if (avatarWrap) {
-            avatarWrap.style.display = 'none';
-        }
-
-        timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
-
-        if (!date || !barberId || !serviceId) {
-            return;
-        }
-
-        const response = await apiGet(`/availability/${barberId}?date=${date}&serviceId=${serviceId}`);
-
-        // 🆕 Controlla se il giorno intero è chiuso
-        if (response.closed_slots && response.closed_slots.length > 0) {
-            const closedDay = response.closed_slots.find(cs => cs.time === null);
-            if (closedDay) {
-                timeSelect.innerHTML = `<option value="">📅 Giorno chiuso: ${closedDay.reason}</option>`;
-                return;
-            }
-        }
-
-        if (!response.slots || response.slots.length === 0) {
-            timeSelect.innerHTML = `<option value="">Nessun orario disponibile</option>`;
-            return;
-        }
-
-        timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
-
-        response.slots.forEach(slot => {
-            // 🆕 Controlla se questo orario specifico è chiuso
-            const closedSlot = response.closed_slots?.find(cs => cs.time && cs.time.substring(0, 5) === slot);
-            const label = closedSlot ? `${slot} ⛔ (${closedSlot.reason})` : slot;
-            timeSelect.innerHTML += `<option value="${slot}" ${closedSlot ? 'disabled' : ''}>${label}</option>`;
-        });
+        updateBarberCard();
+        await loadAvailableTimes();
     });
+
+    dateSelect.addEventListener("change", async () => {
+        highlightDate();
+        await loadAvailableTimes();
+    });
+
+    timeSelect.addEventListener("change", highlightTime);
 });
 
-// ===========================
-// 5️⃣ CONFERMA PRENOTAZIONE
-// ===========================
 async function confirmBooking() {
     const confirmBtn = document.getElementById("confirmBtn");
     const serviceSelect = document.getElementById("serviceSelect");
@@ -175,10 +255,6 @@ async function confirmBooking() {
         return;
     }
 
-    // DEBUG
-    console.log("Token:", getToken());
-    console.log("Booking data:", { serviceId, barberId, date, time });
-
     setButtonLoading(confirmBtn, true);
 
     const bookingData = {
@@ -186,7 +262,7 @@ async function confirmBooking() {
         service_id: parseInt(serviceId),
         date: date,
         time: time,
-        haircut_id: null
+        haircut_id: null,
     };
 
     const response = await apiPost("/bookings", bookingData);
@@ -199,10 +275,9 @@ async function confirmBooking() {
     }
 
     if (response.status === true) {
-        showAlert("Prenotazione confermata! ✅ Reindirizzamento a Le mie prenotazioni...", "success");
+        showAlert("Prenotazione confermata. Reindirizzamento a Le mie prenotazioni...", "success");
 
         setTimeout(() => {
-            // Redirect a My Bookings dopo 1.5 secondi
             window.location.href = "/my-bookings.html";
         }, 1500);
 
