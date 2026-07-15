@@ -48,7 +48,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         };
 
         $reminderText = match ($this->type) {
-            '24h' => 'La tua prenotazione e&apos; prevista per domani. Ti aspettiamo da Aletta Barber 2k24.',
+            '24h' => 'La tua prenotazione e&apos; prevista per domani. Ti aspettiamo da Giovanni Cerino Hair Stylist.',
             '3h' => 'La tua prenotazione e&apos; in arrivo: mancano meno di 3 ore.',
             default => 'La tua prenotazione e&apos; molto vicina: mancano meno di 1 ora.',
         };

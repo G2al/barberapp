@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'alettabarber-v5';
+const CACHE_NAME = 'giovannicerino-v1';
 const ASSETS = [
   '/',
   '/index.html',
