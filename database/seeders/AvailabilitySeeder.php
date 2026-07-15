@@ -9,87 +9,27 @@ class AvailabilitySeeder extends Seeder
 {
     public function run(): void
     {
-        // Martedì (1) - Mattina
-        Availability::create([
-            'weekday' => 2,
-            'slot_type' => 'morning',
-            'start_time' => '09:00',
-            'end_time' => '13:00',
-            'is_active' => true,
-        ]);
+        Availability::query()->update(['is_active' => false]);
 
-        // Martedì (2) - Pomeriggio
-        Availability::create([
-            'weekday' => 2,
-            'slot_type' => 'afternoon',
-            'start_time' => '15:00',
-            'end_time' => '19:00',
-            'is_active' => true,
-        ]);
+        $availabilities = [
+            ['weekday' => 2, 'slot_type' => 'morning', 'start_time' => '09:00', 'end_time' => '13:00'],
+            ['weekday' => 2, 'slot_type' => 'afternoon', 'start_time' => '15:00', 'end_time' => '20:00'],
+            ['weekday' => 3, 'slot_type' => 'morning', 'start_time' => '09:00', 'end_time' => '13:00'],
+            ['weekday' => 3, 'slot_type' => 'afternoon', 'start_time' => '15:00', 'end_time' => '20:00'],
+            ['weekday' => 4, 'slot_type' => 'morning', 'start_time' => '09:00', 'end_time' => '13:00'],
+            ['weekday' => 4, 'slot_type' => 'afternoon', 'start_time' => '15:00', 'end_time' => '20:00'],
+            ['weekday' => 5, 'slot_type' => 'continuous', 'start_time' => '09:00', 'end_time' => '20:00'],
+            ['weekday' => 6, 'slot_type' => 'continuous', 'start_time' => '08:30', 'end_time' => '20:00'],
+        ];
 
-        // Mercoledì (3) - Mattina
-        Availability::create([
-            'weekday' => 3,
-            'slot_type' => 'morning',
-            'start_time' => '09:00',
-            'end_time' => '13:00',
-            'is_active' => true,
-        ]);
-
-        // Mercoledì (3) - Pomeriggio
-        Availability::create([
-            'weekday' => 3,
-            'slot_type' => 'afternoon',
-            'start_time' => '15:00',
-            'end_time' => '19:00',
-            'is_active' => true,
-        ]);
-
-        // Giovedì (4) - Mattina
-        Availability::create([
-            'weekday' => 4,
-            'slot_type' => 'morning',
-            'start_time' => '09:00',
-            'end_time' => '13:00',
-            'is_active' => true,
-        ]);
-
-        // Giovedì (4) - Pomeriggio
-        Availability::create([
-            'weekday' => 4,
-            'slot_type' => 'afternoon',
-            'start_time' => '15:00',
-            'end_time' => '19:00',
-            'is_active' => true,
-        ]);
-
-        // Venerdì (5) - Mattina
-        Availability::create([
-            'weekday' => 5,
-            'slot_type' => 'morning',
-            'start_time' => '09:00',
-            'end_time' => '13:00',
-            'is_active' => true,
-        ]);
-
-        // Venerdì (5) - Pomeriggio
-        Availability::create([
-            'weekday' => 5,
-            'slot_type' => 'afternoon',
-            'start_time' => '15:00',
-            'end_time' => '19:00',
-            'is_active' => true,
-        ]);
-
-        // Sabato (6) - Orario continuo
-        Availability::create([
-            'weekday' => 6,
-            'slot_type' => 'morning',
-            'start_time' => '09:00',
-            'end_time' => '19:00',
-            'is_active' => true,
-        ]);
-
-        // Domenica (0) e Lunedì (1) = CHIUSI (non aggiungiamo nulla)
+        foreach ($availabilities as $availability) {
+            Availability::updateOrCreate(
+                [
+                    'weekday' => $availability['weekday'],
+                    'slot_type' => $availability['slot_type'],
+                ],
+                $availability + ['is_active' => true]
+            );
+        }
     }
 }

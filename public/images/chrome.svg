@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Livello_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 800">
+  <!-- Generator: Adobe Illustrator 29.8.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 2)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #df3a32;
+      }
+
+      .st1 {
+        fill: #fcd900;
+      }
+
+      .st2 {
+        fill: #fff;
+      }
+
+      .st3 {
+        fill: url(#Sfumatura_senza_nome_6);
+      }
+
+      .st4 {
+        fill: #eaca05;
+      }
+
+      .st5 {
+        fill: url(#Sfumatura_senza_nome_61);
+      }
+
+      .st6 {
+        fill: url(#Sfumatura_senza_nome);
+      }
+
+      .st7 {
+        fill: #ef3f36;
+      }
+
+      .st8 {
+        fill: #5ab055;
+      }
+
+      .st9 {
+        fill: #61bc5b;
+      }
+    </style>
+    <linearGradient id="Sfumatura_senza_nome_6" data-name="Sfumatura senza nome 6" x1="1" y1="399" x2="800" y2="399" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d2d2d2"/>
+      <stop offset=".53" stop-color="#f2f2f2"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="Sfumatura_senza_nome" data-name="Sfumatura senza nome" x1="31.33" y1="1061.74" x2="31.33" y2="1051.76" gradientTransform="translate(-384 26818) scale(25 -25)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#86bbe5"/>
+      <stop offset="1" stop-color="#1072ba"/>
+    </linearGradient>
+    <linearGradient id="Sfumatura_senza_nome_61" data-name="Sfumatura senza nome 6" x1="-500" y1="275.06" x2="-362" y2="275.06" xlink:href="#Sfumatura_senza_nome_6"/>
+  </defs>
+  <rect class="st3" x="1" width="799" height="798" rx="163" ry="163"/>
+  <path class="st7" d="M400.01,50.1s206.31-9.22,315.68,197.4h-333.24s-62.89-2.02-116.61,74c-15.43,31.91-32.02,64.78-13.4,129.55-26.82-45.27-142.36-245.74-142.36-245.74,0,0,81.5-147.04,289.93-155.21h0Z"/>
+  <path class="st1" d="M704.98,574.65s-95.2,182.7-329.38,173.66c28.94-49.88,166.67-287.55,166.67-287.55,0,0,33.27-53.24-5.98-137.62-19.97-29.31-40.32-59.97-105.9-76.31,52.76-.48,284.72,0,284.72,0,0,0,86.9,143.87-10.13,327.82Z"/>
+  <path class="st9" d="M96.48,576.08s-111.21-173.47,13.79-371.07c28.84,49.88,166.57,287.55,166.57,287.55,0,0,29.71,55.36,122.59,63.62,35.4-2.59,72.24-4.8,119.31-53.14-25.95,45.75-142.37,245.65-142.37,245.65,0,0-168.59,3.08-279.9-172.61h0Z"/>
+  <path class="st8" d="M375.51,750.03l46.88-194.9s51.5-4.04,94.72-51.23c-26.82,47-141.59,246.13-141.59,246.13Z"/>
+  <path class="st2" d="M242.99,402.23c0-85.92,69.93-155.59,156.15-155.59s156.15,69.68,156.15,155.59-69.93,155.59-156.15,155.59c-86.23-.09-156.15-69.68-156.15-155.59Z"/>
+  <path class="st6" d="M269.14,402.23c0-71.5,58.16-129.55,130.02-129.55s130.02,57.96,130.02,129.55-58.16,129.56-130.02,129.56-130.02-58.05-130.02-129.56Z"/>
+  <path class="st4" d="M715.02,246.92l-193,56.41s-29.13-42.58-91.72-56.41c54.3-.29,284.72,0,284.72,0Z"/>
+  <path class="st0" d="M248.68,443.94c-27.11-46.81-138.6-238.63-138.6-238.63l142.94,140.89s-14.66,30.08-9.16,73.14l4.82,24.6h0Z"/>
+  <rect class="st5" x="-500" y="191.06" width="138" height="168"/>
+</svg>
