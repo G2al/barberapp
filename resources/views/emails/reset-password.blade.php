@@ -9,10 +9,10 @@
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f5f5; margin:0; padding:28px 12px;">
         <tr>
             <td align="center">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px; background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e5e5e5;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:760px; background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e5e5e5;">
                     <tr>
                         <td style="padding:0; background:#111111;">
-                            <img src="{{ $heroImage }}" alt="Giovanni Cerino Hair Stylist" width="640" style="display:block; width:100%; max-width:640px; height:220px; object-fit:cover; border:0;">
+                            <img src="{{ $heroImage }}" alt="Giovanni Cerino Hair Stylist" width="760" style="display:block; width:100%; max-width:760px; height:auto; border:0;">
                         </td>
                     </tr>
                     <tr>
