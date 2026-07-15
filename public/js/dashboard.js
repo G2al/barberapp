@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const serviceSelect = document.getElementById("serviceSelect");
     const barberSelect = document.getElementById("barberSelect");
     const dateSelect = document.getElementById("dateSelect");
+    const monthSelect = document.getElementById("monthSelect");
     const timeSelect = document.getElementById("timeSelect");
     const dateStrip = document.getElementById("dateStrip");
     const timeGrid = document.getElementById("timeGrid");
@@ -17,7 +18,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const dayLabels = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
 
-    const toIsoDate = (date) => date.toISOString().split("T")[0];
+    const toIsoDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
+    const toMonthValue = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+    const isOpenWeekday = (date) => {
+        const day = date.getDay();
+        return day >= 2 && day <= 6;
+    };
+
+    const formatMonthLabel = (date) => date.toLocaleDateString("it-IT", {
+        month: "long",
+        year: "numeric",
+    });
 
     const formatPrice = (price) => {
         const value = Number(price || 0);
@@ -63,13 +81,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    const renderDateStrip = () => {
-        const start = new Date();
-        dateStrip.innerHTML = "";
+    const renderMonthOptions = () => {
+        if (!monthSelect) return;
 
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(start);
-            date.setDate(start.getDate() + i);
+        const start = new Date();
+        start.setDate(1);
+        monthSelect.innerHTML = "";
+
+        for (let i = 0; i < 6; i++) {
+            const monthDate = new Date(start.getFullYear(), start.getMonth() + i, 1);
+            const option = document.createElement("option");
+            option.value = toMonthValue(monthDate);
+            option.textContent = formatMonthLabel(monthDate);
+            monthSelect.appendChild(option);
+        }
+    };
+
+    const renderDateStrip = () => {
+        const selectedMonth = monthSelect?.value || toMonthValue(new Date());
+        const [year, month] = selectedMonth.split("-").map(Number);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const start = new Date(year, month - 1, 1);
+        const end = new Date(year, month, 0);
+        dateStrip.innerHTML = "";
+        const visibleDates = [];
+
+        for (let day = 1; day <= end.getDate(); day++) {
+            const date = new Date(year, month - 1, day);
+            if (date < today || !isOpenWeekday(date)) continue;
+
+            visibleDates.push(date);
             const value = toIsoDate(date);
 
             const button = document.createElement("button");
@@ -85,6 +127,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             dateStrip.appendChild(button);
         }
+
+        if (!visibleDates.length) {
+            dateStrip.innerHTML = `<p class="time-empty">Nessun giorno disponibile in questo mese.</p>`;
+            dateSelect.value = "";
+            resetTimes("Scegli un mese con giorni disponibili.");
+            return;
+        }
+
+        const selectedStillVisible = visibleDates.some((date) => toIsoDate(date) === dateSelect.value);
+        if (!selectedStillVisible) {
+            dateSelect.value = toIsoDate(visibleDates[0]);
+        }
+
+        highlightDate();
     };
 
     const highlightDate = () => {
@@ -172,7 +228,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const today = toIsoDate(new Date());
     dateSelect.min = today;
-    dateSelect.value = today;
+    renderMonthOptions();
+    if (monthSelect) monthSelect.value = toMonthValue(new Date());
     renderDateStrip();
     highlightDate();
     resetTimes();
@@ -239,6 +296,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadAvailableTimes();
     });
 
+    monthSelect?.addEventListener("change", async () => {
+        renderDateStrip();
+        await loadAvailableTimes();
+    });
+
     timeSelect.addEventListener("change", highlightTime);
 });
 
@@ -279,7 +341,7 @@ async function confirmBooking() {
     }
 
     if (response.status === true) {
-        showAlert("Prenotazione confermata. Reindirizzamento a Le mie prenotazioni...", "success");
+        showAlert("Prenotazione confermata. Reindirizzamento a Prenotazioni...", "success");
 
         setTimeout(() => {
             window.location.href = "/my-bookings.html";
