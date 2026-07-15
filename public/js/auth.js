@@ -266,6 +266,7 @@ async function submitRegister() {
 // ====== SUBMIT LOGIN ======
 async function submitLogin() {
     const submitBtn = document.getElementById("submitBtn");
+    const rememberLogin = document.getElementById("rememberLogin");
 
     const data = {
         email: document.getElementById("email").value.trim(),
@@ -286,6 +287,12 @@ async function submitLogin() {
     if (res.token) {
         saveToken(res.token);
 
+        if (rememberLogin?.checked) {
+            localStorage.setItem("remembered_email", data.email);
+        } else {
+            localStorage.removeItem("remembered_email");
+        }
+
         // Salva anche i dati utente
         if (res.user) {
             saveUser(res.user);
@@ -303,6 +310,17 @@ async function submitLogin() {
     // ERRORE GENERICO
     showAlert("Errore durante il login.", "danger");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const rememberedEmail = localStorage.getItem("remembered_email");
+    const emailInput = document.getElementById("email");
+    const rememberLogin = document.getElementById("rememberLogin");
+
+    if (rememberedEmail && emailInput) {
+        emailInput.value = rememberedEmail;
+        if (rememberLogin) rememberLogin.checked = true;
+    }
+});
 
 
 

@@ -52,6 +52,24 @@
             color: var(--primary-color) !important;
         }
 
+        body.login-page .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: -2px 0 18px;
+        }
+
+        body.login-page .remember-row .form-check {
+            min-height: auto;
+            margin: 0;
+        }
+
+        body.login-page .remember-row .form-check-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
         body.login-page .install-guide {
             width: 100%;
             max-width: 420px;
@@ -238,6 +256,13 @@
                         onclick="togglePassword('password', 'toggleLoginPass')">
                         <i id="toggleLoginPass" class="bi bi-eye text-muted"></i>
                     </span>
+                </div>
+            </div>
+
+            <div class="remember-row">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberLogin">
+                    <label class="form-check-label" for="rememberLogin">Ricordami</label>
                 </div>
             </div>
 
