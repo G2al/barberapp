@@ -26,52 +26,44 @@
       margin: 0;
       padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
       background:
-        linear-gradient(180deg, rgba(5, 5, 5, 0.22), rgba(5, 5, 5, 0.96) 430px),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.96) 310px),
+        url("/images/bg-login.jpg") top center / cover fixed no-repeat,
         #090909;
       color: #fff;
       font-family: "Karla", Arial, sans-serif;
     }
 
-    .booking-hero {
-      position: relative;
-      min-height: 310px;
-      padding: calc(18px + env(safe-area-inset-top, 0px)) 22px 68px;
-      overflow: hidden;
-      background:
-        linear-gradient(90deg, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.18)),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.82)),
-        url("/images/bg-login.jpg") center / cover no-repeat;
+    .gc-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 16px;
+      background: rgba(9, 9, 9, 0.82);
+      border-bottom: 1px solid var(--gc-line);
+      backdrop-filter: blur(18px);
     }
 
-    .hero-top {
+    .gc-header-title {
       display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
-      gap: 16px;
-    }
-
-    .brand-lockup {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0;
+      align-items: center;
+      gap: 10px;
       color: #fff;
+      font-size: 20px;
+      font-weight: 900;
     }
 
-    .brand-lockup img {
-      width: min(38vw, 150px);
-      height: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.48));
+    .gc-header-title i,
+    .gc-action-btn {
+      color: var(--gc-gold-light);
     }
 
-    .hero-actions {
+    .gc-actions {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .hero-action {
+    .gc-action-btn {
       width: 38px;
       height: 38px;
       display: inline-flex;
@@ -79,45 +71,9 @@
       justify-content: center;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 50%;
-      background: rgba(0, 0, 0, 0.36);
-      color: #fff;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
-    }
-
-    .hero-action i {
-      font-size: 18px;
-    }
-
-    button.hero-action {
+      background: rgba(255, 255, 255, 0.06);
+      text-decoration: none;
       padding: 0;
-    }
-
-    .hero-copy {
-      position: absolute;
-      left: 22px;
-      right: 22px;
-      bottom: 26px;
-      z-index: 2;
-      max-width: 360px;
-    }
-
-    .hero-copy h1 {
-      margin: 0;
-      font-size: clamp(25px, 6.3vw, 34px);
-      line-height: 1.08;
-      font-weight: 900;
-      color: #fff;
-    }
-
-    .hero-copy h1 span {
-      color: var(--gc-gold-light);
-    }
-
-    .hero-copy p {
-      margin: 10px 0 0;
-      color: rgba(255, 255, 255, 0.72);
-      font-size: 15px;
-      line-height: 1.35;
     }
 
     .profile-portrait {
@@ -144,8 +100,8 @@
       position: relative;
       z-index: 4;
       width: min(100%, 760px);
-      margin: -30px auto 0;
-      padding: 0 14px;
+      margin: 0 auto;
+      padding: 22px 14px 0;
     }
 
     #alertBox {
@@ -495,42 +451,12 @@
     }
 
     @media (min-width: 860px) {
-      .booking-hero {
-        min-height: 380px;
-        padding-left: calc((100vw - 760px) / 2);
-        padding-right: calc((100vw - 760px) / 2);
-      }
-
-      .hero-copy {
-        left: calc((100vw - 760px) / 2);
-      }
-
       .profile-portrait {
         right: calc((100vw - 760px) / 2 + 28px);
       }
     }
 
     @media (max-width: 520px) {
-      .booking-hero {
-        min-height: 275px;
-        padding-left: 16px;
-        padding-right: 16px;
-      }
-
-      .brand-lockup img {
-        width: 136px;
-      }
-
-      .hero-copy {
-        left: 16px;
-        right: 16px;
-      }
-
-      .hero-copy p {
-        max-width: 235px;
-        font-size: 14px;
-      }
-
       .booking-card {
         padding: 24px 15px 18px;
         border-radius: 21px;
@@ -571,27 +497,16 @@
 </head>
 
 <body class="booking-page">
-  <header class="booking-hero">
-    <div class="hero-top">
-      <div class="brand-lockup">
-        <img src="/images/logo.png" alt="Giovanni Cerino">
-      </div>
-      <div class="hero-actions ms-auto">
-        <button type="button" id="favoritesToggle" class="hero-action" title="Preferiti">
-          <i class="bi bi-star"></i>
-        </button>
-        <button type="button" class="hero-action" onclick="logout()" title="Logout">
-          <i class="bi bi-box-arrow-right"></i>
-        </button>
-      </div>
+  <div class="gc-header d-flex justify-content-between align-items-center">
+    <div class="gc-header-title">
+      <i class="bi bi-calendar-check"></i>
+      <span>Prenota</span>
     </div>
-
-    <div class="hero-copy">
-      <h1>Bentornato, <span id="welcomeName">Utente</span></h1>
-      <p>Prenota il tuo prossimo appuntamento</p>
+    <div class="gc-actions">
+      <button type="button" id="favoritesToggle" class="gc-action-btn" title="Preferiti"><i class="bi bi-star"></i></button>
+      <button type="button" class="gc-action-btn" onclick="logout()" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
     </div>
-
-  </header>
+  </div>
 
   <main class="booking-shell">
     <div id="alertBox"></div>
