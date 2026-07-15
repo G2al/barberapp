@@ -46,6 +46,7 @@ class AvailabilityResource extends Resource
                     ->options([
                         'morning' => 'Mattina',
                         'afternoon' => 'Pomeriggio',
+                        'continuous' => 'Orario continuo',
                     ])
                     ->required()
                     ->label('Fascia oraria'),
@@ -85,7 +86,8 @@ class AvailabilityResource extends Resource
                     ->formatStateUsing(fn ($state) => [
                         'morning' => 'Mattina',
                         'afternoon' => 'Pomeriggio',
-                    ][$state])
+                        'continuous' => 'Orario continuo',
+                    ][$state] ?? $state)
                     ->label('Fascia'),
 
                 Tables\Columns\TextColumn::make('start_time')
