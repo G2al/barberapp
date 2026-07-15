@@ -63,7 +63,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
                 'time' => substr($this->booking->time, 0, 5),
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
-                'heroImage' => asset('images/temamail.jpeg'),
+                'heroImage' => asset('images/booking-reminder.png'),
             ]);
     }
 
