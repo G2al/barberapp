@@ -168,6 +168,15 @@
       color: var(--gc-muted) !important;
     }
 
+    .booking-note-box {
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.055);
+      color: #fff;
+      line-height: 1.35;
+    }
+
     .booking-history-card .action-btn {
       border-radius: 13px;
       font-weight: 800;
@@ -457,6 +466,13 @@
         return timeString.slice(0, 5); // da "10:30:00" -> "10:30"
       };
 
+      const escapeHtml = (value) => String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
       const renderBookings = () => {
         const filtered = bookingsData.filter((b) => currentFilter === "all" || b.status === currentFilter);
         bookingsList.innerHTML = "";
@@ -476,6 +492,12 @@
           const formattedDate = formatDate(booking.date);
           const formattedTime = formatTime(booking.time);
           const canCancel = isCancellable(booking.status);
+          const noteHtml = booking.note ? `
+            <div class="booking-note-box mb-3">
+              <div class="small text-muted mb-1">Nota</div>
+              <div>${escapeHtml(booking.note)}</div>
+            </div>
+          ` : '';
 
           const item = document.createElement("div");
           item.className = "booking-history-card mb-3";
@@ -504,6 +526,8 @@
                 <span>${formattedTime}</span>
               </div>
             </div>
+
+            ${noteHtml}
 
             <div class="d-flex justify-content-center gap-2">
               <button class="btn action-btn secondary-action-btn flex-grow-1 contact-btn">

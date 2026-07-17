@@ -14,6 +14,7 @@ class Booking extends Model
         'date',
         'time',
         'status',
+        'note',
         'reminder_24h_sent',
         'reminder_3h_sent',
         'reminder_1h_sent',
@@ -101,6 +102,10 @@ class Booking extends Model
     public static function canUserBookMore($userId): bool
     {
         $maxBookings = \App\Models\Setting::get('max_active_bookings', 3);
+        if ((int) $maxBookings <= 0) {
+            return true;
+        }
+
         $activeCount = static::countActiveBookings($userId);
         return $activeCount < (int)$maxBookings;
     }

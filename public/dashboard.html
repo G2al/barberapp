@@ -343,6 +343,24 @@
       text-align: center;
     }
 
+    .booking-note-field {
+      width: 100%;
+      min-height: 98px;
+      resize: vertical;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.055);
+      color: #fff;
+      padding: 14px 16px;
+      font-size: 15px;
+      line-height: 1.4;
+      outline: none;
+    }
+
+    .booking-note-field::placeholder {
+      color: rgba(255, 255, 255, 0.48);
+    }
+
     .confirm-booking-btn {
       min-height: 60px;
       width: 100%;
@@ -567,6 +585,15 @@
         <div class="time-grid" id="timeGrid">
           <p class="time-empty">Scegli servizio, barbiere e data.</p>
         </div>
+      </div>
+
+      <div class="booking-step admin-note-step d-none" id="adminNoteStep">
+        <h3 class="step-label"><span>5.</span> Nota opzionale</h3>
+        <textarea
+          id="bookingNote"
+          class="booking-note-field"
+          maxlength="1000"
+          placeholder="Stai prenotando per un'altra persona? Scrivi qui nome, telefono o una nota utile."></textarea>
       </div>
 
       <button id="confirmBtn" class="confirm-booking-btn" onclick="confirmBooking()">

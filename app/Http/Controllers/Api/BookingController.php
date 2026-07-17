@@ -30,6 +30,7 @@ class BookingController extends Controller
             'date' => 'required|date_format:Y-m-d|after_or_equal:today',
             'time' => 'required|date_format:H:i',
             'haircut_id' => 'nullable|exists:haircuts,id',
+            'note' => 'nullable|string|max:1000',
         ]);
 
         $user = $request->user();
@@ -132,6 +133,7 @@ class BookingController extends Controller
             'date' => $date,
             'time' => $time,
             'status' => 'confirmed',
+            'note' => $user->role === 'admin' ? ($validated['note'] ?? null) : null,
         ]);
 
         // 📱 Invia notifica Telegram all'admin
@@ -186,6 +188,7 @@ class BookingController extends Controller
                 'date' => $booking->date,
                 'time' => $booking->time,
                 'status' => $booking->status,
+                'note' => $booking->note,
                 'created_at' => $booking->created_at,
             ]
         ], 201);
@@ -213,6 +216,7 @@ class BookingController extends Controller
                     'date' => $booking->date,
                     'time' => $booking->time,
                     'status' => $booking->status,
+                    'note' => $booking->note,
                     'created_at' => $booking->created_at,
                 ];
             });

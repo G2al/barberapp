@@ -15,6 +15,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const barberAvatar = document.getElementById("barberAvatar");
     const barberAvatarImg = document.getElementById("barberAvatarImg");
     const heroBarberImg = document.getElementById("heroBarberImg");
+    const adminNoteStep = document.getElementById("adminNoteStep");
+    const currentUser = getUser();
+
+    if (currentUser?.role === "admin") {
+        adminNoteStep?.classList.remove("d-none");
+    }
 
     const dayLabels = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
 
@@ -310,6 +316,7 @@ async function confirmBooking() {
     const barberSelect = document.getElementById("barberSelect");
     const dateSelect = document.getElementById("dateSelect");
     const timeSelect = document.getElementById("timeSelect");
+    const bookingNote = document.getElementById("bookingNote");
 
     const serviceId = serviceSelect.value;
     const barberId = barberSelect.value;
@@ -330,6 +337,12 @@ async function confirmBooking() {
         time: time,
         haircut_id: null,
     };
+
+    const currentUser = getUser();
+    const note = bookingNote?.value.trim();
+    if (currentUser?.role === "admin" && note) {
+        bookingData.note = note;
+    }
 
     const response = await apiPost("/bookings", bookingData);
 

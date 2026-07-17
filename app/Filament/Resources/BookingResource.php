@@ -78,6 +78,12 @@ class BookingResource extends Resource
                     ->default('pending')
                     ->required()
                     ->label('Stato'),
+
+                Forms\Components\Textarea::make('note')
+                    ->nullable()
+                    ->rows(3)
+                    ->maxLength(1000)
+                    ->label('Nota / prenotazione per conto di'),
             ]);
     }
 
@@ -103,6 +109,12 @@ class BookingResource extends Resource
                 Tables\Columns\TextColumn::make('service.name')
                     ->searchable()
                     ->label('Servizio'),
+
+                Tables\Columns\TextColumn::make('note')
+                    ->label('Nota')
+                    ->limit(35)
+                    ->toggleable()
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('date')
                     ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->format('d/m/Y'))
