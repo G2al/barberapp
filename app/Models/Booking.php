@@ -14,6 +14,7 @@ class Booking extends Model
         'date',
         'time',
         'status',
+        'note',
         'reminder_24h_sent',
         'reminder_3h_sent',
         'reminder_1h_sent',
@@ -65,11 +66,11 @@ class Booking extends Model
      */
     public static function isSlotAvailable($staffId, $date, $time): bool
     {
-        return !ClosedSlot::where('staff_id', $staffId)
-            ->where('date', $date)
+        return !ClosedSlot::appliesToStaff($staffId)
+            ->coversDate($date)
             ->where(function ($query) use ($time) {
                 $query->whereNull('time') // Giorno intero chiuso
-                    ->orWhere('time', $time); // Orario specifico chiuso
+                    ->orWhereTime('time', substr((string) $time, 0, 5)); // Orario specifico chiuso
             })
             ->exists();
     }
@@ -101,6 +102,10 @@ class Booking extends Model
     public static function canUserBookMore($userId): bool
     {
         $maxBookings = \App\Models\Setting::get('max_active_bookings', 3);
+        if ((int) $maxBookings <= 0) {
+            return true;
+        }
+
         $activeCount = static::countActiveBookings($userId);
         return $activeCount < (int)$maxBookings;
     }
