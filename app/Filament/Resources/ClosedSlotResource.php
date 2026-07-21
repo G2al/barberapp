@@ -5,7 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ClosedSlotResource\Pages;
 use App\Filament\Resources\ClosedSlotResource\RelationManagers;
 use App\Models\ClosedSlot;
+use App\Models\Staff;
 use Filament\Forms;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -29,17 +32,45 @@ class ClosedSlotResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Radio::make('is_global')
+                    ->label('Ambito chiusura')
+                    ->options([
+                        false => 'Staff specifico',
+                        true => 'Tutto il negozio',
+                    ])
+                    ->default(false)
+                    ->inline()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, $state): void {
+                        if ((bool) $state) {
+                            $set('staff_id', null);
+                        }
+                    })
+                    ->required(),
+
                 Forms\Components\Select::make('staff_id')
-                    ->relationship('staff', 'first_name')
                     ->label('Staff')
-                    ->required()
+                    ->options(fn () => Staff::query()
+                        ->where('is_active', true)
+                        ->orderBy('first_name')
+                        ->orderBy('last_name')
+                        ->get()
+                        ->pluck('full_name', 'id'))
+                    ->required(fn (Get $get): bool => ! (bool) $get('is_global'))
+                    ->hidden(fn (Get $get): bool => (bool) $get('is_global'))
                     ->searchable()
                     ->preload(),
 
                 Forms\Components\DatePicker::make('date')
-                    ->label('Data')
+                    ->label('Data inizio')
                     ->required()
                     ->minDate(now()),
+
+                Forms\Components\DatePicker::make('end_date')
+                    ->label('Data fine')
+                    ->helperText('Lascia vuoto per chiudere solo la data inizio.')
+                    ->nullable()
+                    ->minDate(fn (Get $get) => $get('date') ?: now()),
 
                 Forms\Components\TimePicker::make('time')
                     ->label('Orario (lascia vuoto per giorno intero)')
@@ -58,14 +89,23 @@ class ClosedSlotResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('staff.full_name')
-                    ->label('Staff')
-                    ->sortable()
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('scope')
+                    ->label('Ambito')
+                    ->state(fn (ClosedSlot $record): string => $record->is_global
+                        ? 'Tutto il negozio'
+                        : ($record->staff?->full_name ?? 'Staff non disponibile'))
+                    ->badge()
+                    ->color(fn (ClosedSlot $record): string => $record->is_global ? 'danger' : 'gray'),
 
                 Tables\Columns\TextColumn::make('date')
-                    ->label('Data')
+                    ->label('Data inizio')
                     ->date('d/m/Y')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('end_date')
+                    ->label('Data fine')
+                    ->date('d/m/Y')
+                    ->placeholder('Solo un giorno')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('time')
@@ -84,8 +124,18 @@ class ClosedSlotResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TernaryFilter::make('is_global')
+                    ->label('Ambito')
+                    ->trueLabel('Tutto il negozio')
+                    ->falseLabel('Staff specifico'),
+
                 Tables\Filters\SelectFilter::make('staff_id')
-                    ->relationship('staff', 'first_name')
+                    ->options(fn () => Staff::query()
+                        ->where('is_active', true)
+                        ->orderBy('first_name')
+                        ->orderBy('last_name')
+                        ->get()
+                        ->pluck('full_name', 'id'))
                     ->label('Staff'),
 
                 Tables\Filters\Filter::make('date')
@@ -99,7 +149,12 @@ class ClosedSlotResource extends Resource
                         return $query
                             ->when(
                                 $data['date_from'] ?? null,
-                                fn (Builder $query, $date) => $query->whereDate('date', '>=', $date),
+                                fn (Builder $query, $date) => $query->where(function (Builder $query) use ($date) {
+                                    $query->where(function (Builder $query) use ($date) {
+                                        $query->whereNull('end_date')
+                                            ->whereDate('date', '>=', $date);
+                                    })->orWhereDate('end_date', '>=', $date);
+                                }),
                             )
                             ->when(
                                 $data['date_to'] ?? null,

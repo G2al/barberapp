@@ -88,8 +88,8 @@ class AvailabilityController extends Controller
             ->get();
 
         // ✅ NUOVO: Carica i closed slots per questo staff e data
-        $closedSlots = ClosedSlot::where('staff_id', $staffId)
-            ->where('date', $date)
+        $closedSlots = ClosedSlot::appliesToStaff($staffId)
+            ->coversDate($date)
             ->get();
 
         $serviceDuration = $service->duration;
@@ -140,7 +140,7 @@ class AvailabilityController extends Controller
                         }
 
                         // Se un orario specifico è chiuso
-                        $closedStart = Carbon::createFromFormat('H:i', $closedTime);
+                        $closedStart = Carbon::createFromFormat('H:i', substr((string) $closedTime, 0, 5));
                         if ($slotStart->format('H:i') === $closedStart->format('H:i')) {
                             $isAvailable = false;
                             break;

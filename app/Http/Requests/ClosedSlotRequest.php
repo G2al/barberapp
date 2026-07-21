@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ClosedSlotRequest extends FormRequest
 {
@@ -14,6 +15,16 @@ class ClosedSlotRequest extends FormRequest
         return $this->user() && $this->user()->role === 'admin';
     }
 
+    protected function prepareForValidation(): void
+    {
+        $isGlobal = filter_var($this->input('is_global', false), FILTER_VALIDATE_BOOLEAN);
+
+        $this->merge([
+            'is_global' => $isGlobal,
+            'staff_id' => $isGlobal ? null : $this->input('staff_id'),
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -22,8 +33,10 @@ class ClosedSlotRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'staff_id' => 'required|exists:staff,id',
+            'is_global' => 'boolean',
+            'staff_id' => ['nullable', Rule::requiredIf(fn () => ! $this->boolean('is_global')), 'exists:staff,id'],
             'date' => 'required|date|date_format:Y-m-d',
+            'end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:date',
             'time' => 'nullable|date_format:H:i',
             'reason' => 'required|string|max:255',
         ];

@@ -15,7 +15,8 @@ class ClosedSlotController extends Controller
      */
     public function index(Staff $staff): JsonResponse
     {
-        $closedSlots = $staff->closedSlots()
+        $closedSlots = ClosedSlot::with('staff')
+            ->appliesToStaff($staff->id)
             ->orderBy('date', 'desc')
             ->get();
 
@@ -97,14 +98,20 @@ class ClosedSlotController extends Controller
         $fromDate = $request->query('from_date');
         $toDate = $request->query('to_date');
 
-        $query = $staff->closedSlots();
-
-        if ($fromDate) {
-            $query->whereDate('date', '>=', $fromDate);
-        }
+        $query = ClosedSlot::with('staff')
+            ->appliesToStaff($staff->id);
 
         if ($toDate) {
             $query->whereDate('date', '<=', $toDate);
+        }
+
+        if ($fromDate) {
+            $query->where(function ($query) use ($fromDate) {
+                $query->where(function ($query) use ($fromDate) {
+                    $query->whereNull('end_date')
+                        ->whereDate('date', '>=', $fromDate);
+                })->orWhereDate('end_date', '>=', $fromDate);
+            });
         }
 
         $closedSlots = $query->orderBy('date')->get();
