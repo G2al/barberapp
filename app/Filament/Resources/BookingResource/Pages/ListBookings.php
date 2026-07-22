@@ -23,7 +23,11 @@ class ListBookings extends ListRecords
         parent::mount();
 
         if (! request()->has('tableFilters')) {
-            $this->tableFilters['today']['isActive'] = true;
+            $this->tableFilters = [
+                'today' => [
+                    'isActive' => true,
+                ],
+            ];
         }
     }
 
