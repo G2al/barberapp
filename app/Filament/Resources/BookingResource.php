@@ -10,11 +10,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\Layout\Panel;
-use Filament\Tables\Columns\Layout\Split;
-use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 
 class BookingResource extends Resource
 {
@@ -107,73 +105,50 @@ class BookingResource extends Resource
                     ->get(),
             ]))
             ->columns([
-                Split::make([
-                    Tables\Columns\TextColumn::make('when')
-                        ->label('Quando')
-                        ->state(fn (Booking $record) => Carbon::parse($record->time)->format('H:i'))
-                        ->description(fn (Booking $record) => Carbon::parse($record->date)->translatedFormat('d M, D'))
-                        ->badge()
-                        ->color('gray')
-                        ->extraAttributes(['class' => 'min-w-[72px]']),
-
-                    Stack::make([
-                        Tables\Columns\TextColumn::make('service.name')
-                            ->label('Servizio')
-                            ->weight('bold')
-                            ->searchable(),
-
-                        Tables\Columns\TextColumn::make('user_full_name')
-                            ->label('Cliente')
-                            ->state(fn (Booking $record) => trim(($record->user->name ?? '') . ' ' . ($record->user->surname ?? '')) ?: $record->user?->email)
-                            ->searchable(['users.name', 'users.surname', 'users.email', 'users.phone']),
-
-                        Tables\Columns\TextColumn::make('note_preview')
-                            ->label('Note')
-                            ->state(fn (Booking $record) => filled($record->note) ? $record->note : null)
-                            ->placeholder('Senza note')
-                            ->color('warning')
-                            ->wrap()
-                            ->searchable(query: fn ($query, string $search) => $query->where('note', 'like', "%{$search}%")),
-                    ])->space(1),
-
-                    Tables\Columns\TextColumn::make('status')
-                        ->label('Stato')
-                        ->formatStateUsing(fn ($state) => [
+                Tables\Columns\TextColumn::make('mobile_summary')
+                    ->label('Prenotazione')
+                    ->state(function (Booking $record): HtmlString {
+                        $client = trim(($record->user->name ?? '') . ' ' . ($record->user->surname ?? '')) ?: ($record->user->email ?? 'Cliente');
+                        $service = $record->service?->name ?? 'Servizio';
+                        $note = filled($record->note) ? e($record->note) : '<span class="text-gray-500">Senza note</span>';
+                        $status = [
                             'pending' => 'In sospeso',
                             'confirmed' => 'Confermata',
                             'completed' => 'Completata',
                             'cancelled' => 'Annullata',
                             'no_show' => 'Non presentato',
-                        ][$state] ?? $state)
-                        ->badge()
-                        ->color(fn ($state) => [
-                            'pending' => 'warning',
-                            'confirmed' => 'success',
-                            'completed' => 'info',
-                            'cancelled' => 'danger',
-                            'no_show' => 'gray',
-                        ][$state] ?? 'gray'),
-                ])
-                    ->from('md')
-                    ->extraAttributes(['class' => 'md:hidden']),
+                        ][$record->status] ?? $record->status;
 
-                Panel::make([
-                    Stack::make([
-                        Tables\Columns\TextColumn::make('service_details')
-                            ->label('Dettagli servizio')
-                            ->state(fn (Booking $record) => collect([
-                                $record->haircut?->name,
-                                $record->service?->duration ? $record->service->duration . ' min' : null,
-                            ])->filter()->join(' - ') ?: 'Nessun dettaglio'),
-
-                        Tables\Columns\TextColumn::make('client_contact')
-                            ->label('Contatto cliente')
-                            ->state(fn (Booking $record) => $record->user?->phone ?: $record->user?->email ?: 'Nessun contatto'),
-                    ])->space(2),
-                ])
-                    ->collapsible()
-                    ->collapsed()
-                    ->extraAttributes(['class' => 'md:hidden']),
+                        return new HtmlString(sprintf(
+                            '<div class="space-y-2">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div class="text-base font-semibold text-gray-950 dark:text-white">%s</div>
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">%s</div>
+                                    </div>
+                                    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-sm font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-100">%s</span>
+                                </div>
+                                <div class="text-sm"><span class="font-semibold">%s</span></div>
+                                <div class="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 ring-1 ring-amber-200 dark:bg-amber-950 dark:text-amber-100 dark:ring-amber-800">%s</div>
+                                <div class="text-xs font-medium text-gray-500 dark:text-gray-400">%s</div>
+                            </div>',
+                            e(Carbon::parse($record->time)->format('H:i')),
+                            e(Carbon::parse($record->date)->translatedFormat('d M, D')),
+                            e($status),
+                            e($service),
+                            $note,
+                            e($client),
+                        ));
+                    })
+                    ->html()
+                    ->searchable(query: fn ($query, string $search) => $query
+                        ->where('note', 'like', "%{$search}%")
+                        ->orWhereHas('user', fn ($query) => $query
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('surname', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('service', fn ($query) => $query->where('name', 'like', "%{$search}%")))
+                    ->hiddenFrom('md'),
 
                 Tables\Columns\TextColumn::make('date')
                     ->formatStateUsing(fn ($state) => Carbon::parse($state)->format('d/m/Y'))
@@ -192,6 +167,11 @@ class BookingResource extends Resource
                     ->formatStateUsing(fn ($state, Booking $record) => trim(($record->user->name ?? '') . ' ' . ($record->user->surname ?? '')) ?: $record->user?->email)
                     ->description(fn (Booking $record) => $record->user?->phone ?: $record->user?->email)
                     ->searchable(['users.name', 'users.surname', 'users.email', 'users.phone'])
+                    ->visibleFrom('md'),
+
+                Tables\Columns\TextColumn::make('staff.full_name')
+                    ->label('Barbiere')
+                    ->searchable(['staff.first_name', 'staff.last_name'])
                     ->visibleFrom('md'),
 
                 Tables\Columns\TextColumn::make('desktop_service')
