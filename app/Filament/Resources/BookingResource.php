@@ -97,7 +97,6 @@ class BookingResource extends Resource
             ->modifyQueryUsing(fn ($query) => $query
                 ->with(['user', 'staff', 'service', 'haircut'])
                 ->whereIn('status', ['pending', 'confirmed'])
-                ->whereDate('date', '>=', Carbon::today())
                 ->orderBy('date')
                 ->orderBy('time')
             )

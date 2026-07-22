@@ -18,6 +18,15 @@ class ListBookings extends ListRecords
 
     protected static string $view = 'filament.resources.booking-resource.pages.list-bookings';
 
+    public function mount(): void
+    {
+        parent::mount();
+
+        if (! request()->has('tableFilters')) {
+            $this->tableFilters['today']['isActive'] = true;
+        }
+    }
+
     public function getDefaultActiveTab(): string | int | null
     {
         $firstStaff = Staff::query()
