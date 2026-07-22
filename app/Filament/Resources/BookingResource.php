@@ -118,6 +118,13 @@ class BookingResource extends Resource
                             'cancelled' => 'Annullata',
                             'no_show' => 'Non presentato',
                         ][$record->status] ?? $record->status;
+                        $statusClass = [
+                            'pending' => 'background:#fef3c7;color:#92400e;ring-color:#fde68a;',
+                            'confirmed' => 'background:#dcfce7;color:#166534;ring-color:#bbf7d0;',
+                            'completed' => 'background:#dbeafe;color:#1e40af;ring-color:#bfdbfe;',
+                            'cancelled' => 'background:#fee2e2;color:#991b1b;ring-color:#fecaca;',
+                            'no_show' => 'background:#f3f4f6;color:#374151;ring-color:#e5e7eb;',
+                        ][$record->status] ?? 'background:#f3f4f6;color:#374151;ring-color:#e5e7eb;';
 
                         return new HtmlString(sprintf(
                             '<div class="space-y-2">
@@ -126,7 +133,7 @@ class BookingResource extends Resource
                                         <div class="text-base font-semibold text-gray-950 dark:text-white">%s</div>
                                         <div class="text-sm text-gray-600 dark:text-gray-400">%s</div>
                                     </div>
-                                    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-sm font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-100">%s</span>
+                                    <span class="rounded-full px-2.5 py-1 text-sm font-semibold ring-1" style="%s">%s</span>
                                 </div>
                                 <div class="text-sm"><span class="font-semibold">%s</span></div>
                                 <div class="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 ring-1 ring-amber-200 dark:bg-amber-950 dark:text-amber-100 dark:ring-amber-800">%s</div>
@@ -134,6 +141,7 @@ class BookingResource extends Resource
                             </div>',
                             e(Carbon::parse($record->time)->format('H:i')),
                             e(Carbon::parse($record->date)->translatedFormat('d M, D')),
+                            $statusClass,
                             e($status),
                             e($service),
                             $note,

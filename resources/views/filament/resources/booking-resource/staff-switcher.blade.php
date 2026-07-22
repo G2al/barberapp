@@ -14,21 +14,21 @@
             <button
                 type="button"
                 wire:click="$set('activeTab', '{{ $tabKey }}')"
-                style="min-width: 92px;"
+                style="min-width: 92px; {{ $isActive ? 'background:#111827;color:#facc15;border-color:#d4af37;box-shadow:0 8px 18px rgba(17,24,39,.18);' : 'background:#fffbeb;color:#3f2f08;border-color:#f3d88b;' }}"
                 @class([
                     'flex flex-col items-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition',
-                    'border-primary-500 bg-primary-50 text-primary-700 shadow-sm' => $isActive,
-                    'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50' => ! $isActive,
+                    'shadow-sm' => $isActive,
+                    'hover:border-amber-400 hover:bg-amber-50' => ! $isActive,
                 ])
             >
                 @if ($imageUrl)
                     <img
                         src="{{ $imageUrl }}"
                         alt="{{ $staff->full_name }}"
-                        class="h-14 w-14 rounded-full object-cover ring-2 {{ $isActive ? 'ring-primary-500' : 'ring-gray-200' }}"
+                        class="h-14 w-14 rounded-full object-cover ring-2 {{ $isActive ? 'ring-amber-300' : 'ring-amber-200' }}"
                     >
                 @else
-                    <span class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-base font-bold ring-2 {{ $isActive ? 'ring-primary-500' : 'ring-gray-200' }}">
+                    <span class="flex h-14 w-14 items-center justify-center rounded-full text-base font-bold ring-2 {{ $isActive ? 'bg-gray-900 text-amber-300 ring-amber-300' : 'bg-amber-100 text-amber-900 ring-amber-200' }}">
                         {{ mb_substr($staff->first_name, 0, 1) }}{{ mb_substr($staff->last_name, 0, 1) }}
                     </span>
                 @endif
