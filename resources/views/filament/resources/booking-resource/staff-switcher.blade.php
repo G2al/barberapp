@@ -2,17 +2,18 @@
     use Illuminate\Support\Facades\Storage;
 @endphp
 
-<div class="mb-4 overflow-x-auto">
+<div class="mb-4 overflow-x-auto md:hidden">
     <div class="flex gap-3">
         @foreach ($staffMembers as $staff)
             @php
-                $isActive = (int) $this->selectedStaffId === (int) $staff->id;
+                $tabKey = 'staff_' . $staff->id;
+                $isActive = $this->activeTab === $tabKey;
                 $imageUrl = $staff->image ? Storage::url($staff->image) : null;
             @endphp
 
             <button
                 type="button"
-                wire:click="selectStaff({{ $staff->id }})"
+                wire:click="$set('activeTab', '{{ $tabKey }}')"
                 style="min-width: 92px;"
                 @class([
                     'flex flex-col items-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition',

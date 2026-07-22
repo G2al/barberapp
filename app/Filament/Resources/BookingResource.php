@@ -97,13 +97,7 @@ class BookingResource extends Resource
             ->modifyQueryUsing(fn ($query) => $query
                 ->with(['user', 'staff', 'service', 'haircut'])
                 ->whereIn('status', ['pending', 'confirmed'])
-                ->where(function ($query) {
-                    $query->whereDate('date', '>', Carbon::today())
-                        ->orWhere(function ($query) {
-                            $query->whereDate('date', Carbon::today())
-                                ->whereTime('time', '>=', Carbon::now()->format('H:i'));
-                        });
-                })
+                ->whereDate('date', '>=', Carbon::today())
                 ->orderBy('date')
                 ->orderBy('time')
             )
@@ -134,14 +128,36 @@ class BookingResource extends Resource
                             ->label('Cliente')
                             ->state(fn (Booking $record) => trim(($record->user->name ?? '') . ' ' . ($record->user->surname ?? '')) ?: $record->user?->email)
                             ->searchable(['users.name', 'users.surname', 'users.email', 'users.phone']),
+
+                        Tables\Columns\TextColumn::make('note_preview')
+                            ->label('Note')
+                            ->state(fn (Booking $record) => filled($record->note) ? $record->note : null)
+                            ->placeholder('Senza note')
+                            ->color('warning')
+                            ->wrap()
+                            ->searchable(query: fn ($query, string $search) => $query->where('note', 'like', "%{$search}%")),
                     ])->space(1),
 
-                    Tables\Columns\TextColumn::make('note_flag')
-                        ->label('Note')
-                        ->state(fn (Booking $record) => filled($record->note) ? 'Note' : 'No note')
+                    Tables\Columns\TextColumn::make('status')
+                        ->label('Stato')
+                        ->formatStateUsing(fn ($state) => [
+                            'pending' => 'In sospeso',
+                            'confirmed' => 'Confermata',
+                            'completed' => 'Completata',
+                            'cancelled' => 'Annullata',
+                            'no_show' => 'Non presentato',
+                        ][$state] ?? $state)
                         ->badge()
-                        ->color(fn (Booking $record) => filled($record->note) ? 'warning' : 'gray'),
-                ])->from('md'),
+                        ->color(fn ($state) => [
+                            'pending' => 'warning',
+                            'confirmed' => 'success',
+                            'completed' => 'info',
+                            'cancelled' => 'danger',
+                            'no_show' => 'gray',
+                        ][$state] ?? 'gray'),
+                ])
+                    ->from('md')
+                    ->extraAttributes(['class' => 'md:hidden']),
 
                 Panel::make([
                     Stack::make([
@@ -155,39 +171,72 @@ class BookingResource extends Resource
                         Tables\Columns\TextColumn::make('client_contact')
                             ->label('Contatto cliente')
                             ->state(fn (Booking $record) => $record->user?->phone ?: $record->user?->email ?: 'Nessun contatto'),
-
-                        Tables\Columns\TextColumn::make('note')
-                            ->label('Note')
-                            ->state(fn (Booking $record) => filled($record->note) ? $record->note : 'Senza note')
-                            ->color(fn (Booking $record) => filled($record->note) ? 'warning' : 'gray')
-                            ->wrap()
-                            ->searchable(),
-
-                        Tables\Columns\TextColumn::make('status')
-                            ->label('Stato')
-                            ->formatStateUsing(fn ($state) => [
-                                'pending' => 'In sospeso',
-                                'confirmed' => 'Confermata',
-                                'completed' => 'Completata',
-                                'cancelled' => 'Annullata',
-                                'no_show' => 'Non presentato',
-                            ][$state] ?? $state)
-                            ->badge()
-                            ->color(fn ($state) => [
-                                'pending' => 'warning',
-                                'confirmed' => 'success',
-                                'completed' => 'info',
-                                'cancelled' => 'danger',
-                                'no_show' => 'gray',
-                            ][$state] ?? 'gray'),
                     ])->space(2),
                 ])
                     ->collapsible()
-                    ->collapsed(),
+                    ->collapsed()
+                    ->extraAttributes(['class' => 'md:hidden']),
+
+                Tables\Columns\TextColumn::make('date')
+                    ->formatStateUsing(fn ($state) => Carbon::parse($state)->format('d/m/Y'))
+                    ->sortable()
+                    ->label('Data')
+                    ->visibleFrom('md'),
+
+                Tables\Columns\TextColumn::make('time')
+                    ->formatStateUsing(fn ($state) => Carbon::parse($state)->format('H:i'))
+                    ->label('Ora')
+                    ->sortable()
+                    ->visibleFrom('md'),
+
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Cliente')
+                    ->formatStateUsing(fn ($state, Booking $record) => trim(($record->user->name ?? '') . ' ' . ($record->user->surname ?? '')) ?: $record->user?->email)
+                    ->description(fn (Booking $record) => $record->user?->phone ?: $record->user?->email)
+                    ->searchable(['users.name', 'users.surname', 'users.email', 'users.phone'])
+                    ->visibleFrom('md'),
+
+                Tables\Columns\TextColumn::make('desktop_service')
+                    ->state(fn (Booking $record) => $record->service?->name)
+                    ->label('Servizio')
+                    ->description(fn (Booking $record) => collect([
+                        $record->haircut?->name,
+                        $record->service?->duration ? $record->service->duration . ' min' : null,
+                    ])->filter()->join(' - '))
+                    ->searchable(query: fn ($query, string $search) => $query->whereHas('service', fn ($query) => $query->where('name', 'like', "%{$search}%")))
+                    ->visibleFrom('md'),
+
+                Tables\Columns\TextColumn::make('note')
+                    ->label('Note')
+                    ->placeholder('Senza note')
+                    ->limit(45)
+                    ->wrap()
+                    ->searchable()
+                    ->visibleFrom('md'),
+
+                Tables\Columns\BadgeColumn::make('desktop_status')
+                    ->label('Stato')
+                    ->state(fn (Booking $record) => $record->status)
+                    ->formatStateUsing(fn ($state) => [
+                        'pending' => 'In sospeso',
+                        'confirmed' => 'Confermata',
+                        'completed' => 'Completata',
+                        'cancelled' => 'Annullata',
+                        'no_show' => 'Non presentato',
+                    ][$state] ?? $state)
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'confirmed',
+                        'info' => 'completed',
+                        'danger' => 'cancelled',
+                        'gray' => 'no_show',
+                    ])
+                    ->visibleFrom('md'),
             ])
             ->filters([
                 Tables\Filters\Filter::make('today')
                     ->query(fn ($query) => $query->whereDate('date', Carbon::today()))
+                    ->default()
                     ->toggle()
                     ->label('Oggi'),
 
@@ -223,10 +272,6 @@ class BookingResource extends Resource
                     ->label('Servizio'),
             ])
             ->poll('30s')
-            ->contentGrid([
-                'md' => 1,
-                'xl' => 1,
-            ])
             ->paginated([25, 50, 100])
             ->defaultPaginationPageOption(50)
             ->actions([
