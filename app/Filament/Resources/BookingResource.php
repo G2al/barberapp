@@ -96,7 +96,6 @@ class BookingResource extends Resource
         return $table
             ->modifyQueryUsing(fn ($query) => $query
                 ->with(['user', 'staff', 'service', 'haircut'])
-                ->whereIn('status', ['pending', 'confirmed'])
                 ->orderBy('date')
                 ->orderBy('time')
             )

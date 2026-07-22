@@ -55,7 +55,6 @@ class ListBookings extends ListRecords
                 $tabs['staff_' . $staff->id] = Tab::make($staff->full_name)
                     ->badge(fn () => Booking::query()
                         ->where('staff_id', $staff->id)
-                        ->whereIn('status', ['pending', 'confirmed'])
                         ->whereDate('date', Carbon::today())
                         ->count())
                     ->modifyQueryUsing(fn (Builder $query) => $query->where('staff_id', $staff->id));
