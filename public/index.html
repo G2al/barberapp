@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Accedi - La Barberia Di Salvatore Nappaa</title>
+    <title>Accedi - La Barberia Di Salvatore Nappa</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="vender/bootstrap/css/bootstrap.min.css">
@@ -367,8 +367,19 @@
 
     // Registra il Service Worker per PWA
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+        let reloadingForUpdate = false;
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (reloadingForUpdate) return;
+            reloadingForUpdate = true;
+            window.location.reload();
+        });
+
+        navigator.serviceWorker.register('/service-worker.js', {
+            updateViaCache: 'none'
+        }).then((registration) => {
             console.log('Service Worker registrato:', registration);
+            registration.update();
         }).catch((error) => {
             console.log('Service Worker registrazione fallita:', error);
         });
