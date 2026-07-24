@@ -64,7 +64,7 @@ class BookingController extends Controller
         $hasOverlap = false;
         $bookings = Booking::where('staff_id', $staffId)
             ->where('date', $date)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['pending', 'confirmed', 'completed'])
             ->get();
 
         foreach ($bookings as $booking) {

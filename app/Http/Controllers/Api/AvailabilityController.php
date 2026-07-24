@@ -83,7 +83,7 @@ class AvailabilityController extends Controller
 
         $bookings = Booking::where('staff_id', $staffId)
             ->where('date', $date)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['pending', 'confirmed', 'completed'])
             ->orderBy('time')
             ->get();
 

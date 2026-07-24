@@ -28,17 +28,32 @@ class CompleteExpiredBookings extends Command
     public function handle()
     {
         // 🆕 Ottieni tutte le prenotazioni "confirmed" che sono scadute
-        $expiredBookings = Booking::where('status', 'confirmed')
-            ->where(function ($query) {
-                $query->whereRaw('CONCAT(date, \' \', time) <= ?', [Carbon::now()->format('Y-m-d H:i')])
-                    ->orWhereRaw('DATE(date) < ?', [Carbon::now()->format('Y-m-d')]);
-            })
+        $now = Carbon::now();
+
+        // Carica solo le prenotazioni confermate di oggi o dei giorni passati.
+        // La scadenza effettiva viene calcolata usando la durata del servizio.
+        $bookings = Booking::with('service')
+            ->where('status', 'confirmed')
+            ->whereDate('date', '<=', $now->toDateString())
             ->get();
 
         $count = 0;
-        foreach ($expiredBookings as $booking) {
-            $booking->update(['status' => 'completed']);
-            $count++;
+        foreach ($bookings as $booking) {
+            if (!$booking->service) {
+                continue;
+            }
+
+            $bookingDate = $booking->date instanceof Carbon
+                ? $booking->date->format('Y-m-d')
+                : Carbon::parse($booking->date)->format('Y-m-d');
+
+            $bookingEnd = Carbon::parse("{$bookingDate} {$booking->time}")
+                ->addMinutes((int) $booking->service->duration);
+
+            if ($bookingEnd->lte($now)) {
+                $booking->update(['status' => 'completed']);
+                $count++;
+            }
         }
 
         $this->info("✅ Marked $count expired bookings as completed");
