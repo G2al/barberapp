@@ -65,15 +65,29 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
 
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
     {
-        $this->booking->loadMissing('service');
+        $this->booking->loadMissing(['service', 'staff']);
+
+        $date = ucfirst(
+            $this->booking->date
+                ->locale('it')
+                ->translatedFormat('l j F Y')
+        );
+        $time = substr($this->booking->time, 0, 5);
+        $service = $this->booking->service->name ?? 'Servizio prenotato';
+        $staff = trim(
+            ($this->booking->staff->first_name ?? '') . ' ' .
+            ($this->booking->staff->last_name ?? '')
+        );
+        $staffText = $staff !== '' ? " con {$staff}" : '';
 
         return (new WebPushMessage)
             ->title('Prenotazione confermata')
             ->body(sprintf(
-                '%s alle %s · %s',
-                $this->booking->date->format('d/m/Y'),
-                substr($this->booking->time, 0, 5),
-                $this->booking->service->name ?? 'Servizio'
+                "%s alle %s\n%s%s",
+                $date,
+                $time,
+                $service,
+                $staffText
             ))
             ->icon('/images/logo-192x192.png')
             ->badge('/images/logo-192x192.png')

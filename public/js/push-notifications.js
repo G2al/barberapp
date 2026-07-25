@@ -5,6 +5,101 @@
         error: null,
     };
 
+    function ensureNotificationUi() {
+        if (!document.getElementById('pushNotificationMenu')) {
+            const headerActions = document.querySelector('.app-header > .d-flex:last-child');
+
+            if (headerActions) {
+                headerActions.insertAdjacentHTML('afterbegin', `
+                    <button
+                        type="button"
+                        class="btn header-btn notification-trigger"
+                        id="pushNotificationMenu"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#pushNotificationSheet"
+                        aria-controls="pushNotificationSheet"
+                        aria-label="Gestisci notifiche"
+                        title="Notifiche"
+                        hidden
+                    >
+                        <i class="bi bi-bell icon-md" id="pushNotificationIcon"></i>
+                        <span class="notification-status-dot" id="pushNotificationIndicator" aria-hidden="true"></span>
+                    </button>
+                `);
+            }
+        }
+
+        if (!document.getElementById('pushNotificationSheet')) {
+            document.body.insertAdjacentHTML('beforeend', `
+                <div
+                    class="offcanvas offcanvas-bottom notification-sheet"
+                    tabindex="-1"
+                    id="pushNotificationSheet"
+                    aria-labelledby="pushNotificationSheetTitle"
+                >
+                    <div class="offcanvas-header align-items-start px-4 pt-3 pb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="notification-sheet-icon">
+                                <i class="bi bi-bell-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="offcanvas-title fw-bold mb-1" id="pushNotificationSheetTitle">
+                                    Notifiche appuntamenti
+                                </h5>
+                                <p class="text-muted small mb-0">Promemoria utili, senza messaggi inutili.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Chiudi"></button>
+                    </div>
+                    <div class="offcanvas-body px-4 pt-2">
+                        <div class="rounded-4 bg-light p-3 mb-3">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-info-circle text-primary-color mt-1"></i>
+                                <p class="small mb-0" id="pushNotificationStatus">
+                                    Verifica disponibilità delle notifiche...
+                                </p>
+                            </div>
+                        </div>
+                        <div class="alert alert-warning small rounded-4 mb-3" id="pushNotificationHelp" hidden></div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-app py-2" id="pushNotificationToggle">
+                                <i class="bi bi-bell me-2"></i>Attiva notifiche
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary py-2" id="pushNotificationTest" hidden>
+                                <i class="bi bi-send-check me-2"></i>Invia notifica di prova
+                            </button>
+                        </div>
+                        <p class="text-muted text-center mt-3 mb-0" style="font-size: 12px;">
+                            Puoi disattivarle in qualsiasi momento da questo dispositivo.
+                        </p>
+                    </div>
+                </div>
+            `);
+        }
+
+        if (!document.getElementById('pushNotificationToast')) {
+            document.body.insertAdjacentHTML('beforeend', `
+                <div class="toast-container push-toast-container">
+                    <div
+                        class="toast push-toast border-0 shadow"
+                        id="pushNotificationToast"
+                        role="status"
+                        aria-live="polite"
+                        aria-atomic="true"
+                    >
+                        <div class="d-flex align-items-center gap-3 p-3">
+                            <div class="push-toast-icon" id="pushNotificationToastIcon" aria-hidden="true">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <div class="toast-body flex-grow-1" id="pushNotificationToastBody"></div>
+                            <button type="button" class="btn-close flex-shrink-0" data-bs-dismiss="toast" aria-label="Chiudi"></button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+    }
+
     function elements() {
         return {
             trigger: document.getElementById('pushNotificationMenu'),
@@ -16,6 +111,7 @@
             toggle: document.getElementById('pushNotificationToggle'),
             test: document.getElementById('pushNotificationTest'),
             toast: document.getElementById('pushNotificationToast'),
+            toastIcon: document.getElementById('pushNotificationToastIcon'),
             toastBody: document.getElementById('pushNotificationToastBody'),
         };
     }
@@ -33,6 +129,10 @@
         return 'serviceWorker' in navigator &&
             'PushManager' in window &&
             'Notification' in window;
+    }
+
+    function isDashboardPage() {
+        return window.location.pathname.endsWith('/dashboard.html');
     }
 
     function urlBase64ToUint8Array(value) {
@@ -69,13 +169,26 @@
         test.disabled = busy;
     }
 
-    function showToast(message) {
-        const { toast, toastBody } = elements();
+    function showToast(message, type = 'success') {
+        const { toast, toastIcon, toastBody } = elements();
         if (!toast || !toastBody || !window.bootstrap?.Toast) return;
 
+        const iconNames = {
+            success: 'bi-check-lg',
+            neutral: 'bi-bell-slash',
+            error: 'bi-exclamation-lg',
+        };
+
         toastBody.textContent = message;
+        toast.classList.toggle('is-neutral', type === 'neutral');
+        toast.classList.toggle('is-error', type === 'error');
+
+        if (toastIcon) {
+            toastIcon.innerHTML = `<i class="bi ${iconNames[type] || iconNames.success}"></i>`;
+        }
+
         window.bootstrap.Toast.getOrCreateInstance(toast, {
-            delay: 2800,
+            delay: 3500,
         }).show();
     }
 
@@ -84,6 +197,15 @@
         if (!sheet || !window.bootstrap?.Offcanvas) return;
 
         window.bootstrap.Offcanvas.getInstance(sheet)?.hide();
+    }
+
+    function openSheet() {
+        const { sheet } = elements();
+        if (!sheet || !window.bootstrap?.Offcanvas) return;
+
+        window.setTimeout(() => {
+            window.bootstrap.Offcanvas.getOrCreateInstance(sheet).show();
+        }, 500);
     }
 
     function setTriggerState(iconName, indicatorState = null) {
@@ -201,13 +323,14 @@
             state.error = null;
             render();
             closeSheet();
-            showToast('Notifiche attivate su questo dispositivo.');
+            showToast('Notifiche attivate. Ti avviseremo per ogni aggiornamento importante.');
         } catch (error) {
             if (Notification.permission === 'denied') {
                 render();
             } else {
                 const { status } = elements();
                 status.textContent = error.message || 'Impossibile attivare le notifiche.';
+                showToast('Non è stato possibile attivare le notifiche.', 'error');
             }
         } finally {
             setBusy(false);
@@ -234,10 +357,11 @@
             state.error = null;
             render();
             closeSheet();
-            showToast('Notifiche disattivate su questo dispositivo.');
+            showToast('Notifiche disattivate su questo dispositivo.', 'neutral');
         } catch (error) {
             const { status } = elements();
             status.textContent = error.message || 'Impossibile disattivare le notifiche.';
+            showToast('Non è stato possibile disattivare le notifiche.', 'error');
         } finally {
             setBusy(false);
         }
@@ -256,12 +380,15 @@
             showToast(result.message);
         } catch (error) {
             elements().status.textContent = error.message || 'Invio della notifica di prova non riuscito.';
+            showToast('Invio della notifica di prova non riuscito.', 'error');
         } finally {
             setBusy(false);
         }
     }
 
     async function initialize() {
+        ensureNotificationUi();
+
         const { trigger, toggle, test } = elements();
         if (!trigger || !getToken()) return;
 
@@ -276,7 +403,12 @@
 
         render();
 
-        if (!isPushSupported() || (isIos() && !isInstalledApp())) return;
+        if (!isPushSupported() || (isIos() && !isInstalledApp())) {
+            if (isDashboardPage()) {
+                openSheet();
+            }
+            return;
+        }
 
         try {
             const config = await pushApiRequest('/push/config');
@@ -299,6 +431,10 @@
         }
 
         render();
+
+        if (!state.subscription && isDashboardPage()) {
+            openSheet();
+        }
     }
 
     document.addEventListener('DOMContentLoaded', initialize);

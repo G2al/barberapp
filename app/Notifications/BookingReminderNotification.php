@@ -81,20 +81,34 @@ class BookingReminderNotification extends Notification implements ShouldQueue
 
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
     {
-        $this->booking->loadMissing('service');
+        $this->booking->loadMissing(['service', 'staff']);
 
         $title = match ($this->type) {
-            '24h' => 'Ci vediamo domani',
-            '3h' => 'Mancano meno di 3 ore',
-            default => 'Manca meno di 1 ora',
+            '24h' => 'Il tuo appuntamento è domani',
+            '3h' => 'Il tuo appuntamento è tra poco',
+            default => 'Manca meno di un’ora',
         };
+        $date = ucfirst(
+            $this->booking->date
+                ->locale('it')
+                ->translatedFormat('l j F Y')
+        );
+        $time = substr($this->booking->time, 0, 5);
+        $service = $this->booking->service->name ?? 'Servizio prenotato';
+        $staff = trim(
+            ($this->booking->staff->first_name ?? '') . ' ' .
+            ($this->booking->staff->last_name ?? '')
+        );
+        $staffText = $staff !== '' ? " con {$staff}" : '';
 
         return (new WebPushMessage)
             ->title($title)
             ->body(sprintf(
-                'Appuntamento alle %s · %s',
-                substr($this->booking->time, 0, 5),
-                $this->booking->service->name ?? 'Servizio'
+                "%s alle %s\n%s%s",
+                $date,
+                $time,
+                $service,
+                $staffText
             ))
             ->icon('/images/logo-192x192.png')
             ->badge('/images/logo-192x192.png')

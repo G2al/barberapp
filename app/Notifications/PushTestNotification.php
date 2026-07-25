@@ -16,8 +16,8 @@ class PushTestNotification extends Notification
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
     {
         return (new WebPushMessage)
-            ->title('Aletta Barber')
-            ->body('Le notifiche sono attive su questo dispositivo.')
+            ->title('Notifiche attive')
+            ->body('Perfetto! Riceverai qui conferme, aggiornamenti e promemoria dei tuoi appuntamenti.')
             ->icon('/images/logo-192x192.png')
             ->badge('/images/logo-192x192.png')
             ->tag('webpush-test')
