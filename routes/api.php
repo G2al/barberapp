@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\ClosedSlotController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\PushSubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +86,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites/{product}', [FavoriteController::class, 'store']);
     Route::delete('/favorites/{product}', [FavoriteController::class, 'destroy']);
+
+    Route::get('/push/config', [PushSubscriptionController::class, 'config']);
+    Route::post('/push/subscriptions', [PushSubscriptionController::class, 'store']);
+    Route::delete('/push/subscriptions', [PushSubscriptionController::class, 'destroy']);
+    Route::post('/push/test', [PushSubscriptionController::class, 'test'])->middleware('throttle:3,1');
 });
 
 

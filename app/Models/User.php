@@ -11,10 +11,11 @@ use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\ResetPasswordLink;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable implements FilamentUser, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable, CanResetPasswordTrait;
+    use HasApiTokens, HasFactory, HasPushSubscriptions, Notifiable, CanResetPasswordTrait;
 
     protected $fillable = [
         'name',

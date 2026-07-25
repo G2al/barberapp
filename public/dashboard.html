@@ -72,6 +72,28 @@
     <!-- Alert -->
     <div id="alertBox" class="ms-2 me-2"></div>
 
+    <div class="search-card mb-3" id="pushNotificationCard" hidden>
+      <div class="d-flex align-items-start gap-3">
+        <div class="fs-3 text-primary-color">
+          <i class="bi bi-bell"></i>
+        </div>
+        <div class="flex-grow-1">
+          <h6 class="fw-bold mb-1">Notifiche appuntamenti</h6>
+          <p class="text-muted small mb-3" id="pushNotificationStatus">
+            Verifica disponibilità delle notifiche...
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-app" id="pushNotificationToggle">
+              <i class="bi bi-bell me-2"></i>Attiva notifiche
+            </button>
+            <button type="button" class="btn btn-outline-secondary" id="pushNotificationTest" hidden>
+              Invia prova
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <h5 class="fw-bold text-primary-color mt-3 mb-3 ms-2">Prenota un servizio</h5>
 
     <div class="search-card">
@@ -151,12 +173,16 @@
   <script src="/js/config.js" defer></script>
   <script src="/js/auth.js" defer></script>
   <script src="/js/dashboard.js" defer></script>
+  <script src="/js/push-notifications.js" defer></script>
 
   <!-- PWA Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+      navigator.serviceWorker.register('/service-worker.js', {
+        updateViaCache: 'none'
+      }).then((registration) => {
         console.log('Service Worker registrato:', registration);
+        registration.update();
       }).catch((error) => {
         console.log('Service Worker registrazione fallita:', error);
       });

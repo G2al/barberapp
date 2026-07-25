@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class BookingCancelledNotification extends Notification implements ShouldQueue
 {
@@ -29,7 +31,17 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+
+        if (
+            filled(config('webpush.vapid.public_key')) &&
+            filled(config('webpush.vapid.private_key')) &&
+            $notifiable->pushSubscriptions()->exists()
+        ) {
+            $channels[] = WebPushChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -48,6 +60,29 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
                 'heroImage' => asset('images/temamail.jpeg'),
+            ]);
+    }
+
+    public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
+    {
+        return (new WebPushMessage)
+            ->title('Prenotazione annullata')
+            ->body(sprintf(
+                'La prenotazione del %s alle %s è stata annullata.',
+                $this->booking->date->format('d/m/Y'),
+                substr($this->booking->time, 0, 5)
+            ))
+            ->icon('/images/logo-192x192.png')
+            ->badge('/images/logo-192x192.png')
+            ->tag("booking-{$this->booking->id}-cancelled")
+            ->data([
+                'url' => '/my-bookings.html',
+                'booking_id' => $this->booking->id,
+                'type' => 'booking_cancelled',
+            ])
+            ->options([
+                'TTL' => 86400,
+                'urgency' => 'normal',
             ]);
     }
 

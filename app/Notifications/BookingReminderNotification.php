@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class BookingReminderNotification extends Notification implements ShouldQueue
 {
@@ -31,7 +33,17 @@ class BookingReminderNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+
+        if (
+            filled(config('webpush.vapid.public_key')) &&
+            filled(config('webpush.vapid.private_key')) &&
+            $notifiable->pushSubscriptions()->exists()
+        ) {
+            $channels[] = WebPushChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -64,6 +76,42 @@ class BookingReminderNotification extends Notification implements ShouldQueue
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
                 'heroImage' => asset('images/temamail.jpeg'),
+            ]);
+    }
+
+    public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
+    {
+        $this->booking->loadMissing('service');
+
+        $title = match ($this->type) {
+            '24h' => 'Ci vediamo domani',
+            '3h' => 'Mancano meno di 3 ore',
+            default => 'Manca meno di 1 ora',
+        };
+
+        return (new WebPushMessage)
+            ->title($title)
+            ->body(sprintf(
+                'Appuntamento alle %s · %s',
+                substr($this->booking->time, 0, 5),
+                $this->booking->service->name ?? 'Servizio'
+            ))
+            ->icon('/images/logo-192x192.png')
+            ->badge('/images/logo-192x192.png')
+            ->tag("booking-{$this->booking->id}-reminder-{$this->type}")
+            ->data([
+                'url' => '/my-bookings.html',
+                'booking_id' => $this->booking->id,
+                'type' => 'booking_reminder',
+                'reminder_type' => $this->type,
+            ])
+            ->options([
+                'TTL' => match ($this->type) {
+                    '24h' => 43200,
+                    '3h' => 7200,
+                    default => 3600,
+                },
+                'urgency' => $this->type === '1h' ? 'high' : 'normal',
             ]);
     }
 
