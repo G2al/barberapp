@@ -2,14 +2,21 @@
     const state = {
         publicKey: null,
         subscription: null,
+        error: null,
     };
 
     function elements() {
         return {
-            card: document.getElementById('pushNotificationCard'),
+            trigger: document.getElementById('pushNotificationMenu'),
+            indicator: document.getElementById('pushNotificationIndicator'),
+            icon: document.getElementById('pushNotificationIcon'),
+            sheet: document.getElementById('pushNotificationSheet'),
             status: document.getElementById('pushNotificationStatus'),
+            help: document.getElementById('pushNotificationHelp'),
             toggle: document.getElementById('pushNotificationToggle'),
             test: document.getElementById('pushNotificationTest'),
+            toast: document.getElementById('pushNotificationToast'),
+            toastBody: document.getElementById('pushNotificationToastBody'),
         };
     }
 
@@ -62,41 +69,85 @@
         test.disabled = busy;
     }
 
-    function render() {
-        const { card, status, toggle, test } = elements();
-        if (!card) return;
+    function showToast(message) {
+        const { toast, toastBody } = elements();
+        if (!toast || !toastBody || !window.bootstrap?.Toast) return;
 
-        card.hidden = false;
+        toastBody.textContent = message;
+        window.bootstrap.Toast.getOrCreateInstance(toast, {
+            delay: 2800,
+        }).show();
+    }
+
+    function closeSheet() {
+        const { sheet } = elements();
+        if (!sheet || !window.bootstrap?.Offcanvas) return;
+
+        window.bootstrap.Offcanvas.getInstance(sheet)?.hide();
+    }
+
+    function setTriggerState(iconName, indicatorState = null) {
+        const { icon, indicator } = elements();
+
+        icon.className = `bi ${iconName} icon-md`;
+        indicator.classList.remove('is-active', 'is-blocked');
+
+        if (indicatorState) {
+            indicator.classList.add(indicatorState);
+        }
+    }
+
+    function render() {
+        const { trigger, status, help, toggle, test } = elements();
+        if (!trigger) return;
+
+        trigger.hidden = false;
+        help.hidden = true;
+        help.textContent = '';
+        toggle.hidden = false;
+        test.hidden = true;
+        setTriggerState('bi-bell');
 
         if (isIos() && !isInstalledApp()) {
             status.textContent = 'Su iPhone apri Aletta Barber dalla schermata Home per attivare le notifiche.';
+            help.textContent = 'Apri il sito in Safari, tocca Condividi e scegli “Aggiungi alla schermata Home”.';
+            help.hidden = false;
             toggle.hidden = true;
-            test.hidden = true;
             return;
         }
 
         if (!isPushSupported()) {
             status.textContent = 'Le notifiche push non sono supportate su questo browser.';
+            help.textContent = 'Prova ad aggiornare il browser o utilizza Safari, Chrome o Edge.';
+            help.hidden = false;
             toggle.hidden = true;
-            test.hidden = true;
+            return;
+        }
+
+        if (state.error) {
+            status.textContent = state.error;
+            help.textContent = 'Controlla la connessione e riprova tra poco.';
+            help.hidden = false;
+            toggle.hidden = true;
+            setTriggerState('bi-bell-slash', 'is-blocked');
             return;
         }
 
         if (!state.publicKey) {
             status.textContent = 'Le notifiche saranno disponibili dopo la configurazione del server.';
             toggle.hidden = true;
-            test.hidden = true;
             return;
         }
 
         if (Notification.permission === 'denied') {
             status.textContent = 'Le notifiche sono bloccate. Riattivale dalle impostazioni del dispositivo.';
+            help.textContent = 'Apri le impostazioni delle notifiche del dispositivo e abilita Aletta Barber.';
+            help.hidden = false;
             toggle.hidden = true;
-            test.hidden = true;
+            setTriggerState('bi-bell-slash', 'is-blocked');
             return;
         }
 
-        toggle.hidden = false;
         toggle.disabled = false;
 
         if (state.subscription) {
@@ -105,6 +156,7 @@
             toggle.classList.remove('btn-app');
             toggle.classList.add('btn-outline-secondary');
             test.hidden = false;
+            setTriggerState('bi-bell-fill', 'is-active');
         } else {
             status.textContent = 'Ricevi conferme, annullamenti e promemoria delle tue prenotazioni.';
             toggle.innerHTML = '<i class="bi bi-bell me-2"></i>Attiva notifiche';
@@ -146,10 +198,17 @@
             });
 
             state.subscription = subscription;
+            state.error = null;
             render();
+            closeSheet();
+            showToast('Notifiche attivate su questo dispositivo.');
         } catch (error) {
-            const { status } = elements();
-            status.textContent = error.message || 'Impossibile attivare le notifiche.';
+            if (Notification.permission === 'denied') {
+                render();
+            } else {
+                const { status } = elements();
+                status.textContent = error.message || 'Impossibile attivare le notifiche.';
+            }
         } finally {
             setBusy(false);
         }
@@ -172,7 +231,10 @@
             }
 
             state.subscription = null;
+            state.error = null;
             render();
+            closeSheet();
+            showToast('Notifiche disattivate su questo dispositivo.');
         } catch (error) {
             const { status } = elements();
             status.textContent = error.message || 'Impossibile disattivare le notifiche.';
@@ -190,6 +252,8 @@
                 body: JSON.stringify({}),
             });
             elements().status.textContent = result.message;
+            closeSheet();
+            showToast(result.message);
         } catch (error) {
             elements().status.textContent = error.message || 'Invio della notifica di prova non riuscito.';
         } finally {
@@ -198,8 +262,8 @@
     }
 
     async function initialize() {
-        const { card, toggle, test } = elements();
-        if (!card || !getToken()) return;
+        const { trigger, toggle, test } = elements();
+        if (!trigger || !getToken()) return;
 
         toggle.addEventListener('click', () => {
             if (state.subscription) {
@@ -217,6 +281,7 @@
         try {
             const config = await pushApiRequest('/push/config');
             state.publicKey = config.supported ? config.public_key : null;
+            state.error = null;
 
             if (state.publicKey) {
                 const registration = await navigator.serviceWorker.ready;
@@ -230,7 +295,7 @@
                 }
             }
         } catch (error) {
-            elements().status.textContent = error.message || 'Impossibile verificare le notifiche.';
+            state.error = error.message || 'Impossibile verificare le notifiche.';
         }
 
         render();

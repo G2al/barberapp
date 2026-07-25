@@ -15,6 +15,66 @@
   <!-- Custom -->
   <link rel="stylesheet" href="css/style.css">
 
+  <style>
+    .notification-trigger {
+      position: relative;
+    }
+
+    .notification-status-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 9px;
+      height: 9px;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      background: #adb5bd;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .notification-status-dot.is-active {
+      background: #20c997;
+      transform: scale(1.08);
+    }
+
+    .notification-status-dot.is-blocked {
+      background: #dc3545;
+    }
+
+    .notification-sheet {
+      --bs-offcanvas-height: auto;
+      max-height: 78vh;
+      border-radius: 24px 24px 0 0;
+      border: 0;
+    }
+
+    .notification-sheet::before {
+      content: "";
+      display: block;
+      width: 42px;
+      height: 4px;
+      margin: 10px auto 0;
+      border-radius: 999px;
+      background: #d9d9d9;
+    }
+
+    .notification-sheet-icon {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(26, 26, 26, 0.08);
+      color: var(--primary-color, #1a1a1a);
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .notification-sheet .offcanvas-body {
+      padding-bottom: calc(22px + env(safe-area-inset-bottom));
+    }
+  </style>
+
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a1a1a">
@@ -55,6 +115,20 @@
     <h5 class="fw-bold text-white">Prenota</h5>
 
     <div class="d-flex gap-2">
+      <button
+        type="button"
+        class="btn header-btn notification-trigger"
+        id="pushNotificationMenu"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#pushNotificationSheet"
+        aria-controls="pushNotificationSheet"
+        aria-label="Gestisci notifiche"
+        title="Notifiche"
+        hidden
+      >
+        <i class="bi bi-bell icon-md" id="pushNotificationIcon"></i>
+        <span class="notification-status-dot" id="pushNotificationIndicator" aria-hidden="true"></span>
+      </button>
       <button class="btn header-btn" onclick="refreshApp()" title="Aggiorna">
         <i class="bi bi-arrow-clockwise icon-md"></i>
       </button>
@@ -71,28 +145,6 @@
 
     <!-- Alert -->
     <div id="alertBox" class="ms-2 me-2"></div>
-
-    <div class="search-card mb-3" id="pushNotificationCard" hidden>
-      <div class="d-flex align-items-start gap-3">
-        <div class="fs-3 text-primary-color">
-          <i class="bi bi-bell"></i>
-        </div>
-        <div class="flex-grow-1">
-          <h6 class="fw-bold mb-1">Notifiche appuntamenti</h6>
-          <p class="text-muted small mb-3" id="pushNotificationStatus">
-            Verifica disponibilità delle notifiche...
-          </p>
-          <div class="d-flex flex-wrap gap-2">
-            <button type="button" class="btn btn-app" id="pushNotificationToggle">
-              <i class="bi bi-bell me-2"></i>Attiva notifiche
-            </button>
-            <button type="button" class="btn btn-outline-secondary" id="pushNotificationTest" hidden>
-              Invia prova
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <h5 class="fw-bold text-primary-color mt-3 mb-3 ms-2">Prenota un servizio</h5>
 
@@ -144,6 +196,68 @@
       <button id="confirmBtn" class="btn-app btn w-100 fw-bold p-2 mt-2" onclick="confirmBooking()">
         <i class="bi bi-check-circle me-2"></i>Conferma Prenotazione
       </button>
+    </div>
+  </div>
+
+  <div
+    class="offcanvas offcanvas-bottom notification-sheet"
+    tabindex="-1"
+    id="pushNotificationSheet"
+    aria-labelledby="pushNotificationSheetTitle"
+  >
+    <div class="offcanvas-header align-items-start px-4 pt-3 pb-2">
+      <div class="d-flex align-items-center gap-3">
+        <div class="notification-sheet-icon">
+          <i class="bi bi-bell-fill"></i>
+        </div>
+        <div>
+          <h5 class="offcanvas-title fw-bold mb-1" id="pushNotificationSheetTitle">
+            Notifiche appuntamenti
+          </h5>
+          <p class="text-muted small mb-0">Promemoria utili, senza messaggi inutili.</p>
+        </div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Chiudi"></button>
+    </div>
+    <div class="offcanvas-body px-4 pt-2">
+      <div class="rounded-4 bg-light p-3 mb-3">
+        <div class="d-flex align-items-start gap-2">
+          <i class="bi bi-info-circle text-primary-color mt-1"></i>
+          <p class="small mb-0" id="pushNotificationStatus">
+            Verifica disponibilità delle notifiche...
+          </p>
+        </div>
+      </div>
+
+      <div class="alert alert-warning small rounded-4 mb-3" id="pushNotificationHelp" hidden></div>
+
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-app py-2" id="pushNotificationToggle">
+          <i class="bi bi-bell me-2"></i>Attiva notifiche
+        </button>
+        <button type="button" class="btn btn-outline-secondary py-2" id="pushNotificationTest" hidden>
+          <i class="bi bi-send-check me-2"></i>Invia notifica di prova
+        </button>
+      </div>
+
+      <p class="text-muted text-center mt-3 mb-0" style="font-size: 12px;">
+        Puoi disattivarle in qualsiasi momento da questo dispositivo.
+      </p>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div
+      class="toast border-0 shadow"
+      id="pushNotificationToast"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <div class="d-flex">
+        <div class="toast-body" id="pushNotificationToastBody"></div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Chiudi"></button>
+      </div>
     </div>
   </div>
 
