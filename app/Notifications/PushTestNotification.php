@@ -10,6 +10,10 @@ class PushTestNotification extends Notification
 {
     public function via(object $notifiable): array
     {
+        if (!config('features.push_notifications', false)) {
+            return [];
+        }
+
         return [WebPushChannel::class];
     }
 

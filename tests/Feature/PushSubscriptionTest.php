@@ -23,6 +23,7 @@ class PushSubscriptionTest extends TestCase
         config()->set('webpush.vapid.subject', 'https://alettabarber2k24.it');
         config()->set('webpush.vapid.public_key', 'public-test-key');
         config()->set('webpush.vapid.private_key', 'private-test-key');
+        config()->set('features.push_notifications', true);
     }
 
     public function test_push_routes_require_authentication(): void
@@ -90,6 +91,33 @@ class PushSubscriptionTest extends TestCase
             ->assertOk()
             ->assertJsonPath('supported', false)
             ->assertJsonPath('public_key', null);
+    }
+
+    public function test_push_config_can_be_disabled_by_feature_flag(): void
+    {
+        $user = User::factory()->create([
+            'surname' => 'Test',
+            'phone' => '3330000006',
+        ]);
+        Sanctum::actingAs($user);
+        config()->set('features.push_notifications', false);
+
+        $this->getJson('/api/push/config')
+            ->assertOk()
+            ->assertJsonPath('enabled', false)
+            ->assertJsonPath('supported', false)
+            ->assertJsonPath('public_key', null);
+
+        $this->postJson('/api/push/subscriptions', [
+            'endpoint' => 'https://push.example.test/subscriptions/device-disabled',
+            'keys' => [
+                'p256dh' => 'device-public-key',
+                'auth' => 'device-auth-token',
+            ],
+            'content_encoding' => 'aes128gcm',
+        ])
+            ->assertForbidden()
+            ->assertJsonPath('status', false);
     }
 
     public function test_push_test_requires_an_active_subscription(): void

@@ -34,6 +34,7 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
         $channels = ['mail'];
 
         if (
+            config('features.push_notifications', false) &&
             filled(config('webpush.vapid.public_key')) &&
             filled(config('webpush.vapid.private_key')) &&
             $notifiable->pushSubscriptions()->exists()

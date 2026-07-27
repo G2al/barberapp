@@ -1,5 +1,6 @@
 (() => {
     const state = {
+        enabled: false,
         publicKey: null,
         subscription: null,
         error: null,
@@ -223,6 +224,11 @@
         const { trigger, status, help, toggle, test } = elements();
         if (!trigger) return;
 
+        if (!state.enabled) {
+            trigger.hidden = true;
+            return;
+        }
+
         trigger.hidden = false;
         help.hidden = true;
         help.textContent = '';
@@ -412,8 +418,14 @@
 
         try {
             const config = await pushApiRequest('/push/config');
+            state.enabled = config.enabled === true;
             state.publicKey = config.supported ? config.public_key : null;
             state.error = null;
+
+            if (!state.enabled) {
+                render();
+                return;
+            }
 
             if (state.publicKey) {
                 const registration = await navigator.serviceWorker.ready;

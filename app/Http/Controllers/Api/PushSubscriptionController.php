@@ -11,13 +11,26 @@ use Illuminate\Validation\Rule;
 
 class PushSubscriptionController extends Controller
 {
+    private function pushNotificationsEnabled(): bool
+    {
+        return (bool) config('features.push_notifications', false);
+    }
+
+    private function webPushConfigured(): bool
+    {
+        return filled(config('webpush.vapid.public_key')) &&
+            filled(config('webpush.vapid.private_key'));
+    }
+
     public function config(): JsonResponse
     {
         $publicKey = config('webpush.vapid.public_key');
-        $configured = filled($publicKey) && filled(config('webpush.vapid.private_key'));
+        $enabled = $this->pushNotificationsEnabled();
+        $configured = $enabled && $this->webPushConfigured();
 
         return response()->json([
             'status' => true,
+            'enabled' => $enabled,
             'supported' => $configured,
             'public_key' => $configured ? $publicKey : null,
         ]);
@@ -25,7 +38,14 @@ class PushSubscriptionController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        if (!filled(config('webpush.vapid.public_key')) || !filled(config('webpush.vapid.private_key'))) {
+        if (!$this->pushNotificationsEnabled()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Le notifiche push sono disattivate.',
+            ], 403);
+        }
+
+        if (!$this->webPushConfigured()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Le notifiche push non sono ancora configurate.',
@@ -70,7 +90,14 @@ class PushSubscriptionController extends Controller
 
     public function test(Request $request): JsonResponse
     {
-        if (!filled(config('webpush.vapid.public_key')) || !filled(config('webpush.vapid.private_key'))) {
+        if (!$this->pushNotificationsEnabled()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Le notifiche push sono disattivate.',
+            ], 403);
+        }
+
+        if (!$this->webPushConfigured()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Le notifiche push non sono ancora configurate.',
