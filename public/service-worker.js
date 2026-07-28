@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'gaetabet-v51';
+const CACHE_NAME = 'gaetabet-v52';
 const ASSETS = [
   '/',
   '/index.html',
@@ -13,6 +13,7 @@ const ASSETS = [
   '/css/style.css',
   '/css/app-ui.css',
   '/js/app-ui.js',
+  '/js/push-notifications.js',
   '/js/auth.js',
   '/js/config.js',
   '/js/dashboard.js',
@@ -63,5 +64,63 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => caches.match(req))
+  );
+});
+
+self.addEventListener('push', (event) => {
+  let payload = {};
+
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = {
+      title: 'Nuovo aggiornamento',
+      body: event.data ? event.data.text() : '',
+    };
+  }
+
+  const data = payload.data || {};
+  const options = {
+    body: payload.body || '',
+    icon: payload.icon || '/images/logo-192x192.png',
+    badge: payload.badge || '/images/maskable-icon-192x192.png',
+    tag: payload.tag || 'gaetabet-notification',
+    vibrate: payload.vibrate || [150, 75, 150],
+    data: {
+      ...data,
+      url: data.url || '/my-bookings.html',
+    },
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title || 'GaetaBet', options)
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const targetUrl = new URL(
+    event.notification.data?.url || '/my-bookings.html',
+    self.location.origin
+  ).href;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clients) => {
+        const sameOriginClient = clients.find((client) => {
+          try {
+            return new URL(client.url).origin === self.location.origin;
+          } catch {
+            return false;
+          }
+        });
+
+        if (sameOriginClient) {
+          return sameOriginClient.navigate(targetUrl).then(() => sameOriginClient.focus());
+        }
+
+        return self.clients.openWindow(targetUrl);
+      })
   );
 });

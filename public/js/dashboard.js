@@ -77,6 +77,7 @@ function setupHeaderPanels(signal) {
 
     notificationPanel.addEventListener("click", (event) => event.stopPropagation(), { signal });
     document.addEventListener("click", closePanels, { signal });
+    window.appPushNotifications?.mount({ panel: notificationPanel });
 }
 
 async function loadAppConfiguration() {

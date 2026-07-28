@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\LoyaltyController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\PushSubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,6 +105,12 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/loyalty/summary', [LoyaltyController::class, 'summary']);
     Route::post('/loyalty/rewards/{reward}/redeem', [LoyaltyController::class, 'redeem']);
+});
+
+Route::middleware('auth:sanctum')->prefix('push')->group(function () {
+    Route::get('/config', [PushSubscriptionController::class, 'config']);
+    Route::post('/subscriptions', [PushSubscriptionController::class, 'store']);
+    Route::delete('/subscriptions', [PushSubscriptionController::class, 'destroy']);
 });
 
 

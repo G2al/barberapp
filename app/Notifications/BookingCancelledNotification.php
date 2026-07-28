@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class BookingCancelledNotification extends Notification implements ShouldQueue
 {
@@ -29,7 +31,13 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+
+        if (config('webpush.enabled')) {
+            $channels[] = WebPushChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -48,6 +56,29 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
                 'heroImage' => asset('images/booking-delete.png'),
+            ]);
+    }
+
+    public function toWebPush(object $notifiable): WebPushMessage
+    {
+        $this->booking->loadMissing(['staff', 'service']);
+
+        return (new WebPushMessage)
+            ->title('Prenotazione annullata')
+            ->body(sprintf(
+                'L’appuntamento %s del %s alle %s è stato annullato.',
+                $this->booking->service->name ?? '',
+                $this->booking->date->format('d/m/Y'),
+                substr((string) $this->booking->time, 0, 5),
+            ))
+            ->icon(asset('images/logo-192x192.png'))
+            ->badge(asset('images/maskable-icon-192x192.png'))
+            ->tag("booking-{$this->booking->id}")
+            ->vibrate([150, 75, 150])
+            ->data([
+                'url' => '/my-bookings.html',
+                'booking_id' => $this->booking->id,
+                'type' => 'booking_cancelled',
             ]);
     }
 

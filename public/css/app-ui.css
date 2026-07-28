@@ -748,3 +748,66 @@ body.spa-is-navigating .bottom-nav {
     transition: none;
   }
 }
+.push-panel-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.push-panel-status strong {
+    display: block;
+}
+
+.push-panel-status p {
+    margin: 4px 0 0;
+}
+
+.push-status-dot {
+    width: 9px;
+    height: 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    background: #787878;
+    box-shadow: 0 0 0 4px rgba(120, 120, 120, 0.12);
+}
+
+.push-panel-status--on .push-status-dot {
+    background: #32c875;
+    box-shadow: 0 0 0 4px rgba(50, 200, 117, 0.14);
+}
+
+.push-panel-status--error .push-status-dot {
+    background: #e4665a;
+    box-shadow: 0 0 0 4px rgba(228, 102, 90, 0.14);
+}
+
+.push-panel-status--loading .push-status-dot {
+    background: #ffd21c;
+    animation: push-status-pulse 1s ease-in-out infinite;
+}
+
+.push-panel-action {
+    width: 100%;
+    min-height: 38px;
+    margin-top: 13px;
+    border: 1px solid #ffd21c;
+    border-radius: 6px;
+    background: #ffd21c;
+    color: #090909;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.push-panel-action:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+@keyframes push-status-pulse {
+    50% {
+        opacity: 0.35;
+    }
+}

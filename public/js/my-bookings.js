@@ -87,6 +87,7 @@ function setupHeaderPanels(signal) {
 
     notificationPanel.addEventListener("click", (event) => event.stopPropagation());
     document.addEventListener("click", closePanels, { signal });
+    window.appPushNotifications?.mount({ panel: notificationPanel });
 }
 
 function setupSearch() {

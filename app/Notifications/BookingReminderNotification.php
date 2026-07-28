@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class BookingReminderNotification extends Notification implements ShouldQueue
 {
@@ -31,7 +33,13 @@ class BookingReminderNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+
+        if (config('webpush.enabled')) {
+            $channels[] = WebPushChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -64,6 +72,35 @@ class BookingReminderNotification extends Notification implements ShouldQueue
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
                 'heroImage' => asset('images/booking-reminder.png'),
+            ]);
+    }
+
+    public function toWebPush(object $notifiable): WebPushMessage
+    {
+        $this->booking->loadMissing(['staff', 'service']);
+
+        $title = match ($this->type) {
+            '24h' => 'Ci vediamo domani',
+            '3h' => 'Il tuo appuntamento si avvicina',
+            default => 'Manca meno di un’ora',
+        };
+
+        return (new WebPushMessage)
+            ->title($title)
+            ->body(sprintf(
+                '%s con %s alle %s.',
+                $this->booking->service->name ?? 'Appuntamento',
+                trim(($this->booking->staff->first_name ?? '').' '.($this->booking->staff->last_name ?? '')),
+                substr((string) $this->booking->time, 0, 5),
+            ))
+            ->icon(asset('images/logo-192x192.png'))
+            ->badge(asset('images/maskable-icon-192x192.png'))
+            ->tag("booking-reminder-{$this->booking->id}-{$this->type}")
+            ->vibrate([150, 75, 150])
+            ->data([
+                'url' => '/my-bookings.html',
+                'booking_id' => $this->booking->id,
+                'type' => 'booking_reminder',
             ]);
     }
 
