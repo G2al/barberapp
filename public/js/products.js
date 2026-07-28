@@ -17,12 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupHeaderPanels();
     setupProductSearch();
     setupFavoritesDrawer();
-    window.appLoader?.show("Prepariamo il catalogo");
-    try {
-        await Promise.all([loadAppConfiguration(), loadProducts()]);
-    } finally {
-        window.appLoader?.hide();
-    }
+    await Promise.all([loadAppConfiguration(), loadProducts()]);
 });
 
 function hydrateUserHeader() {

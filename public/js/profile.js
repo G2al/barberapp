@@ -21,12 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     setupProfileActions();
-    window.appLoader?.show("Carichiamo il tuo profilo");
-    try {
-        await Promise.all([loadProfile(), loadLoyalty()]);
-    } finally {
-        window.appLoader?.hide();
-    }
+    await Promise.all([loadProfile(), loadLoyalty()]);
 });
 
 function setupProfileActions() {

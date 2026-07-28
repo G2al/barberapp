@@ -25,15 +25,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectDate(toIsoDate(new Date()), false);
     updateSummary();
 
-    window.appLoader?.show("Prepariamo le disponibilità");
-    try {
-        await Promise.all([
-            loadAppConfiguration(),
-            loadStaff(),
-        ]);
-    } finally {
-        window.appLoader?.hide();
-    }
+    await Promise.all([
+        loadAppConfiguration(),
+        loadStaff(),
+    ]);
 });
 
 function hydrateUserHeader(user) {

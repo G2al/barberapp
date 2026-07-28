@@ -1,15 +1,34 @@
 (function () {
+    const launchLoaderVisible = shouldShowLaunchLoader();
     const state = {
-        loaderCount: 1,
-        loaderReadyAt: Date.now() + 520,
+        loaderCount: launchLoaderVisible ? 1 : 0,
         confirmResolve: null,
     };
+
+    function shouldShowLaunchLoader() {
+        const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+            || window.navigator.standalone === true;
+
+        if (!isStandalone) return false;
+
+        try {
+            if (window.sessionStorage.getItem("gaetabet-launch-loader-shown") === "1") {
+                return false;
+            }
+
+            window.sessionStorage.setItem("gaetabet-launch-loader-shown", "1");
+        } catch {
+            // Il loader resta disponibile anche se lo storage del browser e' bloccato.
+        }
+
+        return true;
+    }
 
     function mountUi() {
         if (document.getElementById("appLoader")) return;
 
         document.body.insertAdjacentHTML("beforeend", `
-            <div id="appLoader" class="app-loader show" role="status" aria-live="polite">
+            <div id="appLoader" class="app-loader${launchLoaderVisible ? " show" : ""}" role="status" aria-live="polite">
                 <div class="app-loader-inner">
                     <div class="app-loader-mark">
                         <span class="app-loader-ring"></span>
@@ -53,12 +72,7 @@
         state.loaderCount = Math.max(0, state.loaderCount - 1);
         if (state.loaderCount > 0) return;
 
-        const remaining = Math.max(0, state.loaderReadyAt - Date.now());
-        window.setTimeout(() => {
-            if (state.loaderCount === 0) {
-                document.getElementById("appLoader")?.classList.remove("show");
-            }
-        }, remaining);
+        document.getElementById("appLoader")?.classList.remove("show");
     }
 
     function loaderClear() {
@@ -204,7 +218,7 @@
         mountUi();
     }
 
-    window.addEventListener("load", () => window.setTimeout(loaderHide, 80), { once: true });
+    window.addEventListener("load", loaderHide, { once: true });
     window.addEventListener("unhandledrejection", () => {
         loaderClear();
         toast("Controlla la connessione e riprova tra qualche istante.", "error", {

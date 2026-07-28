@@ -31,12 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupSearch();
     setupStatusTabs();
     setupFilterDrawer();
-    window.appLoader?.show("Carichiamo le tue prenotazioni");
-    try {
-        await Promise.all([loadAppConfiguration(), loadBookings()]);
-    } finally {
-        window.appLoader?.hide();
-    }
+    await Promise.all([loadAppConfiguration(), loadBookings()]);
 });
 
 function hydrateUserHeader() {
