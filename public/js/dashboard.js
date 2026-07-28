@@ -1,367 +1,712 @@
+const bookingPageState = {
+    staff: [],
+    services: [],
+    selectedStaff: null,
+    selectedService: null,
+    selectedDate: "",
+    selectedTime: "",
+    calendarWeekStart: startOfWeek(new Date()),
+    availabilityRequest: 0,
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
     requireAuth();
 
-    const serviceSelect = document.getElementById("serviceSelect");
-    const barberSelect = document.getElementById("barberSelect");
-    const dateSelect = document.getElementById("dateSelect");
-    const monthSelect = document.getElementById("monthSelect");
-    const timeSelect = document.getElementById("timeSelect");
-    const dateStrip = document.getElementById("dateStrip");
-    const timeGrid = document.getElementById("timeGrid");
-    const serviceCardTitle = document.getElementById("serviceCardTitle");
-    const serviceCardMeta = document.getElementById("serviceCardMeta");
-    const barberCardTitle = document.getElementById("barberCardTitle");
-    const barberCardMeta = document.getElementById("barberCardMeta");
-    const barberAvatar = document.getElementById("barberAvatar");
-    const barberAvatarImg = document.getElementById("barberAvatarImg");
-    const heroBarberImg = document.getElementById("heroBarberImg");
-    const adminNoteStep = document.getElementById("adminNoteStep");
     const currentUser = getUser();
+    hydrateUserHeader(currentUser);
+    setupHeaderPanels();
+    setupCalendar();
+    setupServiceSelect();
 
     if (currentUser?.role === "admin") {
-        adminNoteStep?.classList.remove("d-none");
+        document.getElementById("adminNoteStep")?.classList.remove("d-none");
     }
 
-    const dayLabels = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
+    selectDate(toIsoDate(new Date()), false);
+    updateSummary();
 
-    const toIsoDate = (date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
+    window.appLoader?.show("Prepariamo le disponibilità");
+    try {
+        await Promise.all([
+            loadAppConfiguration(),
+            loadStaff(),
+        ]);
+    } finally {
+        window.appLoader?.hide();
+    }
+});
+
+function hydrateUserHeader(user) {
+    const firstName = user?.name?.trim() || "cliente";
+    document.getElementById("welcomeName").textContent = firstName;
+    document.getElementById("profileName").textContent = [user?.name, user?.surname].filter(Boolean).join(" ") || "Il tuo profilo";
+    document.getElementById("profileEmail").textContent = user?.email || "";
+}
+
+function setupHeaderPanels() {
+    const notificationButton = document.getElementById("notificationButton");
+    const profileButton = document.getElementById("profileButton");
+    const notificationPanel = document.getElementById("notificationPanel");
+    const profilePanel = document.getElementById("profilePanel");
+
+    const closePanels = () => {
+        notificationPanel.classList.remove("open");
+        profilePanel.classList.remove("open");
+        notificationButton.setAttribute("aria-expanded", "false");
+        profileButton.setAttribute("aria-expanded", "false");
     };
 
-    const toMonthValue = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    notificationButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const shouldOpen = !notificationPanel.classList.contains("open");
+        closePanels();
+        notificationPanel.classList.toggle("open", shouldOpen);
+        notificationButton.setAttribute("aria-expanded", String(shouldOpen));
+    });
 
-    const isOpenWeekday = (date) => {
-        const day = date.getDay();
-        return day >= 2 && day <= 6;
-    };
+    profileButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const shouldOpen = !profilePanel.classList.contains("open");
+        closePanels();
+        profilePanel.classList.toggle("open", shouldOpen);
+        profileButton.setAttribute("aria-expanded", String(shouldOpen));
+    });
 
-    const formatMonthLabel = (date) => date.toLocaleDateString("it-IT", {
+    notificationPanel.addEventListener("click", (event) => event.stopPropagation());
+    profilePanel.addEventListener("click", (event) => event.stopPropagation());
+    document.addEventListener("click", closePanels);
+}
+
+async function loadAppConfiguration() {
+    const locationElement = document.getElementById("shopLocation");
+
+    try {
+        const config = await apiGet("/app-config");
+        locationElement.textContent = config.location || "Via Toledo 156, Napoli";
+    } catch (error) {
+        locationElement.textContent = "Via Toledo 156, Napoli";
+    }
+}
+
+async function loadStaff() {
+    const staffGrid = document.getElementById("staffGrid");
+    const status = document.getElementById("staffStepStatus");
+
+    try {
+        const staff = await apiGet("/staff");
+        bookingPageState.staff = Array.isArray(staff) ? staff : [];
+        renderStaff();
+
+        status.textContent = bookingPageState.staff.length
+            ? `${bookingPageState.staff.length} disponibili`
+            : "Nessuno disponibile";
+    } catch (error) {
+        staffGrid.innerHTML = '<p class="empty-line">Impossibile caricare lo staff. Riprova tra poco.</p>';
+        status.textContent = "Errore";
+    }
+}
+
+function renderStaff() {
+    const staffGrid = document.getElementById("staffGrid");
+    const barberSelect = document.getElementById("barberSelect");
+
+    staffGrid.innerHTML = "";
+    barberSelect.innerHTML = '<option value="">Seleziona barbiere</option>';
+
+    if (!bookingPageState.staff.length) {
+        staffGrid.innerHTML = '<p class="empty-line">Nessun barbiere disponibile al momento.</p>';
+        return;
+    }
+
+    bookingPageState.staff.forEach((staffMember) => {
+        const fullName = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(" ");
+        const option = document.createElement("option");
+        option.value = staffMember.id;
+        option.textContent = fullName;
+        barberSelect.appendChild(option);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "staff-option";
+        button.dataset.staffId = String(staffMember.id);
+        button.setAttribute("aria-pressed", "false");
+        button.setAttribute("aria-label", `Seleziona ${fullName}`);
+
+        const avatar = document.createElement("span");
+        avatar.className = "staff-avatar";
+        const initials = getInitials(staffMember);
+
+        if (staffMember.image_url) {
+            const image = document.createElement("img");
+            image.src = staffMember.image_url;
+            image.alt = fullName;
+            image.addEventListener("error", () => {
+                image.remove();
+                avatar.textContent = initials;
+            }, { once: true });
+            avatar.appendChild(image);
+        } else {
+            avatar.textContent = initials;
+        }
+
+        const name = document.createElement("span");
+        name.className = "staff-name";
+        name.textContent = staffMember.first_name || fullName;
+
+        button.append(avatar, name);
+        button.addEventListener("click", () => selectStaff(staffMember.id));
+        staffGrid.appendChild(button);
+    });
+}
+
+function getInitials(staffMember) {
+    return [staffMember.first_name, staffMember.last_name]
+        .filter(Boolean)
+        .map((value) => value.charAt(0).toUpperCase())
+        .join("")
+        .slice(0, 2) || "GC";
+}
+
+async function selectStaff(staffId) {
+    const numericId = Number(staffId);
+    const selectedStaff = bookingPageState.staff.find((staffMember) => Number(staffMember.id) === numericId);
+
+    if (!selectedStaff) return;
+
+    bookingPageState.selectedStaff = selectedStaff;
+    bookingPageState.selectedService = null;
+    bookingPageState.selectedTime = "";
+
+    document.getElementById("barberSelect").value = String(selectedStaff.id);
+    document.querySelectorAll(".staff-option").forEach((button) => {
+        const isActive = Number(button.dataset.staffId) === numericId;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+    });
+
+    document.getElementById("staffStepStatus").textContent = selectedStaff.first_name;
+    resetServices("Caricamento servizi...");
+    resetTimes("Seleziona un servizio per vedere gli orari.");
+    updateSummary();
+
+    await loadServicesForStaff(selectedStaff.id);
+}
+
+function resetServices(message) {
+    const serviceSelect = document.getElementById("serviceSelect");
+    bookingPageState.services = [];
+    serviceSelect.disabled = true;
+    serviceSelect.innerHTML = `<option value="">${message}</option>`;
+    document.getElementById("serviceMeta").textContent = "Durata e prezzo appariranno qui.";
+    document.getElementById("serviceStepStatus").textContent = message;
+    renderCustomServiceSelect();
+}
+
+async function loadServicesForStaff(staffId) {
+    const serviceSelect = document.getElementById("serviceSelect");
+    const status = document.getElementById("serviceStepStatus");
+
+    try {
+        const services = await apiGet(`/services/by-staff/${staffId}`);
+
+        if (Number(bookingPageState.selectedStaff?.id) !== Number(staffId)) return;
+
+        bookingPageState.services = Array.isArray(services) ? services : [];
+        serviceSelect.innerHTML = '<option value="">Seleziona servizio</option>';
+
+        bookingPageState.services.forEach((service) => {
+            const option = document.createElement("option");
+            option.value = service.id;
+            option.textContent = service.name;
+            serviceSelect.appendChild(option);
+        });
+
+        serviceSelect.disabled = bookingPageState.services.length === 0;
+        renderCustomServiceSelect();
+        status.textContent = bookingPageState.services.length
+            ? `${bookingPageState.services.length} servizi`
+            : "Nessun servizio";
+
+        if (!bookingPageState.services.length) {
+            serviceSelect.innerHTML = '<option value="">Nessun servizio disponibile</option>';
+            renderCustomServiceSelect();
+        }
+    } catch (error) {
+        bookingPageState.services = [];
+        serviceSelect.disabled = true;
+        serviceSelect.innerHTML = '<option value="">Errore nel caricamento</option>';
+        status.textContent = "Errore";
+        renderCustomServiceSelect();
+    }
+}
+
+function setupServiceSelect() {
+    const serviceSelect = document.getElementById("serviceSelect");
+    const shell = document.getElementById("serviceSelectShell");
+    const trigger = document.getElementById("serviceSelectTrigger");
+    const menu = document.getElementById("serviceSelectMenu");
+
+    trigger.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (trigger.disabled) return;
+        setServiceMenuOpen(!shell.classList.contains("open"));
+    });
+
+    trigger.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown" && !trigger.disabled) {
+            event.preventDefault();
+            setServiceMenuOpen(true);
+            menu.querySelector(".service-select-option")?.focus();
+        }
+
+        if (event.key === "Escape") {
+            setServiceMenuOpen(false);
+        }
+    });
+
+    menu.addEventListener("click", (event) => event.stopPropagation());
+    document.addEventListener("click", () => setServiceMenuOpen(false));
+
+    serviceSelect.addEventListener("change", async (event) => {
+        const serviceId = Number(event.target.value);
+        bookingPageState.selectedService = bookingPageState.services.find((service) => Number(service.id) === serviceId) || null;
+        bookingPageState.selectedTime = "";
+        syncCustomServiceSelection();
+        setServiceMenuOpen(false);
+
+        if (bookingPageState.selectedService) {
+            const service = bookingPageState.selectedService;
+            document.getElementById("serviceMeta").textContent = `${service.duration} minuti · ${formatPrice(service.price)}`;
+            document.getElementById("serviceStepStatus").textContent = `${service.duration} min`;
+        } else {
+            document.getElementById("serviceMeta").textContent = "Durata e prezzo appariranno qui.";
+            document.getElementById("serviceStepStatus").textContent = `${bookingPageState.services.length} servizi`;
+        }
+
+        resetTimes("Caricamento orari...");
+        updateSummary();
+        await loadAvailableTimes();
+    });
+
+    renderCustomServiceSelect();
+}
+
+function renderCustomServiceSelect() {
+    const serviceSelect = document.getElementById("serviceSelect");
+    const trigger = document.getElementById("serviceSelectTrigger");
+    const menu = document.getElementById("serviceSelectMenu");
+
+    trigger.disabled = serviceSelect.disabled;
+    menu.innerHTML = "";
+
+    bookingPageState.services.forEach((service) => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "service-select-option";
+        option.dataset.serviceId = String(service.id);
+        option.setAttribute("role", "option");
+
+        const name = document.createElement("span");
+        name.className = "service-option-name";
+        name.textContent = service.name;
+
+        const meta = document.createElement("span");
+        meta.className = "service-option-meta";
+        meta.textContent = `${service.duration} min - ${formatPrice(service.price)}`;
+
+        option.append(name, meta);
+        option.addEventListener("click", () => {
+            serviceSelect.value = String(service.id);
+            serviceSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+        menu.appendChild(option);
+    });
+
+    syncCustomServiceSelection();
+}
+
+function syncCustomServiceSelection() {
+    const serviceSelect = document.getElementById("serviceSelect");
+    const label = document.getElementById("serviceSelectLabel");
+    const selectedService = bookingPageState.selectedService;
+
+    label.textContent = selectedService
+        ? selectedService.name
+        : serviceSelect.options[0]?.textContent || "Seleziona servizio";
+
+    document.querySelectorAll(".service-select-option").forEach((option) => {
+        const isActive = Number(option.dataset.serviceId) === Number(selectedService?.id);
+        option.classList.toggle("active", isActive);
+        option.setAttribute("aria-selected", String(isActive));
+    });
+}
+
+function setServiceMenuOpen(isOpen) {
+    const shell = document.getElementById("serviceSelectShell");
+    const trigger = document.getElementById("serviceSelectTrigger");
+
+    if (trigger.disabled) isOpen = false;
+
+    shell.classList.toggle("open", isOpen);
+    trigger.setAttribute("aria-expanded", String(isOpen));
+}
+
+function setupCalendar() {
+    document.getElementById("previousMonth").addEventListener("click", () => changeCalendarWeek(-1));
+    document.getElementById("nextMonth").addEventListener("click", () => changeCalendarWeek(1));
+    renderCalendar();
+}
+
+function changeCalendarWeek(offset) {
+    const nextWeek = new Date(bookingPageState.calendarWeekStart);
+    nextWeek.setDate(nextWeek.getDate() + (offset * 7));
+
+    const firstWeek = startOfWeek(new Date());
+    const maxDate = new Date(new Date().getFullYear(), new Date().getMonth() + 6, 0);
+
+    if (nextWeek < firstWeek || nextWeek > maxDate) return;
+
+    bookingPageState.calendarWeekStart = nextWeek;
+    renderCalendar();
+}
+
+function renderCalendar() {
+    const grid = document.getElementById("calendarGrid");
+    const monthLabel = document.getElementById("calendarMonthLabel");
+    const weekStart = bookingPageState.calendarWeekStart;
+    const today = startOfDay(new Date());
+    const maxDate = new Date(today.getFullYear(), today.getMonth() + 6, 0);
+    const labelDate = new Date(weekStart);
+    labelDate.setDate(labelDate.getDate() + 3);
+    const weekdayLabels = ["L", "M", "M", "G", "V", "S", "D"];
+
+    monthLabel.textContent = labelDate.toLocaleDateString("it-IT", {
         month: "long",
         year: "numeric",
     });
 
-    const formatPrice = (price) => {
-        const value = Number(price || 0);
-        return `EUR ${value.toFixed(2)}`;
-    };
+    grid.innerHTML = "";
 
-    const updateServiceCard = () => {
-        const option = serviceSelect.options[serviceSelect.selectedIndex];
+    for (let index = 0; index < 7; index++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + index);
+        const isoDate = toIsoDate(date);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "calendar-day";
+        const isPast = startOfDay(date) < today;
+        const isBeyondRange = date > maxDate;
 
-        if (!serviceSelect.value || !option) {
-            serviceCardTitle.textContent = "Scegli servizio";
-            serviceCardMeta.textContent = "Durata e prezzo";
-            return;
-        }
+        const weekday = document.createElement("span");
+        weekday.className = "weekday";
+        weekday.textContent = weekdayLabels[index];
 
-        serviceCardTitle.textContent = option.dataset.name || option.textContent.trim();
-        serviceCardMeta.textContent = `${option.dataset.duration || "-"} min  -  ${formatPrice(option.dataset.price)}`;
-    };
+        const dayNumber = document.createElement("strong");
+        dayNumber.className = "day-number";
+        dayNumber.textContent = String(date.getDate());
 
-    const updateBarberCard = () => {
-        const option = barberSelect.options[barberSelect.selectedIndex];
+        button.append(weekday, dayNumber);
+        button.dataset.date = isoDate;
+        button.disabled = isPast || isBeyondRange;
+        button.classList.toggle("today", isoDate === toIsoDate(today));
+        button.classList.toggle("active", isoDate === bookingPageState.selectedDate);
+        button.setAttribute("aria-label", formatLongDate(date));
+        button.addEventListener("click", () => selectDate(isoDate));
+        grid.appendChild(button);
+    }
 
-        if (!barberSelect.value || !option) {
-            barberCardTitle.textContent = "Scegli barbiere";
-            barberCardMeta.textContent = "Giovanni Cerino Hair Stylist";
-            barberAvatar.classList.remove("has-image");
-            barberAvatarImg.removeAttribute("src");
-            if (heroBarberImg) heroBarberImg.src = "/images/logo.jpg";
-            return;
-        }
+    const firstAllowedWeek = startOfWeek(today);
+    const nextWeekStart = new Date(weekStart);
+    nextWeekStart.setDate(nextWeekStart.getDate() + 7);
+    document.getElementById("previousMonth").disabled = weekStart <= firstAllowedWeek;
+    document.getElementById("nextMonth").disabled = nextWeekStart > maxDate;
+}
 
-        barberCardTitle.textContent = option.textContent.trim();
-        barberCardMeta.textContent = "Senior Barber";
+async function selectDate(isoDate, loadTimes = true) {
+    bookingPageState.selectedDate = isoDate;
+    bookingPageState.selectedTime = "";
+    document.getElementById("dateSelect").value = isoDate;
 
-        if (option.dataset.image) {
-            barberAvatarImg.src = option.dataset.image;
-            if (heroBarberImg) heroBarberImg.src = option.dataset.image;
-            barberAvatar.classList.add("has-image");
-        } else {
-            barberAvatar.classList.remove("has-image");
-            barberAvatarImg.removeAttribute("src");
-            if (heroBarberImg) heroBarberImg.src = "/images/logo.jpg";
-        }
-    };
+    const date = parseIsoDate(isoDate);
+    const formattedDate = formatLongDate(date);
+    document.getElementById("selectedDateLabel").textContent = formattedDate;
 
-    const renderMonthOptions = () => {
-        if (!monthSelect) return;
+    const visibleWeekEnd = new Date(bookingPageState.calendarWeekStart);
+    visibleWeekEnd.setDate(visibleWeekEnd.getDate() + 6);
 
-        const start = new Date();
-        start.setDate(1);
-        monthSelect.innerHTML = "";
+    if (date < bookingPageState.calendarWeekStart || date > visibleWeekEnd) {
+        bookingPageState.calendarWeekStart = startOfWeek(date);
+    }
 
-        for (let i = 0; i < 6; i++) {
-            const monthDate = new Date(start.getFullYear(), start.getMonth() + i, 1);
-            const option = document.createElement("option");
-            option.value = toMonthValue(monthDate);
-            option.textContent = formatMonthLabel(monthDate);
-            monthSelect.appendChild(option);
-        }
-    };
+    renderCalendar();
+    updateSummary();
 
-    const renderDateStrip = () => {
-        const selectedMonth = monthSelect?.value || toMonthValue(new Date());
-        const [year, month] = selectedMonth.split("-").map(Number);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const start = new Date(year, month - 1, 1);
-        const end = new Date(year, month, 0);
-        dateStrip.innerHTML = "";
-        const visibleDates = [];
-
-        for (let day = 1; day <= end.getDate(); day++) {
-            const date = new Date(year, month - 1, day);
-            if (date < today || !isOpenWeekday(date)) continue;
-
-            visibleDates.push(date);
-            const value = toIsoDate(date);
-
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "date-pill";
-            button.dataset.date = value;
-            button.innerHTML = `<strong>${String(date.getDate()).padStart(2, "0")}</strong><span>${dayLabels[date.getDay()]}</span>`;
-            button.addEventListener("click", async () => {
-                dateSelect.value = value;
-                highlightDate();
-                await loadAvailableTimes();
-            });
-
-            dateStrip.appendChild(button);
-        }
-
-        if (!visibleDates.length) {
-            dateStrip.innerHTML = `<p class="time-empty">Nessun giorno disponibile in questo mese.</p>`;
-            dateSelect.value = "";
-            resetTimes("Scegli un mese con giorni disponibili.");
-            return;
-        }
-
-        const selectedStillVisible = visibleDates.some((date) => toIsoDate(date) === dateSelect.value);
-        if (!selectedStillVisible) {
-            dateSelect.value = toIsoDate(visibleDates[0]);
-        }
-
-        highlightDate();
-    };
-
-    const highlightDate = () => {
-        document.querySelectorAll(".date-pill").forEach((button) => {
-            button.classList.toggle("active", button.dataset.date === dateSelect.value);
-        });
-    };
-
-    const renderTimeButtonsFromSelect = () => {
-        timeGrid.innerHTML = "";
-
-        const options = Array.from(timeSelect.options).filter((option) => option.value && !option.disabled);
-
-        if (options.length === 0) {
-            const message = timeSelect.options[0]?.textContent || "Nessun orario disponibile";
-            timeGrid.innerHTML = `<p class="time-empty">${message}</p>`;
-            return;
-        }
-
-        options.forEach((option) => {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "time-slot";
-            button.textContent = option.value;
-            button.dataset.time = option.value;
-            button.addEventListener("click", () => {
-                timeSelect.value = option.value;
-                highlightTime();
-            });
-
-            timeGrid.appendChild(button);
-        });
-
-        highlightTime();
-    };
-
-    const highlightTime = () => {
-        document.querySelectorAll(".time-slot").forEach((button) => {
-            button.classList.toggle("active", button.dataset.time === timeSelect.value);
-        });
-    };
-
-    const resetTimes = (message = "Scegli servizio, barbiere e data.") => {
-        timeSelect.innerHTML = `<option value="">${message}</option>`;
-        timeGrid.innerHTML = `<p class="time-empty">${message}</p>`;
-    };
-
-    const loadAvailableTimes = async () => {
-        const date = dateSelect.value;
-        const barberId = barberSelect.value;
-        const serviceId = serviceSelect.value;
-
+    if (loadTimes) {
         resetTimes("Caricamento orari...");
-
-        if (!date || !barberId || !serviceId) {
-            resetTimes("Scegli servizio, barbiere e data.");
-            return;
-        }
-
-        const response = await apiGet(`/availability/${barberId}?date=${date}&serviceId=${serviceId}`);
-
-        if (response.closed_slots && response.closed_slots.length > 0) {
-            const closedDay = response.closed_slots.find(cs => cs.time === null);
-            if (closedDay) {
-                resetTimes(`Giorno chiuso: ${closedDay.reason || ""}`.trim());
-                return;
-            }
-        }
-
-        if (!response.slots || response.slots.length === 0) {
-            resetTimes("Nessun orario disponibile");
-            return;
-        }
-
-        timeSelect.innerHTML = `<option value="">Seleziona ora</option>`;
-
-        response.slots.forEach(slot => {
-            const closedSlot = response.closed_slots?.find(cs => cs.time && cs.time.substring(0, 5) === slot);
-            const label = closedSlot ? `${slot} - chiuso (${closedSlot.reason || ""})` : slot;
-            timeSelect.innerHTML += `<option value="${slot}" ${closedSlot ? "disabled" : ""}>${label}</option>`;
-        });
-
-        renderTimeButtonsFromSelect();
-    };
-
-    const today = toIsoDate(new Date());
-    dateSelect.min = today;
-    renderMonthOptions();
-    if (monthSelect) monthSelect.value = toMonthValue(new Date());
-    renderDateStrip();
-    highlightDate();
-    resetTimes();
-
-    const services = await apiGet("/services");
-
-    serviceSelect.innerHTML = `<option value="">Seleziona servizio</option>`;
-
-    services.forEach(s => {
-        const option = document.createElement("option");
-        option.value = s.id;
-        option.textContent = `${s.name} - ${formatPrice(s.price)} (${s.duration} min)`;
-        option.dataset.name = s.name;
-        option.dataset.price = s.price;
-        option.dataset.duration = s.duration;
-        serviceSelect.appendChild(option);
-    });
-
-    updateServiceCard();
-    updateBarberCard();
-
-    serviceSelect.addEventListener("change", async () => {
-        const serviceId = serviceSelect.value;
-
-        updateServiceCard();
-        barberSelect.innerHTML = `<option value="">Caricamento...</option>`;
-        updateBarberCard();
-        resetTimes();
-
-        if (!serviceId) {
-            barberSelect.innerHTML = `<option value="">Seleziona un servizio prima</option>`;
-            updateBarberCard();
-            return;
-        }
-
-        const staff = await apiGet(`/staff/by-service/${serviceId}`);
-
-        if (staff.length === 0) {
-            barberSelect.innerHTML = `<option value="">Nessun barbiere disponibile</option>`;
-            updateBarberCard();
-            return;
-        }
-
-        barberSelect.innerHTML = `<option value="">Seleziona barbiere</option>`;
-
-        staff.forEach(b => {
-            const option = document.createElement("option");
-            option.value = b.id;
-            option.textContent = `${b.first_name} ${b.last_name}`;
-            if (b.image_url) option.dataset.image = b.image_url;
-            barberSelect.appendChild(option);
-        });
-
-        updateBarberCard();
-    });
-
-    barberSelect.addEventListener("change", async () => {
-        updateBarberCard();
         await loadAvailableTimes();
-    });
+    } else {
+        resetTimes("Scegli barbiere, servizio e data per vedere gli orari.");
+    }
+}
 
-    dateSelect.addEventListener("change", async () => {
-        highlightDate();
-        await loadAvailableTimes();
-    });
+async function loadAvailableTimes() {
+    const staffId = bookingPageState.selectedStaff?.id;
+    const serviceId = bookingPageState.selectedService?.id;
+    const date = bookingPageState.selectedDate;
 
-    monthSelect?.addEventListener("change", async () => {
-        renderDateStrip();
-        await loadAvailableTimes();
-    });
-
-    timeSelect.addEventListener("change", highlightTime);
-});
-
-async function confirmBooking() {
-    const confirmBtn = document.getElementById("confirmBtn");
-    const serviceSelect = document.getElementById("serviceSelect");
-    const barberSelect = document.getElementById("barberSelect");
-    const dateSelect = document.getElementById("dateSelect");
-    const timeSelect = document.getElementById("timeSelect");
-    const bookingNote = document.getElementById("bookingNote");
-
-    const serviceId = serviceSelect.value;
-    const barberId = barberSelect.value;
-    const date = dateSelect.value;
-    const time = timeSelect.value;
-
-    if (!serviceId || !barberId || !date || !time) {
-        showAlert("Compila tutti i campi", "danger");
+    if (!staffId || !serviceId || !date) {
+        resetTimes("Seleziona barbiere, servizio e data per vedere gli orari disponibili.");
         return;
     }
 
-    setButtonLoading(confirmBtn, true);
+    const requestId = ++bookingPageState.availabilityRequest;
+    resetTimes("Caricamento orari disponibili...");
+    document.getElementById("timeStepStatus").textContent = "Caricamento";
+
+    try {
+        const response = await apiGet(`/availability/${staffId}?date=${encodeURIComponent(date)}&serviceId=${serviceId}`);
+
+        if (requestId !== bookingPageState.availabilityRequest) return;
+
+        const fullDayClosure = response.closed_slots?.find((closedSlot) => closedSlot.time === null);
+        if (fullDayClosure) {
+            const reason = fullDayClosure.reason ? `: ${fullDayClosure.reason}` : "";
+            resetTimes(`Giorno non disponibile${reason}`);
+            return;
+        }
+
+        const slots = Array.isArray(response.slots) ? response.slots : [];
+        renderTimeSlots(slots);
+    } catch (error) {
+        if (requestId !== bookingPageState.availabilityRequest) return;
+        resetTimes("Impossibile caricare gli orari. Riprova.");
+    }
+}
+
+function renderTimeSlots(slots) {
+    const timeGrid = document.getElementById("timeGrid");
+    const timeSelect = document.getElementById("timeSelect");
+    const status = document.getElementById("timeStepStatus");
+
+    timeGrid.innerHTML = "";
+    timeSelect.innerHTML = '<option value="">Seleziona orario</option>';
+    bookingPageState.selectedTime = "";
+
+    if (!slots.length) {
+        timeGrid.innerHTML = '<p class="time-empty">Nessun orario disponibile per questa data. Prova un altro giorno.</p>';
+        status.textContent = "Nessun orario";
+        updateSummary();
+        return;
+    }
+
+    const periods = [
+        {
+            label: "Mattina",
+            slots: slots.filter((slot) => Number(slot.split(":")[0]) < 13),
+        },
+        {
+            label: "Pomeriggio",
+            slots: slots.filter((slot) => Number(slot.split(":")[0]) >= 13),
+        },
+    ];
+
+    periods.filter((period) => period.slots.length).forEach((period) => {
+        const section = document.createElement("section");
+        section.className = "time-period";
+
+        const title = document.createElement("h4");
+        title.className = "time-period-title";
+        title.textContent = period.label;
+
+        const grid = document.createElement("div");
+        grid.className = "time-period-grid";
+        grid.classList.toggle("dense", slots.length > 12);
+
+        period.slots.forEach((slot) => {
+            const option = document.createElement("option");
+            option.value = slot;
+            option.textContent = slot;
+            timeSelect.appendChild(option);
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "time-slot";
+            button.dataset.time = slot;
+            button.textContent = slot;
+            button.addEventListener("click", () => selectTime(slot));
+            grid.appendChild(button);
+        });
+
+        section.append(title, grid);
+        timeGrid.appendChild(section);
+    });
+
+    status.textContent = `${slots.length} disponibili`;
+    updateSummary();
+}
+
+function selectTime(time) {
+    bookingPageState.selectedTime = time;
+    document.getElementById("timeSelect").value = time;
+    document.querySelectorAll(".time-slot").forEach((button) => {
+        button.classList.toggle("active", button.dataset.time === time);
+    });
+    document.getElementById("timeStepStatus").textContent = time;
+    updateSummary();
+}
+
+function resetTimes(message) {
+    bookingPageState.selectedTime = "";
+    document.getElementById("timeSelect").innerHTML = `<option value="">${message}</option>`;
+    const timeGrid = document.getElementById("timeGrid");
+    timeGrid.innerHTML = `<p class="time-empty">${message}</p>`;
+    document.getElementById("timeStepStatus").textContent = "In attesa";
+    updateSummary();
+}
+
+function updateSummary() {
+    const staffName = bookingPageState.selectedStaff
+        ? [bookingPageState.selectedStaff.first_name, bookingPageState.selectedStaff.last_name].filter(Boolean).join(" ")
+        : "Da scegliere";
+    const serviceName = bookingPageState.selectedService?.name || "Da scegliere";
+    const dateLabel = bookingPageState.selectedDate
+        ? parseIsoDate(bookingPageState.selectedDate).toLocaleDateString("it-IT", { day: "2-digit", month: "short" })
+        : "Da scegliere";
+    const timeLabel = bookingPageState.selectedTime || "Da scegliere";
+
+    document.getElementById("summaryStaff").textContent = staffName;
+    document.getElementById("summaryService").textContent = serviceName;
+    document.getElementById("summaryDate").textContent = dateLabel;
+    document.getElementById("summaryTime").textContent = timeLabel;
+
+    const isComplete = Boolean(
+        bookingPageState.selectedStaff
+        && bookingPageState.selectedService
+        && bookingPageState.selectedDate
+        && bookingPageState.selectedTime
+    );
+    document.getElementById("confirmBtn").disabled = !isComplete;
+}
+
+async function confirmBooking() {
+    const confirmButton = document.getElementById("confirmBtn");
+    setBookingActionMessage("");
+
+    if (
+        !bookingPageState.selectedStaff
+        || !bookingPageState.selectedService
+        || !bookingPageState.selectedDate
+        || !bookingPageState.selectedTime
+    ) {
+        window.appButtonState(confirmButton, "error", {
+            label: "Completa tutte le scelte",
+            resetAfter: 1700,
+            disabledAfterReset: true,
+            onReset: updateSummary,
+        });
+        setBookingActionMessage("Scegli barbiere, servizio, giorno e orario prima di continuare.");
+        return;
+    }
 
     const bookingData = {
-        staff_id: parseInt(barberId),
-        service_id: parseInt(serviceId),
-        date: date,
-        time: time,
+        staff_id: Number(bookingPageState.selectedStaff.id),
+        service_id: Number(bookingPageState.selectedService.id),
+        date: bookingPageState.selectedDate,
+        time: bookingPageState.selectedTime,
         haircut_id: null,
     };
 
     const currentUser = getUser();
-    const note = bookingNote?.value.trim();
+    const note = document.getElementById("bookingNote")?.value.trim();
     if (currentUser?.role === "admin" && note) {
         bookingData.note = note;
     }
 
-    const response = await apiPost("/bookings", bookingData);
+    window.appButtonState(confirmButton, "loading", {
+        label: "Prenotazione in corso...",
+    });
 
-    setButtonLoading(confirmBtn, false);
+    try {
+        const response = await apiPost("/bookings", bookingData);
 
-    if (response.status === false) {
-        showAlert(response.message || "Errore durante la prenotazione", "danger");
-        return;
-    }
+        if (response.status !== true) {
+            const message = getBookingErrorMessage(response);
+            window.appButtonState(confirmButton, "error", {
+                label: "Prenotazione non riuscita",
+                resetAfter: 1900,
+                onReset: updateSummary,
+            });
+            setBookingActionMessage(message);
+            return;
+        }
 
-    if (response.status === true) {
-        showAlert("Prenotazione confermata. Reindirizzamento a Prenotazioni...", "success");
-
+        window.appButtonState(confirmButton, "success", {
+            label: "Prenotazione confermata",
+        });
         setTimeout(() => {
             window.location.href = "/my-bookings.html";
-        }, 1500);
-
-        return;
+        }, 1350);
+    } catch (error) {
+        window.appButtonState(confirmButton, "error", {
+            label: "Connessione non disponibile",
+            resetAfter: 1900,
+            onReset: updateSummary,
+        });
+        setBookingActionMessage("Non riusciamo a contattare il server. Controlla la connessione e riprova.");
     }
+}
 
-    showAlert("Errore sconosciuto", "danger");
+function getBookingErrorMessage(response) {
+    if (response?.message) return response.message;
+
+    const validationError = response?.errors
+        ? Object.values(response.errors).flat().find(Boolean)
+        : null;
+
+    return validationError || "Non è stato possibile completare la prenotazione. Riprova.";
+}
+
+function setBookingActionMessage(message) {
+    const element = document.getElementById("bookingActionMessage");
+    element.textContent = message || "";
+    element.classList.toggle("show", Boolean(message));
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat("it-IT", {
+        style: "currency",
+        currency: "EUR",
+    }).format(Number(price || 0));
+}
+
+function toIsoDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function parseIsoDate(value) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+}
+
+function startOfDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfWeek(date) {
+    const value = startOfDay(date);
+    const mondayOffset = (value.getDay() + 6) % 7;
+    value.setDate(value.getDate() - mondayOffset);
+    return value;
+}
+
+function formatLongDate(date) {
+    return date.toLocaleDateString("it-IT", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
 }

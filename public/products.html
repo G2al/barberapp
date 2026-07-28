@@ -1,282 +1,775 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Prodotti - Giovanni Cerino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="vender/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/app-ui.css">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#0b0b0e">
+
   <style>
     :root {
-      --gc-bg: #090909;
-      --gc-line: rgba(255, 255, 255, 0.09);
-      --gc-muted: rgba(255, 255, 255, 0.62);
-      --gc-gold: #d5a13d;
-      --gc-gold-light: #f0cd6d;
+      --app-bg: #0b0b0e;
+      --app-surface: #1a1a1c;
+      --app-surface-soft: #242426;
+      --app-line: rgba(255, 255, 255, 0.12);
+      --app-text: #fff;
+      --app-muted: #aaa7a0;
+      --app-gold: #ffd558;
+      --app-gold-strong: #ffda32;
+      --app-dark-text: #17150e;
     }
 
-    body.gc-client-page {
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #08080a;
+    }
+
+    body.products-page,
+    body.products-page button,
+    body.products-page input {
+      font-family: "Poppins", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body.products-page {
       min-height: 100vh;
-      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+      margin: 0;
+      background: #08080a;
+      color: var(--app-text);
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app-shell {
+      width: min(100%, 480px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+      background: var(--app-bg);
+      box-shadow: 0 0 64px rgba(0, 0, 0, 0.5);
+    }
+
+    .home-header {
+      position: relative;
+      min-height: 138px;
       background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.96) 310px),
-        url("/images/bg-login.jpg") top center / cover fixed no-repeat,
-        #090909;
+        linear-gradient(90deg, rgba(10, 9, 13, 0.28), rgba(13, 15, 20, 0.68)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(11, 11, 14, 0.18)),
+        url("/images/bg-login.jpg") center 42% / cover no-repeat;
+    }
+
+    .header-inner {
+      min-height: 138px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: calc(18px + env(safe-area-inset-top, 0px)) 22px 18px;
+    }
+
+    .greeting-copy {
+      min-width: 0;
+    }
+
+    .greeting-copy h1 {
+      margin: 0;
+      overflow: hidden;
       color: #fff;
+      font-size: 25px;
+      line-height: 1.1;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .gc-header {
-      position: sticky;
-      top: 0;
+    .location-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      max-width: 255px;
+      margin-top: 7px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .location-line i {
+      flex-shrink: 0;
+      color: var(--app-gold-strong);
+      font-size: 15px;
+    }
+
+    .location-line span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      position: relative;
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .header-action {
+      position: relative;
+      width: 43px;
+      height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 218, 50, 0.82);
+      border-radius: 50%;
+      background: rgba(20, 20, 22, 0.62);
+      color: #fff;
+      font-size: 19px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-action.notification::after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border: 1px solid #282828;
+      border-radius: 50%;
+      background: var(--app-gold-strong);
+    }
+
+    .header-popover {
+      position: absolute;
+      top: 53px;
+      right: 0;
+      z-index: 60;
+      width: min(280px, calc(100vw - 40px));
+      display: none;
+      padding: 14px;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      background: rgba(21, 21, 23, 0.99);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.52);
+    }
+
+    .header-popover.open {
+      display: block;
+    }
+
+    .header-popover strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .header-popover p {
+      margin: 4px 0 0;
+      overflow: hidden;
+      color: var(--app-muted);
+      font-size: 11px;
+      text-overflow: ellipsis;
+    }
+
+    .profile-logout {
+      width: 100%;
+      min-height: 38px;
+      margin-top: 11px;
+      border: 1px solid var(--app-line);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .products-content {
+      padding: 24px 22px 20px;
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      margin: 0;
+      color: #fff;
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .favorite-total {
+      flex-shrink: 0;
+      min-width: 42px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      border: 1px solid rgba(255, 218, 50, 0.38);
+      border-radius: 16px;
+      background: rgba(255, 218, 50, 0.09);
+      color: var(--app-gold-strong);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .favorite-total:focus-visible {
+      outline: 2px solid var(--app-gold-strong);
+      outline-offset: 2px;
+    }
+
+    .search-field {
+      position: relative;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .search-field i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      color: var(--app-muted);
+      font-size: 15px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .search-field input {
+      width: 100%;
+      height: 54px;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      outline: 0;
+      background: #1a1a1c;
+      color: #fff;
+      padding: 0 14px 0 43px;
+      font-size: 12px;
+    }
+
+    .search-field input::placeholder {
+      color: #948f84;
+    }
+
+    .search-field input:focus {
+      border-color: var(--app-gold-strong);
+      box-shadow: 0 0 0 3px rgba(255, 218, 50, 0.1);
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 18px;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .category-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-tab {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--app-line);
+      border-radius: 20px;
+      background: #19191b;
+      color: #ddd;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .category-tab.active {
+      border-color: var(--app-gold-strong);
+      background: var(--app-gold-strong);
+      color: var(--app-dark-text);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .product-card {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      background: var(--app-surface);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+    }
+
+    .product-image {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #252527;
+      color: #777;
+      font-size: 30px;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .favorite-button {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 50%;
+      background: rgba(13, 13, 15, 0.84);
+      color: #fff;
+      font-size: 16px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(8px);
+    }
+
+    .favorite-button.active {
+      border-color: var(--app-gold-strong);
+      background: var(--app-gold-strong);
+      color: var(--app-dark-text);
+    }
+
+    .favorite-button:disabled {
+      opacity: 0.7;
+    }
+
+    .product-copy {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+      min-height: 82px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 30px 12px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background:
+        linear-gradient(180deg, rgba(12, 12, 14, 0.08), rgba(12, 12, 14, 0.92) 48%, rgba(12, 12, 14, 0.98));
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .product-category {
+      overflow: hidden;
+      margin: 0 0 4px;
+      color: var(--app-gold);
+      font-size: 8px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .product-name {
+      display: -webkit-box;
+      overflow: hidden;
+      margin: 0;
+      color: #fff;
+      font-size: 13px;
+      line-height: 1.3;
+      font-weight: 700;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .product-description {
+      display: none;
+    }
+
+    .catalog-message {
+      grid-column: 1 / -1;
+      padding: 42px 20px;
+      color: var(--app-muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .catalog-message i {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--app-gold-strong);
+      font-size: 30px;
+    }
+
+    .feedback-toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+      z-index: 80;
+      width: max-content;
+      max-width: min(88vw, 380px);
+      visibility: hidden;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 218, 50, 0.34);
+      border-radius: 7px;
+      background: #222224;
+      color: #fff;
+      font-size: 10px;
+      text-align: center;
+      opacity: 0;
+      transform: translate(-50%, 10px);
+      transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+    }
+
+    .feedback-toast.show {
+      visibility: visible;
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .favorites-overlay {
+      position: fixed;
+      inset: 0;
       z-index: 100;
-      padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 16px;
-      background: rgba(9, 9, 9, 0.82);
-      border-bottom: 1px solid var(--gc-line);
-      backdrop-filter: blur(18px);
+      visibility: hidden;
+      background: rgba(0, 0, 0, 0.66);
+      opacity: 0;
+      transition: opacity 180ms ease, visibility 180ms ease;
     }
 
-    .gc-header h5 {
-      font-size: 20px;
-      font-weight: 900;
+    .favorites-overlay.open {
+      visibility: visible;
+      opacity: 1;
     }
 
-    .gc-action-btn {
+    .favorites-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 110;
+      width: min(88vw, 350px);
+      height: 100dvh;
+      overflow-y: auto;
+      padding: calc(20px + env(safe-area-inset-top, 0px)) 18px 24px;
+      border-left: 1px solid var(--app-line);
+      background: #111113;
+      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.58);
+      transform: translateX(100%);
+      transition: transform 220ms ease;
+    }
+
+    .favorites-drawer.open {
+      transform: translateX(0);
+    }
+
+    .favorites-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .favorites-drawer-header h2 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .drawer-close {
       width: 38px;
       height: 38px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--app-line);
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--gc-gold-light);
-      text-decoration: none;
-      padding: 0;
-    }
-
-    .content-area {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 22px 14px 0 !important;
-    }
-
-    .products-hero,
-    .input-group,
-    #productsContainer .card {
-      border: 1px solid var(--gc-line);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
-        rgba(18, 18, 18, 0.88) !important;
+      background: #202022;
       color: #fff;
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28) !important;
+      font-size: 18px;
     }
 
-    .input-group {
-      border-radius: 16px;
+    .favorites-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .favorite-list-item {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) 38px;
+      align-items: center;
+      gap: 11px;
+      padding: 10px;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      background: #1b1b1d;
+    }
+
+    .favorite-list-image {
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
+      border-radius: 6px;
+      background: #29292b;
+      color: #777;
+      font-size: 20px;
     }
 
-    .input-group .input-group-text,
-    .input-group .form-control {
-      background: transparent !important;
-      border-color: transparent !important;
+    .favorite-list-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .favorite-list-copy {
+      min-width: 0;
+    }
+
+    .favorite-list-category {
+      overflow: hidden;
+      margin: 0 0 3px;
+      color: var(--app-gold);
+      font-size: 8px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .favorite-list-name {
+      display: -webkit-box;
+      overflow: hidden;
+      margin: 0;
       color: #fff;
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 600;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
-    .input-group .form-control::placeholder,
-    .text-muted {
-      color: var(--gc-muted) !important;
+    .remove-favorite {
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 218, 50, 0.4);
+      border-radius: 50%;
+      background: rgba(255, 218, 50, 0.1);
+      color: var(--app-gold-strong);
+      font-size: 15px;
     }
 
-    .text-primary-color,
-    #productsContainer h6 {
-      color: #fff !important;
+    .favorites-empty {
+      padding: 42px 15px;
+      color: var(--app-muted);
+      text-align: center;
+      font-size: 11px;
     }
 
-    .cat-pill {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.72);
-      background: rgba(255, 255, 255, 0.055);
-      font-weight: 700;
-    }
-
-    .cat-pill.active {
-      background: linear-gradient(135deg, var(--gc-gold), var(--gc-gold-light));
-      color: #fff;
-      border-color: transparent;
+    .favorites-empty i {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--app-gold-strong);
+      font-size: 30px;
     }
 
     .bottom-nav {
       position: fixed;
-      left: 18px;
-      right: 18px;
-      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      left: 50% !important;
+      right: auto !important;
+      bottom: 0;
       z-index: 50;
-      height: 72px;
+      width: min(100%, 480px);
+      height: calc(64px + env(safe-area-inset-bottom, 0px));
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      align-items: center;
-      max-width: 760px;
-      margin: 0 auto;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035)),
-        rgba(22, 22, 22, 0.92);
-      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(18px);
+      grid-template-columns: repeat(4, 1fr);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      margin: 0 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 0 !important;
+      background: rgba(15, 15, 17, 0.99);
+      box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.3);
+      transform: translateX(-50%) !important;
+      backdrop-filter: blur(16px);
     }
 
     .bottom-nav .nav-item {
+      position: relative;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      min-width: 0;
-      height: 100%;
-      color: rgba(255, 255, 255, 0.48);
+      color: #c8c8ca;
       text-decoration: none;
-      font-size: 11px;
-      line-height: 1.15;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .bottom-nav .nav-item i {
-      font-size: 21px;
+      font-size: 23px;
     }
 
     .bottom-nav .nav-item.active {
-      color: var(--gc-gold-light);
+      color: var(--app-gold-strong);
     }
 
-    .favorites-sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 88vw;
-      max-width: 340px;
-      height: 100vh;
-      background: #151515;
-      color: #fff;
-      box-shadow: 2px 0 12px rgba(0,0,0,0.15);
-      padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 16px 16px;
-      transform: translateX(-100%);
-      opacity: 0;
-      transition: transform 0.25s ease, opacity 0.25s ease;
-      z-index: 2000;
-      overflow-y: auto;
-      display: none;
-      border-top-right-radius: 18px;
-      border-bottom-right-radius: 18px;
-      border-right: 1px solid var(--gc-line);
+    .bottom-nav .nav-item.active::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 7px;
+      width: 26px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--app-gold-strong);
+      transform: translateX(-50%);
     }
-    .favorites-sidebar.open {
-      display: block;
-      transform: translateX(0);
-      opacity: 1;
-    }
-    .favorites-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      display: none;
-      z-index: 1500;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-    .favorites-overlay.show {
-      display: block;
-      opacity: 1;
-    }
-    .favorites-header {
-      padding-top: env(safe-area-inset-top, 0px);
+
+    @media (max-width: 370px) {
+      .products-content {
+        padding-inline: 16px;
+      }
+
+      .products-grid {
+        gap: 9px;
+      }
+
+      .product-copy {
+        min-height: 76px;
+        padding: 10px;
+      }
+
+      .product-name {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
-<body class="gc-client-page">
-  <div class="gc-header d-flex justify-content-between align-items-center">
-    <h5 class="fw-bold text-white mb-0">Prodotti</h5>
-    <div class="d-flex gap-2 align-items-center">
-      <button id="favoritesToggle" class="gc-action-btn position-relative" title="Preferiti">
-        <i class="bi bi-star"></i>
-        <span id="favoritesCount" class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle rounded-pill" style="display:none;">0</span>
-      </button>
-      <button type="button" class="gc-action-btn" onclick="logout()" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
-    </div>
-  </div>
 
-  <div class="content-area p-3">
-    <div class="products-hero rounded-4 p-3 mb-3 shadow-sm text-white" style="
-    background-color: #141414;
-">
-      <div class="d-flex align-items-start">
-        <div class="me-3">
-          <div class="rounded-circle hero-icon d-flex align-items-center justify-content-center">
-            <i class="bi bi-stars fs-5"></i>
+<body class="products-page">
+  <div class="app-shell">
+    <header class="home-header">
+      <div class="header-inner">
+        <div class="greeting-copy">
+          <h1>Ciao <span id="welcomeName">cliente</span>,</h1>
+          <div class="location-line">
+            <i class="bi bi-geo-alt"></i>
+            <span id="shopLocation">Caricamento posizione...</span>
           </div>
         </div>
-        <div>
-          <h6 class="mb-1">Scopri i prodotti del salone</h6>
-          <p class="mb-0 small">Filtra per categoria e scorri le card per trovare ciò che ti serve.</p>
+
+        <div class="header-actions">
+          <button type="button" id="notificationButton" class="header-action notification" aria-label="Notifiche" aria-expanded="false">
+            <i class="bi bi-bell-fill"></i>
+          </button>
+          <button type="button" id="profileButton" class="header-action" aria-label="Profilo" aria-expanded="false">
+            <i class="bi bi-person-fill"></i>
+          </button>
+
+          <div id="notificationPanel" class="header-popover">
+            <strong>Notifiche</strong>
+            <p>I tuoi prodotti preferiti restano salvati nel catalogo.</p>
+          </div>
+
+          <div id="profilePanel" class="header-popover">
+            <strong id="profileName">Il tuo profilo</strong>
+            <p id="profileEmail"></p>
+            <button type="button" class="profile-logout" onclick="logout()">
+              <i class="bi bi-box-arrow-right me-1"></i>
+              Esci dall'account
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
 
-    <div class="mb-3">
-      <div class="input-group shadow-sm">
-        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-        <input id="productSearch" type="text" class="form-control border-start-0" placeholder="Cerca prodotto...">
+    <main class="products-content">
+      <div class="page-heading">
+        <h2 class="page-title">I nostri prodotti</h2>
+        <button type="button" id="openFavorites" class="favorite-total" aria-label="Apri i miei preferiti" aria-expanded="false">
+          <i class="bi bi-heart-fill"></i>
+          <span id="favoritesCount">0</span>
+        </button>
       </div>
-    </div>
 
-    <div id="categoryTabs" class="nav nav-pills small gap-2 mb-3 overflow-auto flex-nowrap"></div>
+      <label class="search-field">
+        <i class="bi bi-search"></i>
+        <input id="productSearch" type="search" placeholder="Cerca un prodotto..." autocomplete="off">
+      </label>
 
-    <div id="productsContainer">
-      <div class="text-center mt-5 text-muted" id="loadingMsg">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2">Caricamento prodotti...</p>
+      <div id="categoryTabs" class="category-tabs" aria-label="Categorie prodotti"></div>
+
+      <div id="productsContainer" class="products-grid">
+        <div class="catalog-message">
+          <span class="spinner-border spinner-border-sm" role="status"></span>
+          <p class="mt-2 mb-0">Caricamento prodotti...</p>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 
-  <div class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
-      <i class="bi bi-calendar-check"></i>
-      <span>Prenota</span>
+  <div id="feedbackToast" class="feedback-toast" role="status" aria-live="polite"></div>
+  <div id="favoritesOverlay" class="favorites-overlay"></div>
+  <aside id="favoritesDrawer" class="favorites-drawer" aria-hidden="true">
+    <div class="favorites-drawer-header">
+      <h2>I miei preferiti</h2>
+      <button type="button" id="closeFavorites" class="drawer-close" aria-label="Chiudi preferiti">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div id="favoritesList" class="favorites-list"></div>
+  </aside>
+
+  <nav class="bottom-nav" aria-label="Navigazione principale">
+    <a href="dashboard.html" class="nav-item" aria-label="Prenota" title="Prenota">
+      <i class="bi bi-scissors"></i>
     </a>
-    <a href="my-bookings.html" class="nav-item">
-      <i class="bi bi-journal-text"></i>
-      <span>Prenotazioni</span>
+    <a href="my-bookings.html" class="nav-item" aria-label="Le mie prenotazioni" title="Le mie prenotazioni">
+      <i class="bi bi-calendar2-check"></i>
     </a>
-    <a class="nav-item active">
-      <i class="bi bi-box"></i>
-      <span>Prodotti</span>
+    <a href="products.html" class="nav-item active" aria-label="Prodotti" title="Prodotti">
+      <i class="bi bi-bag"></i>
     </a>
-  </div>
+    <a href="profile.html" class="nav-item" aria-label="Profilo" title="Profilo">
+      <i class="bi bi-person"></i>
+    </a>
+  </nav>
 
   <script src="vender/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/js/config.js" defer></script>
-  <script src="/js/auth.js" defer></script>
-  <script src="/js/products.js" defer></script>
-
-  <!-- Favorites sidebar -->
-  <div id="favoritesSidebar" class="favorites-sidebar">
-    <div class="favorites-header d-flex justify-content-between align-items-center">
-      <h6 class="mb-0">Preferiti</h6>
-      <button class="btn btn-sm btn-outline-secondary" id="closeFavorites"><i class="bi bi-x"></i></button>
-    </div>
-    <p class="mt-2 mb-3 small text-muted">Questa è la tua lista di prodotti preferiti. Mostrala in salone per richiederli al team.</p>
-    <div id="favoritesList" class="mt-3 small"></div>
-  </div>
-  <div id="favoritesOverlay" class="favorites-overlay"></div>
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/products.js"></script>
 </body>
+
 </html>

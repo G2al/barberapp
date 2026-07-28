@@ -1,6 +1,13 @@
 // ====== ALERT (rimane fisso) ======
 function showAlert(message, type = "danger") {
+    if (window.appToast) {
+        window.appToast(message, type === "success" ? "success" : type === "danger" ? "error" : "info");
+        return;
+    }
+
     const alertBox = document.getElementById("alertBox");
+
+    if (!alertBox) return;
 
     alertBox.innerHTML = `
         <div class="alert alert-${type} rounded-4 py-2 px-3 mb-3">

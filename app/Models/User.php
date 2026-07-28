@@ -21,6 +21,7 @@ class User extends Authenticatable implements FilamentUser, CanResetPassword
         'surname',
         'email',
         'phone',
+        'avatar',
         'password',
         'role',
         'is_active',
@@ -54,6 +55,16 @@ class User extends Authenticatable implements FilamentUser, CanResetPassword
     public function productFavorites()
     {
         return $this->belongsToMany(Product::class, 'product_favorites')->withTimestamps();
+    }
+
+    public function loyaltyPointTransactions()
+    {
+        return $this->hasMany(LoyaltyPointTransaction::class);
+    }
+
+    public function loyaltyRewards()
+    {
+        return $this->hasMany(LoyaltyReward::class);
     }
 
     public function sendPasswordResetNotification($token): void

@@ -5,651 +5,959 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Prenota - Giovanni Cerino</title>
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="vender/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    :root {
-      --gc-bg: #090909;
-      --gc-panel: rgba(27, 27, 27, 0.82);
-      --gc-panel-strong: rgba(35, 35, 35, 0.94);
-      --gc-line: rgba(255, 255, 255, 0.09);
-      --gc-muted: rgba(255, 255, 255, 0.62);
-      --gc-gold: #d5a13d;
-      --gc-gold-light: #f0cd6d;
-      --gc-gold-dark: #9f7222;
-    }
-
-    body.booking-page {
-      min-height: 100vh;
-      margin: 0;
-      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
-      background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.96) 310px),
-        url("/images/bg-login.jpg") top center / cover fixed no-repeat,
-        #090909;
-      color: #fff;
-      font-family: "Karla", Arial, sans-serif;
-    }
-
-    .gc-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 16px;
-      background: rgba(9, 9, 9, 0.82);
-      border-bottom: 1px solid var(--gc-line);
-      backdrop-filter: blur(18px);
-    }
-
-    .gc-header-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fff;
-      font-size: 20px;
-      font-weight: 900;
-    }
-
-    .gc-header-title i,
-    .gc-action-btn {
-      color: var(--gc-gold-light);
-    }
-
-    .gc-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .gc-action-btn {
-      width: 38px;
-      height: 38px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.06);
-      text-decoration: none;
-      padding: 0;
-    }
-
-    .profile-portrait {
-      display: none;
-      position: absolute;
-      right: 22px;
-      top: 16px;
-      z-index: 8;
-      width: 92px;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      overflow: hidden;
-      background: #f1f1f1;
-      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.42);
-    }
-
-    .profile-portrait img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .booking-shell {
-      position: relative;
-      z-index: 4;
-      width: min(100%, 760px);
-      margin: 0 auto;
-      padding: 34px 14px 0;
-    }
-
-    #alertBox {
-      margin-bottom: 12px;
-    }
-
-    .booking-card {
-      position: relative;
-      padding: 94px 20px 22px;
-      border-radius: 22px;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
-        rgba(18, 18, 18, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.48);
-      backdrop-filter: blur(18px);
-    }
-
-    .booking-step {
-      margin-bottom: 20px;
-    }
-
-    .step-label {
-      margin: 0 0 11px;
-      color: #fff;
-      font-size: 15px;
-      line-height: 1.2;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .step-label span {
-      color: var(--gc-gold-light);
-    }
-
-    .premium-select-card {
-      display: grid;
-      grid-template-columns: 54px 1fr 24px;
-      align-items: center;
-      gap: 12px;
-      min-height: 76px;
-      padding: 8px 12px 8px 8px;
-      border-radius: 17px;
-      background: rgba(255, 255, 255, 0.045);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .premium-select-card select {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-      z-index: 3;
-    }
-
-    .select-icon,
-    .barber-avatar-large {
-      width: 52px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 14px;
-      background:
-        linear-gradient(145deg, rgba(213, 161, 61, 0.18), rgba(213, 161, 61, 0.05)),
-        rgba(255, 255, 255, 0.04);
-      color: var(--gc-gold-light);
-      overflow: hidden;
-    }
-
-    .select-icon i {
-      font-size: 25px;
-    }
-
-    .barber-avatar-large {
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.9);
-    }
-
-    .barber-avatar-large img {
-      display: none;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .barber-avatar-large.has-image img {
-      display: block;
-    }
-
-    .barber-avatar-large:not(.has-image)::before {
-      content: "GC";
-      color: #111;
-      font-weight: 900;
-    }
-
-    .select-copy strong {
-      display: block;
-      color: #fff;
-      font-size: 17px;
-      line-height: 1.2;
-      font-weight: 900;
-    }
-
-    .select-copy span {
-      display: block;
-      margin-top: 5px;
-      color: rgba(255, 255, 255, 0.66);
-      font-size: 13px;
-      line-height: 1.25;
-    }
-
-    .select-chevron {
-      color: #fff;
-      font-size: 23px;
-      z-index: 1;
-    }
-
-    .native-date {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .month-control {
-      margin-bottom: 12px;
-    }
-
-    .month-control select {
-      width: 100%;
-      height: 70px;
-      min-height: 70px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.055);
-      color: #fff;
-      padding: 0 24px;
-      font-size: 21px;
-      font-weight: 800;
-      outline: none;
-    }
-
-    .month-control option {
-      color: #111;
-    }
-
-    .date-strip {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(58px, 1fr));
-      gap: 9px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
-
-    .date-strip::-webkit-scrollbar {
-      display: none;
-    }
-
-    .date-pill {
-      min-width: 58px;
-      min-height: 70px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 13px;
-      background: rgba(255, 255, 255, 0.045);
-      color: #fff;
-      text-align: center;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    }
-
-    .date-pill strong {
-      display: block;
-      font-size: 22px;
-      line-height: 1;
-      font-weight: 900;
-    }
-
-    .date-pill span {
-      display: block;
-      margin-top: 7px;
-      color: rgba(255, 255, 255, 0.68);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .date-pill.active {
-      border-color: rgba(255, 255, 255, 0.14);
-      background: linear-gradient(135deg, var(--gc-gold), var(--gc-gold-light));
-      color: #fff;
-      box-shadow: 0 15px 34px rgba(213, 161, 61, 0.24);
-    }
-
-    .date-pill.active span {
-      color: rgba(255, 255, 255, 0.86);
-    }
-
-    #timeSelect {
-      display: none;
-    }
-
-    .time-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 9px;
-    }
-
-    .time-slot {
-      min-height: 48px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 13px;
-      background: rgba(255, 255, 255, 0.045);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 800;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    }
-
-    .time-slot.active {
-      background: linear-gradient(135deg, var(--gc-gold), var(--gc-gold-light));
-      border-color: rgba(255, 255, 255, 0.14);
-      box-shadow: 0 16px 36px rgba(213, 161, 61, 0.24);
-    }
-
-    .time-empty {
-      grid-column: 1 / -1;
-      margin: 0;
-      padding: 15px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.045);
-      color: rgba(255, 255, 255, 0.68);
-      text-align: center;
-    }
-
-    .booking-note-field {
-      width: 100%;
-      min-height: 98px;
-      resize: vertical;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.055);
-      color: #fff;
-      padding: 14px 16px;
-      font-size: 15px;
-      line-height: 1.4;
-      outline: none;
-    }
-
-    .booking-note-field::placeholder {
-      color: rgba(255, 255, 255, 0.48);
-    }
-
-    .confirm-booking-btn {
-      min-height: 60px;
-      width: 100%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      border: 0;
-      border-radius: 15px;
-      background: linear-gradient(135deg, var(--gc-gold), var(--gc-gold-light));
-      color: #fff;
-      font-size: 15px;
-      font-weight: 900;
-      text-transform: uppercase;
-      box-shadow: 0 18px 40px rgba(213, 161, 61, 0.28);
-    }
-
-    .confirm-booking-btn i {
-      font-size: 24px;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 18px;
-      right: 18px;
-      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-      z-index: 50;
-      height: 72px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      align-items: center;
-      max-width: 760px;
-      margin: 0 auto;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035)),
-        rgba(22, 22, 22, 0.92);
-      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(18px);
-    }
-
-    .bottom-nav .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      min-width: 0;
-      height: 100%;
-      color: rgba(255, 255, 255, 0.48);
-      text-decoration: none;
-      font-size: 11px;
-      line-height: 1.15;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .bottom-nav .nav-item i {
-      font-size: 21px;
-    }
-
-    .bottom-nav .nav-item.active {
-      color: var(--gc-gold-light);
-    }
-
-    .favorites-sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 88vw;
-      max-width: 340px;
-      height: 100vh;
-      background: #151515;
-      color: #fff;
-      box-shadow: 2px 0 18px rgba(0, 0, 0, 0.35);
-      padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 16px;
-      transform: translateX(-100%);
-      opacity: 0;
-      transition: transform 0.25s ease, opacity 0.25s ease;
-      z-index: 2000;
-      overflow-y: auto;
-      display: none;
-      border-top-right-radius: 18px;
-      border-bottom-right-radius: 18px;
-      border-right: 1px solid var(--gc-line);
-    }
-
-    .favorites-sidebar.open {
-      display: block;
-      transform: translateX(0);
-      opacity: 1;
-    }
-
-    .favorites-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.48);
-      display: none;
-      z-index: 1500;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-
-    .favorites-overlay.show {
-      display: block;
-      opacity: 1;
-    }
-
-    @media (min-width: 860px) {
-      .profile-portrait {
-        right: calc((100vw - 760px) / 2 + 28px);
-      }
-    }
-
-    @media (max-width: 520px) {
-      .booking-card {
-        padding: 86px 15px 18px;
-        border-radius: 21px;
-      }
-
-      .profile-portrait {
-        display: block;
-        width: 88px;
-        right: 22px;
-        top: 18px;
-      }
-
-      .date-strip {
-        grid-template-columns: repeat(7, 64px);
-      }
-
-      .time-slot {
-        font-size: 15px;
-      }
-
-      .confirm-booking-btn {
-        gap: 10px;
-        font-size: 14px;
-      }
-    }
-  </style>
-
+  <link rel="stylesheet" href="css/app-ui.css">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#10111d">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
+
+  <style>
+    :root {
+      --app-bg: #0b0b0e;
+      --app-panel: #2b2b2e;
+      --app-panel-deep: #1b1b1e;
+      --app-line: rgba(255, 255, 255, 0.34);
+      --app-text: #f9faf7;
+      --app-muted: #bdbdbf;
+      --app-gold: #ffd558;
+      --app-gold-strong: #ffda32;
+      --app-dark-text: #17150e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #08090d;
+    }
+
+    body.booking-page,
+    body.booking-page button,
+    body.booking-page input,
+    body.booking-page select,
+    body.booking-page textarea {
+      font-family: "Poppins", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body.booking-page {
+      min-height: 100vh;
+      margin: 0;
+      background: #08090d;
+      color: var(--app-text);
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app-shell {
+      width: min(100%, 480px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+      background: var(--app-bg);
+      box-shadow: 0 0 64px rgba(0, 0, 0, 0.5);
+    }
+
+    .home-header {
+      position: relative;
+      min-height: 138px;
+      background:
+        linear-gradient(90deg, rgba(10, 9, 13, 0.28), rgba(13, 15, 26, 0.68)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(16, 17, 29, 0.18)),
+        url("/images/bg-login.jpg") center 42% / cover no-repeat;
+    }
+
+    .header-inner {
+      min-height: 138px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: calc(18px + env(safe-area-inset-top, 0px)) 22px 18px;
+    }
+
+    .greeting-copy {
+      min-width: 0;
+      padding-bottom: 2px;
+    }
+
+    .greeting-copy h1 {
+      margin: 0;
+      overflow: hidden;
+      color: #fff;
+      font-size: 25px;
+      line-height: 1.1;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .location-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      max-width: 255px;
+      margin-top: 7px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .location-line i {
+      color: var(--app-gold);
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .location-line span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      position: relative;
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .header-action {
+      position: relative;
+      width: 43px;
+      height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(240, 203, 87, 0.82);
+      border-radius: 50%;
+      background: rgba(20, 23, 35, 0.54);
+      color: #fff;
+      font-size: 19px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-action.notification::after {
+      content: "";
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 7px;
+      height: 7px;
+      border: 1px solid #283036;
+      border-radius: 50%;
+      background: var(--app-gold-strong);
+    }
+
+    .header-popover {
+      position: absolute;
+      top: 56px;
+      right: 0;
+      z-index: 40;
+      width: min(280px, calc(100vw - 40px));
+      display: none;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      background: rgba(21, 23, 34, 0.98);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.46);
+    }
+
+    .header-popover.open {
+      display: block;
+    }
+
+    .header-popover strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .header-popover p {
+      margin: 5px 0 0;
+      overflow: hidden;
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 1.45;
+      text-overflow: ellipsis;
+    }
+
+    .profile-logout {
+      width: 100%;
+      min-height: 40px;
+      margin-top: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .booking-content {
+      padding: 18px 22px 16px;
+    }
+
+    #alertBox {
+      position: sticky;
+      top: 8px;
+      z-index: 30;
+    }
+
+    #alertBox .alert {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px !important;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .booking-intro {
+      margin-bottom: 16px;
+    }
+
+    .booking-intro p {
+      margin: 0 0 4px;
+      color: var(--app-gold);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .booking-intro h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 27px;
+      line-height: 1.12;
+      font-weight: 700;
+    }
+
+    .field-title {
+      margin: 0 0 9px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .staff-section {
+      margin-bottom: 16px;
+    }
+
+    .staff-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 66px;
+      justify-content: start;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 1px 1px 4px;
+      scrollbar-width: none;
+    }
+
+    .staff-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .staff-option {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #fff;
+    }
+
+    .staff-avatar {
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      background: #9cb7bb;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 500;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .staff-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .staff-option.active .staff-avatar {
+      border-color: var(--app-gold-strong);
+      box-shadow: 0 0 0 2px rgba(255, 216, 66, 0.15);
+    }
+
+    .staff-name {
+      width: 100%;
+      overflow: hidden;
+      color: #f4f6f4;
+      font-size: 10px;
+      font-weight: 600;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .staff-option.active .staff-name {
+      color: var(--app-gold-strong);
+    }
+
+    .loading-line,
+    .empty-line {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--app-muted);
+      font-size: 12px;
+    }
+
+    .service-section {
+      margin-bottom: 10px;
+    }
+
+    .custom-service-select {
+      position: relative;
+    }
+
+    .service-select-trigger {
+      width: 100%;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      outline: 0;
+      background: linear-gradient(135deg, #37373a, #242427);
+      color: #fff;
+      padding: 0 18px;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .service-select-trigger:focus,
+    .custom-service-select.open .service-select-trigger {
+      border-color: var(--app-gold-strong);
+      box-shadow: 0 0 0 3px rgba(255, 216, 66, 0.12);
+    }
+
+    .service-select-trigger:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+
+    .service-select-trigger > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .service-select-trigger i {
+      flex-shrink: 0;
+      color: var(--app-gold-strong);
+      font-size: 15px;
+      transition: transform 160ms ease;
+    }
+
+    .custom-service-select.open .service-select-trigger i {
+      transform: rotate(180deg);
+    }
+
+    .service-select-menu {
+      position: absolute;
+      top: calc(100% + 7px);
+      left: 0;
+      z-index: 35;
+      width: 100%;
+      max-height: 230px;
+      display: none;
+      overflow-y: auto;
+      padding: 6px;
+      border: 1px solid rgba(255, 218, 50, 0.58);
+      border-radius: 8px;
+      background: #171719;
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.52);
+      scrollbar-width: thin;
+      scrollbar-color: var(--app-gold-strong) #252527;
+    }
+
+    .custom-service-select.open .service-select-menu {
+      display: block;
+    }
+
+    .service-select-option {
+      width: 100%;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 11px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #fff;
+      text-align: left;
+    }
+
+    .service-select-option + .service-select-option {
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .service-select-option:hover,
+    .service-select-option:focus-visible {
+      outline: 0;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .service-select-option.active {
+      background: var(--app-gold-strong);
+      color: var(--app-dark-text);
+    }
+
+    .service-option-name {
+      min-width: 0;
+      overflow: hidden;
+      font-size: 12px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .service-option-meta {
+      flex-shrink: 0;
+      color: var(--app-muted);
+      font-size: 9px;
+      font-weight: 500;
+    }
+
+    .service-select-option.active .service-option-meta {
+      color: rgba(23, 21, 14, 0.72);
+    }
+
+    .service-meta {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      opacity: 0;
+    }
+
+    .schedule-panel {
+      margin-top: 10px;
+      overflow: hidden;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      background: linear-gradient(145deg, #303033, #1e1e21);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .week-calendar {
+      padding: 11px 12px 10px;
+    }
+
+    .week-toolbar {
+      display: grid;
+      grid-template-columns: 34px 1fr 34px;
+      align-items: center;
+      min-height: 34px;
+      margin-bottom: 5px;
+    }
+
+    .week-toolbar button {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--app-gold);
+      font-size: 17px;
+    }
+
+    .week-toolbar button:disabled {
+      opacity: 0.25;
+    }
+
+    .calendar-month {
+      margin: 0;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .calendar-day {
+      min-width: 0;
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: transparent;
+      color: #fff;
+    }
+
+    .calendar-day .weekday {
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .calendar-day .day-number {
+      font-size: 15px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .calendar-day.active {
+      border-color: var(--app-gold-strong);
+      background: var(--app-gold-strong);
+      color: var(--app-dark-text);
+      box-shadow: 0 8px 18px rgba(255, 216, 66, 0.18);
+    }
+
+    .calendar-day.today:not(.active) {
+      border-color: rgba(255, 255, 255, 0.42);
+    }
+
+    .calendar-day:disabled {
+      color: rgba(255, 255, 255, 0.27);
+    }
+
+    .schedule-divider {
+      height: 1px;
+      margin: 0 15px;
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .time-section {
+      padding: 11px 12px 12px;
+    }
+
+    .time-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .time-heading h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .time-heading span {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 10px;
+    }
+
+    .time-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .time-period {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .time-period-title {
+      margin: 0;
+      color: var(--app-gold-strong);
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 600;
+    }
+
+    .time-period-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .time-period-grid.dense {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .time-period-grid.dense .time-slot {
+      min-height: 26px;
+      padding: 0 1px;
+      font-size: 10px;
+    }
+
+    .time-slot {
+      min-width: 0;
+      min-height: 38px;
+      border: 1px solid rgba(232, 246, 244, 0.68);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .time-slot.active {
+      border-color: var(--app-gold-strong);
+      background: var(--app-gold-strong);
+      color: var(--app-dark-text);
+    }
+
+    .time-empty {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding: 13px 8px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 11px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .admin-note {
+      margin-top: 14px;
+    }
+
+    .booking-note-field {
+      width: 100%;
+      min-height: 82px;
+      resize: vertical;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      outline: none;
+      background: var(--app-panel-deep);
+      color: #fff;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .confirm-booking-btn {
+      width: 100%;
+      min-height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(110deg, #f7d96c, #ffda20);
+      color: var(--app-dark-text);
+      font-size: 15px;
+      font-weight: 600;
+      box-shadow: 0 15px 28px rgba(255, 216, 32, 0.16);
+    }
+
+    .confirm-booking-btn:disabled {
+      filter: grayscale(0.04);
+      opacity: 0.94;
+    }
+
+    .booking-action-message {
+      display: none;
+      margin: 9px 3px 0;
+      color: #ef8b82;
+      font-size: 10px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .booking-action-message.show {
+      display: block;
+    }
+
+    .native-control,
+    .support-state {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50% !important;
+      right: auto !important;
+      bottom: 0;
+      z-index: 50;
+      width: min(100%, 480px);
+      height: calc(64px + env(safe-area-inset-bottom, 0px));
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      margin: 0 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 0 !important;
+      background: rgba(15, 15, 17, 0.99);
+      box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.3);
+      transform: translateX(-50%) !important;
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav .nav-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #c8c8ca;
+      text-decoration: none;
+      font-size: 23px;
+    }
+
+    .bottom-nav .nav-item.active {
+      color: var(--app-gold-strong);
+    }
+
+    .bottom-nav .nav-item.active::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 7px;
+      width: 26px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--app-gold-strong);
+      transform: translateX(-50%);
+    }
+
+    @media (max-width: 370px) {
+      .booking-content {
+        padding-inline: 16px;
+      }
+
+      .staff-grid {
+        grid-auto-columns: 64px;
+        gap: 8px;
+      }
+
+      .staff-avatar {
+        width: 56px;
+        height: 56px;
+      }
+
+      .time-period-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .time-period-grid.dense {
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+      }
+
+      .confirm-booking-btn {
+        min-height: 39px;
+        margin-top: 0;
+      }
+    }
+  </style>
 </head>
 
 <body class="booking-page">
-  <div class="gc-header d-flex justify-content-between align-items-center">
-    <div class="gc-header-title">
-      <i class="bi bi-calendar-check"></i>
-      <span>Prenota</span>
-    </div>
-    <div class="gc-actions">
-      <button type="button" id="favoritesToggle" class="gc-action-btn" title="Preferiti"><i class="bi bi-star"></i></button>
-      <button type="button" class="gc-action-btn" onclick="logout()" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
-    </div>
-  </div>
-
-  <main class="booking-shell">
-    <div id="alertBox"></div>
-
-    <div class="profile-portrait">
-      <img id="heroBarberImg" src="/images/logo.jpg" alt="Barbiere selezionato">
-    </div>
-
-    <section class="booking-card">
-      <div class="booking-step">
-        <h3 class="step-label"><span>1.</span> Seleziona servizio</h3>
-        <div class="premium-select-card">
-          <div class="select-icon"><i class="bi bi-scissors"></i></div>
-          <div class="select-copy">
-            <strong id="serviceCardTitle">Scegli servizio</strong>
-            <span id="serviceCardMeta">Durata e prezzo</span>
+  <div class="app-shell">
+    <header class="home-header">
+      <div class="header-inner">
+        <div class="greeting-copy">
+          <h1>Ciao <span id="welcomeName">cliente</span>,</h1>
+          <div class="location-line">
+            <i class="bi bi-geo-alt"></i>
+            <span id="shopLocation">Caricamento posizione...</span>
           </div>
-          <i class="bi bi-chevron-down select-chevron"></i>
-          <select id="serviceSelect" aria-label="Servizio">
-            <option value="">Seleziona servizio</option>
-          </select>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" id="notificationButton" class="header-action notification" aria-label="Notifiche" aria-expanded="false">
+            <i class="bi bi-bell-fill"></i>
+          </button>
+          <button type="button" id="profileButton" class="header-action" aria-label="Profilo" aria-expanded="false">
+            <i class="bi bi-person-fill"></i>
+          </button>
+
+          <div id="notificationPanel" class="header-popover">
+            <strong>Notifiche</strong>
+            <p>Le conferme e gli aggiornamenti dei tuoi appuntamenti sono disponibili nello storico.</p>
+          </div>
+
+          <div id="profilePanel" class="header-popover">
+            <strong id="profileName">Il tuo profilo</strong>
+            <p id="profileEmail"></p>
+            <button type="button" class="profile-logout" onclick="logout()">
+              <i class="bi bi-box-arrow-right me-1"></i>
+              Esci dall'account
+            </button>
+          </div>
         </div>
       </div>
+    </header>
 
-      <div class="booking-step">
-        <h3 class="step-label"><span>2.</span> Seleziona barbiere</h3>
-        <div class="premium-select-card">
-          <div id="barberAvatar" class="barber-avatar-large">
-            <img id="barberAvatarImg" src="" alt="Avatar barbiere">
-          </div>
-          <div class="select-copy">
-            <strong id="barberCardTitle">Scegli barbiere</strong>
-            <span id="barberCardMeta">Giovanni Cerino Hair Stylist</span>
-          </div>
-          <i class="bi bi-chevron-down select-chevron"></i>
-          <select id="barberSelect" aria-label="Barbiere">
-            <option value="">Seleziona barbiere</option>
-          </select>
+    <main class="booking-content">
+      <div id="alertBox"></div>
+
+      <section class="booking-intro">
+        <p>Scegli il tuo stile</p>
+        <h2>Prenota ora</h2>
+      </section>
+
+      <section class="staff-section">
+        <h3 class="field-title">Scegli il barbiere</h3>
+        <div id="staffGrid" class="staff-grid" aria-label="Barbieri disponibili">
+          <p class="loading-line">Caricamento staff...</p>
         </div>
-      </div>
-
-      <div class="booking-step">
-        <h3 class="step-label"><span>3.</span> Scegli data</h3>
-        <input type="date" class="native-date" id="dateSelect" min="">
-        <div class="month-control">
-          <select id="monthSelect" aria-label="Mese"></select>
-        </div>
-        <div class="date-strip" id="dateStrip" aria-label="Date disponibili"></div>
-      </div>
-
-      <div class="booking-step">
-        <h3 class="step-label"><span>4.</span> Scegli orario</h3>
-        <select id="timeSelect" aria-label="Ora">
-          <option value="">Seleziona ora</option>
+        <span id="staffStepStatus" class="support-state">Caricamento...</span>
+        <select id="barberSelect" class="native-control" aria-label="Barbiere">
+          <option value="">Seleziona barbiere</option>
         </select>
-        <div class="time-grid" id="timeGrid">
-          <p class="time-empty">Scegli servizio, barbiere e data.</p>
-        </div>
-      </div>
+      </section>
 
-      <div class="booking-step admin-note-step d-none" id="adminNoteStep">
-        <h3 class="step-label"><span>5.</span> Nota opzionale</h3>
+      <section class="service-section">
+        <div id="serviceSelectShell" class="custom-service-select">
+          <button
+            type="button"
+            id="serviceSelectTrigger"
+            class="service-select-trigger"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            disabled>
+            <span id="serviceSelectLabel">Seleziona prima il barbiere</span>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+          <div id="serviceSelectMenu" class="service-select-menu" role="listbox" aria-label="Servizi disponibili"></div>
+          <select id="serviceSelect" class="native-control" aria-label="Servizio" disabled>
+            <option value="">Seleziona prima il barbiere</option>
+          </select>
+        </div>
+        <span id="serviceStepStatus" class="support-state">Prima scegli lo staff</span>
+        <p id="serviceMeta" class="service-meta"></p>
+      </section>
+
+      <section class="schedule-panel">
+        <div class="week-calendar">
+          <div class="week-toolbar">
+            <button type="button" id="previousMonth" aria-label="Settimana precedente">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <h3 id="calendarMonthLabel" class="calendar-month"></h3>
+            <button type="button" id="nextMonth" aria-label="Settimana successiva">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+
+          <input type="date" id="dateSelect" class="native-control" aria-label="Data">
+          <div id="calendarGrid" class="calendar-grid" aria-label="Settimana disponibile"></div>
+          <span id="selectedDateLabel" class="support-state">nessuna</span>
+        </div>
+
+        <div class="schedule-divider"></div>
+
+        <div class="time-section">
+          <div class="time-heading">
+            <h3>Orario</h3>
+            <span id="timeStepStatus">In attesa</span>
+          </div>
+          <select id="timeSelect" class="native-control" aria-label="Orario">
+            <option value="">Seleziona orario</option>
+          </select>
+          <div id="timeGrid" class="time-grid">
+            <p class="time-empty">Scegli barbiere, servizio e data per vedere gli orari.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="adminNoteStep" class="admin-note d-none">
+        <h3 class="field-title">Nota opzionale</h3>
         <textarea
           id="bookingNote"
           class="booking-note-field"
           maxlength="1000"
-          placeholder="Stai prenotando per un'altra persona? Scrivi qui nome, telefono o una nota utile."></textarea>
+          placeholder="Nome, telefono o una nota utile per la prenotazione."></textarea>
+      </section>
+
+      <div class="support-state" aria-hidden="true">
+        <span id="summaryStaff">Da scegliere</span>
+        <span id="summaryService">Da scegliere</span>
+        <span id="summaryDate">Da scegliere</span>
+        <span id="summaryTime">Da scegliere</span>
       </div>
 
-      <button id="confirmBtn" class="confirm-booking-btn" onclick="confirmBooking()">
-        <i class="bi bi-calendar-check"></i>
+      <button id="confirmBtn" class="confirm-booking-btn" onclick="confirmBooking()" disabled>
         <span>Conferma prenotazione</span>
       </button>
-    </section>
-  </main>
+      <p id="bookingActionMessage" class="booking-action-message" role="alert" aria-live="polite"></p>
+    </main>
+  </div>
 
-  <nav class="bottom-nav">
-    <a class="nav-item active">
-      <i class="bi bi-calendar-check"></i>
-      <span>Prenota</span>
+  <nav class="bottom-nav" aria-label="Navigazione principale">
+    <a href="dashboard.html" class="nav-item active" aria-label="Prenota" title="Prenota">
+      <i class="bi bi-scissors"></i>
     </a>
-    <a href="my-bookings.html" class="nav-item">
-      <i class="bi bi-card-list"></i>
-      <span>Prenotazioni</span>
+    <a href="my-bookings.html" class="nav-item" aria-label="Le mie prenotazioni" title="Le mie prenotazioni">
+      <i class="bi bi-calendar2-check"></i>
     </a>
-    <a href="products.html" class="nav-item">
-      <i class="bi bi-box-seam"></i>
-      <span>Prodotti</span>
+    <a href="products.html" class="nav-item" aria-label="Prodotti" title="Prodotti">
+      <i class="bi bi-bag"></i>
+    </a>
+    <a href="profile.html" class="nav-item" aria-label="Profilo" title="Profilo">
+      <i class="bi bi-person"></i>
     </a>
   </nav>
 
   <script src="vender/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="js/script.js"></script>
+  <script src="/js/app-ui.js" defer></script>
   <script src="/js/config.js" defer></script>
   <script src="/js/auth.js" defer></script>
-  <script src="/js/favorites-drawer.js" defer></script>
   <script src="/js/dashboard.js" defer></script>
-
-  <div id="favoritesSidebar" class="favorites-sidebar">
-    <div class="favorites-header d-flex justify-content-between align-items-center">
-      <h6 class="mb-0">Preferiti</h6>
-      <button class="btn btn-sm btn-outline-secondary" id="closeFavorites"><i class="bi bi-x"></i></button>
-    </div>
-    <p class="mt-2 mb-3 small text-muted">Questa e la tua lista di prodotti preferiti.</p>
-    <div id="favoritesList" class="mt-3 small"></div>
-  </div>
-  <div id="favoritesOverlay" class="favorites-overlay"></div>
-
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-        console.log('Service Worker registrato:', registration);
-      }).catch((error) => {
-        console.log('Service Worker registrazione fallita:', error);
-      });
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js").catch(() => null);
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const user = getUser();
-      if (user && user.name) {
-        document.getElementById('welcomeName').textContent = user.name;
-      }
-    });
   </script>
 </body>
+
 </html>

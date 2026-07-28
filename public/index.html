@@ -5,406 +5,476 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Accedi - Giovanni Cerino</title>
-
-    <!-- Bootstrap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vender/bootstrap/css/bootstrap.min.css">
-
-    <!-- Custom -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/app-ui.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <meta name="theme-color" content="#111111">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
     <style>
-        body.login-page {
+        :root {
+            --auth-bg: #080808;
+            --auth-panel: rgba(16, 18, 21, 0.88);
+            --auth-field: rgba(55, 61, 72, 0.78);
+            --auth-line: rgba(255, 255, 255, 0.1);
+            --auth-muted: rgba(255, 255, 255, 0.62);
+            --auth-gold: #d5a13d;
+            --auth-gold-light: #f0cd6d;
+        }
+
+        body.auth-page,
+        body.auth-page input,
+        body.auth-page button,
+        body.auth-page a {
+            font-family: "Poppins", Arial, sans-serif !important;
+        }
+
+        body.auth-page {
             min-height: 100vh;
-            background:
-                linear-gradient(rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.62)),
-                url("/images/bg-login.jpg") center / cover no-repeat fixed;
-        }
-
-        body.login-page .auth-container {
-            position: relative;
-            z-index: 1;
-        }
-
-        body.login-page .app-logo-img {
-            width: min(82vw, 260px);
-            max-height: 150px;
-            object-fit: contain;
-        }
-
-        body.login-page .text-primary-color,
-        body.login-page .form-label,
-        body.login-page p {
-            color: #fff !important;
-        }
-
-        body.login-page .auth-form {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
-        }
-
-        body.login-page .auth-form .form-label,
-        body.login-page .auth-form p {
-            color: var(--text-secondary) !important;
-        }
-
-        body.login-page .auth-form .text-primary-color {
-            color: var(--primary-color) !important;
-        }
-
-        body.login-page .remember-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin: -2px 0 18px;
-        }
-
-        body.login-page .remember-row .form-check {
-            min-height: auto;
             margin: 0;
+            background: var(--auth-bg);
+            color: #fff;
         }
 
-        body.login-page .remember-row .form-check-label {
-            color: var(--text-secondary);
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.74) 43%, #070707 74%),
+                url("/images/bg-login.jpg") top center / cover no-repeat fixed;
+        }
+
+        .auth-shell {
+            width: min(100%, 480px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: calc(32px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px));
+        }
+
+        .auth-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 20px;
+            padding-top: 34vh;
+        }
+
+        .auth-title {
+            text-align: center;
+        }
+
+        .auth-title h1 {
+            margin: 0;
+            font-size: clamp(38px, 10vw, 52px);
+            line-height: 1;
+            font-weight: 600;
+            letter-spacing: 0;
+            color: #fff;
+        }
+
+        .auth-title p {
+            margin: 14px 0 0;
+            color: rgba(255, 255, 255, 0.74);
+            font-size: 18px;
             font-weight: 600;
         }
 
-        body.login-page .install-guide {
+        .auth-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .auth-field {
+            position: relative;
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--auth-field);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 26px rgba(0, 0, 0, 0.24);
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .auth-field input {
+            position: relative;
+            z-index: 1;
             width: 100%;
-            max-width: 420px;
-            margin: 16px auto 0;
-            padding: 18px;
-            background: rgba(255, 255, 255, 0.94);
-            border-radius: 16px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
-        }
-
-        body.login-page .install-guide-title {
-            color: var(--primary-color);
+            min-width: 0;
+            min-height: 66px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #fff;
             font-size: 17px;
+            font-weight: 600;
+            line-height: 1.5;
+            padding: 0 26px 0 58px;
+        }
+
+        .auth-field.has-toggle input {
+            padding-right: 58px;
+        }
+
+        .auth-field input::placeholder {
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .auth-field input:-webkit-autofill,
+        .auth-field input:-webkit-autofill:hover,
+        .auth-field input:-webkit-autofill:focus,
+        .auth-field input:-webkit-autofill:active {
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-size: 17px !important;
+            font-weight: 600 !important;
+            line-height: 1.5 !important;
+            -webkit-text-fill-color: #fff !important;
+            caret-color: #fff;
+            -webkit-box-shadow: 0 0 0 1000px #3b404a inset !important;
+            box-shadow: 0 0 0 1000px #3b404a inset !important;
+            transition: background-color 9999s ease-out 0s;
+        }
+
+        .auth-field input:-webkit-autofill::first-line {
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-size: 17px !important;
+            font-weight: 600 !important;
+        }
+
+        .toggle-pass {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+        }
+
+        .remember-row {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-self: start;
+            gap: 11px;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 15px;
             font-weight: 700;
-            margin-bottom: 6px;
+            cursor: pointer;
         }
 
-        body.login-page .install-guide p,
-        body.login-page .install-guide .text-muted {
-            color: var(--text-secondary) !important;
+        .remember-row input {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            accent-color: var(--auth-gold-light);
+            cursor: pointer;
         }
 
-        body.login-page .browser-tabs {
+        .auth-submit {
+            min-height: 66px;
+            border: 0;
+            background: linear-gradient(135deg, var(--auth-gold), var(--auth-gold-light));
+            color: #17100a;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 20px 44px rgba(213, 161, 61, 0.24);
+        }
+
+        .auth-links {
+            display: grid;
+            gap: 24px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 17px;
+            font-weight: 750;
+        }
+
+        .auth-links a {
+            color: var(--auth-gold-light);
+            text-decoration: none;
+        }
+
+        #alertBox .alert {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0;
+            font-weight: 700;
+        }
+
+        .install-guide {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 20px;
+            border: 1px solid var(--auth-line);
+            background: rgba(15, 17, 20, 0.86);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(16px);
+        }
+
+        .install-guide-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .install-guide p,
+        .install-guide .text-muted {
+            color: var(--auth-muted) !important;
+        }
+
+        .browser-tabs {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             margin: 14px 0;
         }
 
-        body.login-page .browser-tab {
+        .browser-tab {
+            min-height: 43px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            min-height: 42px;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            background: #fff;
-            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.82);
             font-size: 13px;
-            font-weight: 600;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+            font-weight: 800;
         }
 
-        body.login-page .browser-tab.active {
-            border-color: var(--primary-color);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        .browser-tab.active {
+            color: #17100a;
+            background: linear-gradient(135deg, var(--auth-gold), var(--auth-gold-light));
+            border-color: transparent;
         }
 
-        body.login-page .browser-tab:active {
-            transform: scale(0.98);
-        }
-
-        body.login-page .browser-icon-img {
+        .browser-icon-img {
             width: 20px;
             height: 20px;
         }
 
-        body.login-page .guide-steps {
+        .guide-steps {
             display: none;
             flex-direction: column;
             gap: 8px;
-            margin-bottom: 12px;
         }
 
-        body.login-page .guide-steps.active {
+        .guide-steps.active {
             display: flex;
         }
 
-        body.login-page .guide-step {
+        .guide-step {
             display: flex;
             align-items: center;
             gap: 9px;
             padding: 10px 12px;
-            background: #f7f7f7;
-            border-radius: 10px;
-            color: var(--text-primary);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.82);
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 650;
         }
 
-        body.login-page .guide-step i {
-            color: var(--primary-color);
+        .guide-step i {
+            color: var(--auth-gold-light);
             font-size: 17px;
             flex-shrink: 0;
         }
 
-        body.login-page .install-faq {
-            display: flex;
-            flex-direction: column;
+        .install-faq {
+            display: grid;
             gap: 8px;
             margin-top: 12px;
         }
 
-        body.login-page .install-faq details {
-            border: 1px solid #e7e7e7;
-            border-radius: 10px;
-            background: #fff;
+        .install-faq details {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.05);
             overflow: hidden;
         }
 
-        body.login-page .install-faq summary {
+        .install-faq summary {
             cursor: pointer;
             padding: 10px 12px;
-            color: var(--primary-color);
-            font-weight: 600;
-            list-style-position: inside;
+            color: var(--auth-gold-light);
+            font-weight: 800;
         }
 
-        body.login-page .install-faq details p {
+        .install-faq details p {
             margin: 0;
             padding: 0 12px 12px;
             font-size: 13px;
             line-height: 1.45;
         }
     </style>
-
-    <!-- Icons Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-    <meta name="theme-color" content="#1a1a1a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
-
-    <!-- Config -->
+    <script src="/js/app-ui.js" defer></script>
     <script src="/js/config.js" defer></script>
-    <!-- Auth Logic -->
     <script src="/js/auth.js" defer></script>
 </head>
 
-<body class="bg-light login-page">
+<body class="auth-page">
+    <main class="auth-screen">
+        <section class="auth-shell">
+            <div class="auth-content">
+                <div class="auth-title">
+                    <h1>Bentornato</h1>
+                    <p>Accedi al tuo account</p>
+                </div>
 
-    <div class="auth-container">
+                <div id="alertBox"></div>
 
-        <!-- Logo -->
-        <div class="text-center mb-4">
-            <div class="mb-3">
-                <img src="/images/logo.png" alt="Giovanni Cerino" class="app-logo-img">
-            </div>
-            <h4 class="fw-bold text-primary-color">Giovanni Cerino</h4>
-            <p class="text-muted">Accedi al tuo account</p>
-        </div>
+                <div class="auth-form">
+                    <label class="auth-field" for="email">
+                        <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
+                        <input type="email" id="email" placeholder="Email" autocomplete="email">
+                    </label>
 
-        <!-- ALERT AREA -->
-        <div id="alertBox"></div>
+                    <label class="auth-field has-toggle" for="password">
+                        <i class="bi bi-lock field-icon" aria-hidden="true"></i>
+                        <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+                        <button type="button" class="toggle-pass" onclick="togglePassword('password', 'toggleLoginPass')" aria-label="Mostra password">
+                            <i id="toggleLoginPass" class="bi bi-eye"></i>
+                        </button>
+                    </label>
 
-        <!-- Form -->
-        <div class="auth-form">
+                    <label class="remember-row" for="rememberLogin">
+                        <input type="checkbox" id="rememberLogin" checked>
+                        <span>Ricordami</span>
+                    </label>
 
-            <!-- EMAIL -->
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="bi bi-envelope text-muted"></i>
-                    </span>
-                    <input type="email" class="form-control border-start-0" id="email" placeholder="Inserisci la tua email">
+                    <button id="submitBtn" class="auth-submit" onclick="submitLogin()">Accedi</button>
+                </div>
+
+                <div class="auth-links">
+                    <a href="forgot-password.html">Password dimenticata?</a>
+                    <div>Non hai un account? <a href="register.html">Registrati</a></div>
+                </div>
+
+                <div class="install-guide" id="installGuide">
+                    <div class="install-guide-title">Installa l'app sul telefono</div>
+                    <div class="text-muted small mb-2">Scegli il browser che stai usando.</div>
+
+                    <div class="browser-tabs" id="browserTabs">
+                        <button type="button" class="browser-tab active" data-guide="chrome">
+                            <img src="/images/chrome.svg" alt="Chrome" class="browser-icon-img">Chrome
+                        </button>
+                        <button type="button" class="browser-tab" data-guide="edge">
+                            <img src="/images/edge.svg" alt="Edge" class="browser-icon-img">Edge
+                        </button>
+                        <button type="button" class="browser-tab" data-guide="safari">
+                            <img src="/images/safari.svg" alt="Safari" class="browser-icon-img">Safari
+                        </button>
+                    </div>
+
+                    <div class="guide-steps active" id="guide-chrome">
+                        <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Tocca Condividi in alto a destra</div>
+                        <div class="guide-step"><i class="bi bi-plus-square"></i> Seleziona "Aggiungi alla schermata Home"</div>
+                        <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
+                    </div>
+
+                    <div class="guide-steps" id="guide-edge">
+                        <div class="guide-step"><i class="bi bi-list"></i> Tocca il menu in basso a destra</div>
+                        <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Seleziona "Condividi"</div>
+                        <div class="guide-step"><i class="bi bi-plus-square"></i> Scegli "Aggiungi alla schermata Home"</div>
+                    </div>
+
+                    <div class="guide-steps" id="guide-safari">
+                        <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Tocca Condividi in basso al centro</div>
+                        <div class="guide-step"><i class="bi bi-plus-square"></i> Scegli "Aggiungi alla schermata Home"</div>
+                        <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
+                    </div>
+
+                    <div class="install-faq">
+                        <details>
+                            <summary>Cos'e un browser?</summary>
+                            <p>E l'app che usi per aprire un sito internet, per esempio Safari, Chrome o Edge.</p>
+                        </details>
+                        <details>
+                            <summary>Perche installare da qui?</summary>
+                            <p>Questa e una PWA: si installa dal browser, occupa poco spazio ed e sempre aggiornata.</p>
+                        </details>
+                    </div>
                 </div>
             </div>
+        </section>
+    </main>
 
-            <!-- PASSWORD -->
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="bi bi-lock text-muted"></i>
-                    </span>
-
-                    <input type="password"
-                        class="form-control border-start-0 border-end-0"
-                        id="password"
-                        placeholder="Inserisci la password">
-
-                    <span class="input-group-text bg-transparent"
-                        style="cursor:pointer;"
-                        onclick="togglePassword('password', 'toggleLoginPass')">
-                        <i id="toggleLoginPass" class="bi bi-eye text-muted"></i>
-                    </span>
-                </div>
-            </div>
-
-            <div class="remember-row">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="rememberLogin">
-                    <label class="form-check-label" for="rememberLogin">Ricordami</label>
-                </div>
-            </div>
-
-            <!-- LOGIN BUTTON -->
-            <div class="d-grid gap-2 mb-4">
-                <button id="submitBtn" class="btn btn-app" onclick="submitLogin()">Accedi</button>
-            </div>
-
-            <!-- FORGOT PASSWORD -->
-            <div class="text-center mb-3">
-                <a href="forgot-password.html" class="text-primary-color text-decoration-none">Hai dimenticato la password?</a>
-            </div>
-
-            <!-- SIGN UP LINK -->
-            <div class="text-center">
-                <p class="mb-0">Non hai un account?
-                    <a href="register.html" class="text-primary-color text-decoration-none">Registrati</a>
-                </p>
-            </div>
-
-        </div>
-
-        <!-- Install Guide (solo quando accedi via browser) -->
-        <div class="install-guide" id="installGuide">
-            <div class="install-guide-title">Come installare la nostra App</div>
-            <div class="text-muted small mb-2">Con quale browser hai aperto Giovanni Cerino?</div>
-
-            <div class="browser-tabs" id="browserTabs">
-                <button type="button" class="browser-tab active" data-guide="chrome">
-                    <img src="/images/chrome.svg" alt="Chrome" class="browser-icon-img">Chrome
-                </button>
-                <button type="button" class="browser-tab" data-guide="edge">
-                    <img src="/images/edge.svg" alt="Edge" class="browser-icon-img">Edge
-                </button>
-                <button type="button" class="browser-tab" data-guide="safari">
-                    <img src="/images/safari.svg" alt="Safari" class="browser-icon-img">Safari
-                </button>
-            </div>
-
-            <div class="guide-steps active" id="guide-chrome">
-                <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Tocca Condividi in alto a destra</div>
-                <div class="guide-step"><i class="bi bi-plus-square"></i> Seleziona "Aggiungi alla schermata Home"</div>
-                <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
-            </div>
-
-            <div class="guide-steps" id="guide-edge">
-                <div class="guide-step"><i class="bi bi-list"></i> Tocca il menu in basso a destra</div>
-                <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Seleziona "Condividi"</div>
-                <div class="guide-step"><i class="bi bi-plus-square"></i> Scegli "Aggiungi alla schermata Home"</div>
-                <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
-            </div>
-
-            <div class="guide-steps" id="guide-safari">
-                <div class="guide-step"><i class="bi bi-box-arrow-up"></i> Tocca Condividi in basso al centro</div>
-                <div class="guide-step"><i class="bi bi-plus-square"></i> Scegli "Aggiungi alla schermata Home"</div>
-                <div class="guide-step"><i class="bi bi-check-circle"></i> Tocca "Aggiungi"</div>
-            </div>
-
-            <div class="install-faq">
-                <details>
-                    <summary>Cos'e un browser?</summary>
-                    <p>E l'app che usi per aprire un sito internet, per esempio Safari, Chrome o Edge.</p>
-                </details>
-                <details>
-                    <summary>Perche installare da qui e non dallo store?</summary>
-                    <p>Questa e una PWA: si installa dal browser, occupa poco spazio ed e sempre aggiornata.</p>
-                </details>
-                <details>
-                    <summary>La PWA e un'app vera?</summary>
-                    <p>Si. Una volta aggiunta alla schermata Home si apre come un'app normale.</p>
-                </details>
-                <details>
-                    <summary>Devo aggiornarla manualmente?</summary>
-                    <p>No. Ogni volta che la apri usa gia la versione piu recente disponibile.</p>
-                </details>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap -->
     <script src="vender/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <script>
-    function togglePassword(id, iconId) {
-        const input = document.getElementById(id);
-        const icon = document.getElementById(iconId);
+        function togglePassword(id, iconId) {
+            const input = document.getElementById(id);
+            const icon = document.getElementById(iconId);
 
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove("bi-eye");
-            icon.classList.add("bi-eye-slash");
-        } else {
-            input.type = "password";
-            icon.classList.remove("bi-eye-slash");
-            icon.classList.add("bi-eye");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
         }
-    }
 
-    // Mostra la guida PWA solo se accedi via URL (non dalla PWA installata)
-    function checkPWAMode() {
-        const installGuide = document.getElementById('installGuide');
-        if (!installGuide) return;
+        function checkPWAMode() {
+            const installGuide = document.getElementById("installGuide");
+            if (!installGuide) return;
 
-        // Se l'app e in modalita PWA (standalone), nascondi la guida
-        if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
-            installGuide.style.display = 'none';
-        } else {
-            // Se accedi via browser URL, mostra la guida
-            installGuide.style.display = 'block';
+            if (window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches) {
+                installGuide.style.display = "none";
+            } else {
+                installGuide.style.display = "block";
+            }
         }
-    }
 
-    // Verifica al caricamento della pagina
-    checkPWAMode();
+        checkPWAMode();
 
-    (function () {
-        const tabs = document.querySelectorAll('.browser-tab');
-        const guides = document.querySelectorAll('.guide-steps');
-
-        tabs.forEach((tab) => {
-            tab.addEventListener('click', () => {
-                tabs.forEach((t) => t.classList.remove('active'));
-                guides.forEach((g) => g.classList.remove('active'));
-
-                tab.classList.add('active');
-
-                const target = document.getElementById(`guide-${tab.dataset.guide}`);
-                if (target) target.classList.add('active');
+        document.querySelectorAll(".browser-tab").forEach((tab) => {
+            tab.addEventListener("click", () => {
+                document.querySelectorAll(".browser-tab").forEach((item) => item.classList.remove("active"));
+                document.querySelectorAll(".guide-steps").forEach((item) => item.classList.remove("active"));
+                tab.classList.add("active");
+                document.getElementById(`guide-${tab.dataset.guide}`)?.classList.add("active");
             });
         });
-    })();
 
-    // Registra il Service Worker per PWA
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-            console.log('Service Worker registrato:', registration);
-        }).catch((error) => {
-            console.log('Service Worker registrazione fallita:', error);
-        });
-    }
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/service-worker.js").catch(() => null);
+        }
     </script>
-
 </body>
 
 </html>

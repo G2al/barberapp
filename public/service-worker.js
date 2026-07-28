@@ -1,19 +1,23 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'giovannicerino-v1';
+const CACHE_NAME = 'giovannicerino-v41';
 const ASSETS = [
   '/',
   '/index.html',
   '/dashboard.html',
   '/my-bookings.html',
   '/products.html',
+  '/profile.html',
   '/register.html',
   '/forgot-password.html',
   '/reset-password.html',
   '/css/style.css',
+  '/css/app-ui.css',
+  '/js/app-ui.js',
   '/js/auth.js',
   '/js/config.js',
   '/js/dashboard.js',
   '/js/products.js',
+  '/js/profile.js',
   '/js/script.js',
   '/service-worker.js',
   '/vender/bootstrap/css/bootstrap.min.css',

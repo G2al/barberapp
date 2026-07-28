@@ -5,206 +5,311 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Registrati - Giovanni Cerino</title>
-
-    <!-- Bootstrap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="vender/bootstrap/css/bootstrap.min.css">
-
-    <!-- Custom -->
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        body.register-page {
-            min-height: 100vh;
-            background:
-                linear-gradient(rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.62)),
-                url("/images/bg-login.jpg") center / cover no-repeat fixed;
-        }
-
-        body.register-page .auth-container {
-            position: relative;
-            z-index: 1;
-        }
-
-        body.register-page .app-logo-img {
-            width: min(82vw, 260px);
-            max-height: 150px;
-            object-fit: contain;
-        }
-
-        body.register-page .text-primary-color,
-        body.register-page .form-label,
-        body.register-page p {
-            color: #fff !important;
-        }
-
-        body.register-page .back-btn {
-            background: rgba(255, 255, 255, 0.92);
-            color: var(--primary-color);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-        }
-
-        body.register-page .auth-form {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
-        }
-
-        body.register-page .auth-form .form-label,
-        body.register-page .auth-form p {
-            color: var(--text-secondary) !important;
-        }
-
-        body.register-page .auth-form .text-primary-color {
-            color: var(--primary-color) !important;
-        }
-    </style>
-
-    <!-- Icons Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <!-- PWA Manifest -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/app-ui.css">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#1a1a1a">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <meta name="theme-color" content="#111111">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
+    <style>
+        :root {
+            --auth-bg: #080808;
+            --auth-field: rgba(55, 61, 72, 0.78);
+            --auth-muted: rgba(255, 255, 255, 0.62);
+            --auth-gold: #d5a13d;
+            --auth-gold-light: #f0cd6d;
+        }
 
-    <!-- Config -->
+        body.auth-page,
+        body.auth-page input,
+        body.auth-page button,
+        body.auth-page a {
+            font-family: "Poppins", Arial, sans-serif !important;
+        }
+
+        body.auth-page {
+            min-height: 100vh;
+            margin: 0;
+            background: var(--auth-bg);
+            color: #fff;
+        }
+
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.46), #080808 48%),
+                url("/images/bg-login.jpg") top center / cover no-repeat fixed;
+        }
+
+        .auth-shell {
+            width: min(100%, 480px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: calc(24px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px));
+        }
+
+        .back-row {
+            margin-top: 6px;
+        }
+
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            background: transparent;
+            color: #fff;
+            font-size: 28px;
+            text-decoration: none;
+        }
+
+        .auth-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 22px;
+            padding: 26px 0 10px;
+        }
+
+        .auth-title h1 {
+            margin: 0;
+            font-size: clamp(36px, 9vw, 48px);
+            line-height: 1.02;
+            font-weight: 600;
+            letter-spacing: 0;
+            color: #fff;
+        }
+
+        .auth-title p {
+            margin: 10px 0 0;
+            color: var(--auth-muted);
+            font-size: 16px;
+            font-weight: 650;
+        }
+
+        .auth-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .auth-field {
+            position: relative;
+            min-height: 66px;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--auth-field);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 26px rgba(0, 0, 0, 0.24);
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .auth-field input {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            min-width: 0;
+            min-height: 64px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.5;
+            padding: 0 26px 0 58px;
+        }
+
+        .auth-field.has-toggle input {
+            padding-right: 58px;
+        }
+
+        .auth-field input::placeholder {
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .auth-field input:-webkit-autofill,
+        .auth-field input:-webkit-autofill:hover,
+        .auth-field input:-webkit-autofill:focus,
+        .auth-field input:-webkit-autofill:active {
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            line-height: 1.5 !important;
+            -webkit-text-fill-color: #fff !important;
+            caret-color: #fff;
+            -webkit-box-shadow: 0 0 0 1000px #3b404a inset !important;
+            box-shadow: 0 0 0 1000px #3b404a inset !important;
+            transition: background-color 9999s ease-out 0s;
+        }
+
+        .auth-field input:-webkit-autofill::first-line {
+            font-family: "Poppins", Arial, sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+        }
+
+        .toggle-pass {
+            width: 42px;
+            height: 42px;
+            border: 0;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+        }
+
+        .auth-submit {
+            min-height: 66px;
+            margin-top: 10px;
+            border: 0;
+            background: linear-gradient(135deg, var(--auth-gold), var(--auth-gold-light));
+            color: #17100a;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 20px 44px rgba(213, 161, 61, 0.24);
+        }
+
+        .terms-copy,
+        .auth-link {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 15px;
+            line-height: 1.35;
+            font-weight: 650;
+        }
+
+        .auth-link {
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .auth-link a {
+            color: var(--auth-gold-light);
+            text-decoration: none;
+        }
+
+        #alertBox .alert {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0;
+            font-weight: 700;
+        }
+    </style>
+    <script src="/js/app-ui.js" defer></script>
     <script src="/js/config.js" defer></script>
-    <!-- Auth Logic -->
     <script src="/js/auth.js" defer></script>
 </head>
 
-<body class="bg-light register-page">
-
-    <div class="auth-container">
-
-        <!-- Back Button -->
-        <div class="mb-4">
-            <a href="index.html" class="btn back-btn">
-                <i class="bi bi-arrow-left"></i>
-            </a>
-        </div>
-
-        <!-- Logo -->
-        <div class="text-center mb-4">
-            <div class="mb-3">
-                <img src="/images/logo.png" alt="Giovanni Cerino" class="app-logo-img">
+<body class="auth-page">
+    <main class="auth-screen">
+        <section class="auth-shell">
+            <div class="back-row">
+                <a href="index.html" class="back-btn" aria-label="Torna al login">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
             </div>
-            <h4 class="fw-bold text-primary-color">Crea un account</h4>
-            <p class="text-muted">Registrati per iniziare</p>
-        </div>
 
-        <!-- ALERT AREA -->
-        <div id="alertBox"></div>
-
-        <!-- Register Form -->
-        <div class="auth-form">
-
-            <div class="mb-3">
-                <label class="form-label">Nome</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="bi bi-person text-muted"></i>
-                    </span>
-                    <input type="text" class="form-control border-start-0" id="name" placeholder="Inserisci il nome">
+            <div class="auth-content">
+                <div class="auth-title">
+                    <h1>Crea un account</h1>
+                    <p>Entra nel club Giovanni Cerino</p>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Cognome</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="bi bi-person text-muted"></i>
-                    </span>
-                    <input type="text" class="form-control border-start-0" id="surname" placeholder="Inserisci il cognome">
+                <div id="alertBox"></div>
+
+                <div class="auth-form">
+                    <label class="auth-field" for="name">
+                        <i class="bi bi-person field-icon" aria-hidden="true"></i>
+                        <input type="text" id="name" placeholder="Nome" autocomplete="given-name">
+                    </label>
+
+                    <label class="auth-field" for="surname">
+                        <i class="bi bi-person-badge field-icon" aria-hidden="true"></i>
+                        <input type="text" id="surname" placeholder="Cognome" autocomplete="family-name">
+                    </label>
+
+                    <label class="auth-field" for="email">
+                        <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
+                        <input type="email" id="email" placeholder="Indirizzo email" autocomplete="email">
+                    </label>
+
+                    <label class="auth-field" for="phone">
+                        <i class="bi bi-telephone field-icon" aria-hidden="true"></i>
+                        <input type="tel" id="phone" placeholder="Numero di telefono" autocomplete="tel">
+                    </label>
+
+                    <label class="auth-field has-toggle" for="password">
+                        <i class="bi bi-lock field-icon" aria-hidden="true"></i>
+                        <input type="password" id="password" placeholder="Password" autocomplete="new-password">
+                        <button type="button" class="toggle-pass" onclick="togglePassword('password', 'toggleRegisterPass')" aria-label="Mostra password">
+                            <i id="toggleRegisterPass" class="bi bi-eye"></i>
+                        </button>
+                    </label>
+
+                    <button id="submitBtn" class="auth-submit" onclick="submitRegister()">Registrati</button>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="bi bi-envelope text-muted"></i>
-                    </span>
-                    <input type="email" class="form-control border-start-0" id="email" placeholder="Inserisci la tua email">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Telefono</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="bi bi-telephone text-muted"></i>
-                    </span>
-                    <input type="tel" class="form-control border-start-0" id="phone" placeholder="Inserisci il numero di telefono">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0">
-                        <i class="bi bi-lock text-muted"></i>
-                    </span>
-
-                    <input type="password"
-                        class="form-control border-start-0 border-end-0"
-                        id="password"
-                        placeholder="Crea una password">
-
-                    <span class="input-group-text bg-transparent"
-                        style="cursor:pointer;"
-                        onclick="togglePassword('password', 'toggleRegisterPass')">
-                        <i id="toggleRegisterPass" class="bi bi-eye text-muted"></i>
-                    </span>
-                </div>
-            </div>
-
-            <div class="d-grid gap-2 mb-4">
-                <button id="submitBtn" class="btn btn-app" onclick="submitRegister()">Crea Account</button>
-            </div>
-
-            <div class="text-center">
-                <p class="mb-0">Hai gia un account?
-                    <a href="index.html" class="text-primary-color text-decoration-none">Accedi</a>
+                <p class="terms-copy">
+                    Continuando accetti la gestione del tuo account e del programma fidelity.
                 </p>
+
+                <div class="auth-link">
+                    Hai già un account? <a href="index.html">Accedi</a>
+                </div>
             </div>
+        </section>
+    </main>
 
-        </div>
-    </div>
-
-    <!-- Bootstrap -->
     <script src="vender/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <script>
-    function togglePassword(id, iconId) {
-        const input = document.getElementById(id);
-        const icon = document.getElementById(iconId);
+        function togglePassword(id, iconId) {
+            const input = document.getElementById(id);
+            const icon = document.getElementById(iconId);
 
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove("bi-eye");
-            icon.classList.add("bi-eye-slash");
-        } else {
-            input.type = "password";
-            icon.classList.remove("bi-eye-slash");
-            icon.classList.add("bi-eye");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
         }
-    }
 
-    // Registra il Service Worker per PWA
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-          console.log('Service Worker registrato:', registration);
-        }).catch((error) => {
-          console.log('Service Worker registrazione fallita:', error);
-        });
-      }
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/service-worker.js").catch(() => null);
+        }
     </script>
-
-
 </body>
 
 </html>

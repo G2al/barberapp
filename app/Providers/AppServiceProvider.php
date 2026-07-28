@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Booking;
+use App\Observers\BookingObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Booking::observe(BookingObserver::class);
+
         // Register Telegram notification channel
         \Illuminate\Support\Facades\Notification::extend('telegram', function ($app) {
             return new \App\Channels\TelegramChannel();

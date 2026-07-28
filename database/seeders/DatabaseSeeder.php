@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             ServiceSeeder::class,
             StaffSeeder::class,
+            LoyaltyServicePointSeeder::class,
+            LoyaltyRewardRuleSeeder::class,
             AvailabilitySeeder::class,
         ]);
     }

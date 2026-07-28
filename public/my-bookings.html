@@ -4,653 +4,861 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Prenotazioni - Giovanni Cerino</title>
-
-  <!-- Bootstrap -->
+  <title>Le mie prenotazioni - Giovanni Cerino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="vender/bootstrap/css/bootstrap.min.css">
-  <!-- Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <!-- Custom -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/app-ui.css">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b0b0e">
+
   <style>
     :root {
-      --gc-bg: #090909;
-      --gc-panel: rgba(27, 27, 27, 0.9);
-      --gc-line: rgba(255, 255, 255, 0.09);
-      --gc-muted: rgba(255, 255, 255, 0.62);
-      --gc-gold: #d5a13d;
-      --gc-gold-light: #f0cd6d;
+      --app-bg: #0b0b0e;
+      --app-surface: #1b1b1d;
+      --app-surface-soft: #242426;
+      --app-line: rgba(255, 255, 255, 0.12);
+      --app-text: #fff;
+      --app-muted: #aaa7a0;
+      --app-gold: #ffd558;
+      --app-gold-strong: #ffda32;
+      --app-danger: #ef7468;
+      --app-success: #64d68b;
     }
 
-    body.gc-client-page {
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #08080a;
+    }
+
+    body.bookings-page,
+    body.bookings-page button,
+    body.bookings-page input,
+    body.bookings-page select {
+      font-family: "Poppins", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body.bookings-page {
       min-height: 100vh;
-      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+      margin: 0;
+      background: #08080a;
+      color: var(--app-text);
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app-shell {
+      width: min(100%, 480px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+      background: var(--app-bg);
+      box-shadow: 0 0 64px rgba(0, 0, 0, 0.5);
+    }
+
+    .home-header {
+      position: relative;
+      min-height: 138px;
       background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.96) 310px),
-        url("/images/bg-login.jpg") top center / cover fixed no-repeat,
-        #090909;
+        linear-gradient(90deg, rgba(10, 9, 13, 0.28), rgba(13, 15, 20, 0.68)),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(11, 11, 14, 0.18)),
+        url("/images/bg-login.jpg") center 42% / cover no-repeat;
+    }
+
+    .header-inner {
+      min-height: 138px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: calc(18px + env(safe-area-inset-top, 0px)) 22px 18px;
+    }
+
+    .greeting-copy {
+      min-width: 0;
+    }
+
+    .greeting-copy h1 {
+      margin: 0;
+      overflow: hidden;
       color: #fff;
+      font-size: 25px;
+      line-height: 1.1;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .gc-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 16px;
-      background: rgba(9, 9, 9, 0.82);
-      border-bottom: 1px solid var(--gc-line);
-      backdrop-filter: blur(18px);
-    }
-
-    .gc-header-title {
+    .location-line {
       display: flex;
       align-items: center;
+      gap: 7px;
+      max-width: 255px;
+      margin-top: 7px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .location-line i {
+      flex-shrink: 0;
+      color: var(--app-gold-strong);
+      font-size: 15px;
+    }
+
+    .location-line span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      position: relative;
+      display: flex;
       gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .header-action {
+      position: relative;
+      width: 43px;
+      height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 218, 50, 0.82);
+      border-radius: 50%;
+      background: rgba(20, 20, 22, 0.62);
       color: #fff;
-      font-size: 20px;
-      font-weight: 900;
+      font-size: 19px;
+      backdrop-filter: blur(10px);
     }
 
-    .gc-header-title i,
-    .gc-action-btn {
-      color: var(--gc-gold-light);
+    .header-action.notification::after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border: 1px solid #282828;
+      border-radius: 50%;
+      background: var(--app-gold-strong);
     }
 
-    .gc-actions {
+    .header-popover {
+      position: absolute;
+      top: 53px;
+      right: 0;
+      z-index: 60;
+      width: min(280px, calc(100vw - 40px));
+      display: none;
+      padding: 14px;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      background: rgba(21, 21, 23, 0.99);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.52);
+    }
+
+    .header-popover.open {
+      display: block;
+    }
+
+    .header-popover strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .header-popover p {
+      margin: 4px 0 0;
+      overflow: hidden;
+      color: var(--app-muted);
+      font-size: 11px;
+      text-overflow: ellipsis;
+    }
+
+    .profile-logout {
+      width: 100%;
+      min-height: 38px;
+      margin-top: 11px;
+      border: 1px solid var(--app-line);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .bookings-content {
+      padding: 24px 22px 20px;
+    }
+
+    .page-title {
+      margin: 0 0 20px;
+      color: #fff;
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 54px;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .search-field {
+      position: relative;
+    }
+
+    .search-field i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      color: var(--app-muted);
+      font-size: 15px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .search-field input {
+      width: 100%;
+      height: 54px;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      outline: 0;
+      background: #1a1a1c;
+      color: #fff;
+      padding: 0 14px 0 43px;
+      font-size: 12px;
+    }
+
+    .search-field input::placeholder {
+      color: #948f84;
+    }
+
+    .search-field input:focus {
+      border-color: var(--app-gold-strong);
+      box-shadow: 0 0 0 3px rgba(255, 218, 50, 0.1);
+    }
+
+    .filter-button {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--app-gold-strong);
+      border-radius: 8px;
+      background: #131315;
+      color: var(--app-gold-strong);
+      font-size: 18px;
+    }
+
+    .filter-button.has-filters::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--app-gold-strong);
+    }
+
+    .status-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 18px;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .status-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .status-tab {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--app-line);
+      border-radius: 20px;
+      background: #19191b;
+      color: #ddd;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .status-tab.active {
+      border-color: var(--app-gold-strong);
+      background: var(--app-gold-strong);
+      color: #17150e;
+    }
+
+    .bookings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .booking-card {
+      padding: 14px;
+      border: 1px solid var(--app-line);
+      border-radius: 8px;
+      background: #1a1a1c;
+    }
+
+    .booking-card-top {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .staff-avatar {
+      width: 58px;
+      height: 58px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 218, 50, 0.44);
+      border-radius: 50%;
+      background: #29292b;
+      color: var(--app-gold-strong);
+      font-size: 16px;
+      font-weight: 600;
     }
 
-    .gc-action-btn {
+    .staff-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+    }
+
+    .booking-main {
+      min-width: 0;
+    }
+
+    .booking-staff {
+      overflow: hidden;
+      margin: 0;
+      color: #b8ae9d;
+      font-size: 10px;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .booking-staff-line {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .booking-service {
+      min-width: 0;
+      overflow: hidden;
+      margin: 0;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .booking-service-line {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .booking-datetime {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px 11px;
+      margin-top: 7px;
+      color: #eee9df;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .booking-datetime span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .booking-datetime i {
+      color: var(--app-gold-strong);
+      font-size: 11px;
+    }
+
+    .booking-duration {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 5px;
+      color: #e4dfd5;
+      font-size: 10px;
+    }
+
+    .booking-duration i {
+      color: var(--app-gold-strong);
+    }
+
+    .booking-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 6px;
+    }
+
+    .booking-meta .booking-duration {
+      margin-top: 0;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .card-action {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 15px;
+    }
+
+    .call-action {
+      border: 0;
+      background: var(--app-gold-strong);
+      color: #17150e;
+      text-decoration: none;
+    }
+
+    .call-action.disabled {
+      pointer-events: none;
+      filter: grayscale(1);
+      opacity: 0.45;
+    }
+
+    .cancel-action {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 1px solid rgba(239, 116, 104, 0.28);
+      border-radius: 50%;
+      background: #242321;
+      color: var(--app-danger);
+      font-size: 15px;
+    }
+
+    .status-badge {
+      min-height: 22px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 6px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .status-pending,
+    .status-confirmed {
+      background: rgba(255, 218, 50, 0.14);
+      color: var(--app-gold);
+    }
+
+    .status-completed {
+      background: rgba(100, 214, 139, 0.14);
+      color: var(--app-success);
+    }
+
+    .status-cancelled,
+    .status-no_show {
+      background: rgba(239, 116, 104, 0.14);
+      color: var(--app-danger);
+    }
+
+    .booking-note {
+      margin: 12px 0 0;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: #bbb7af;
+      font-size: 9px;
+      line-height: 1.45;
+    }
+
+    .list-message {
+      padding: 38px 20px;
+      color: var(--app-muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .list-message i {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--app-gold-strong);
+      font-size: 30px;
+    }
+
+    .filter-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      visibility: hidden;
+      background: rgba(0, 0, 0, 0.66);
+      opacity: 0;
+      transition: opacity 180ms ease, visibility 180ms ease;
+    }
+
+    .filter-overlay.open {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .filter-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 110;
+      width: min(88vw, 350px);
+      height: 100dvh;
+      overflow-y: auto;
+      padding: calc(20px + env(safe-area-inset-top, 0px)) 18px 24px;
+      border-left: 1px solid var(--app-line);
+      background: #111113;
+      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.58);
+      transform: translateX(100%);
+      transition: transform 220ms ease;
+    }
+
+    .filter-drawer.open {
+      transform: translateX(0);
+    }
+
+    .filter-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .filter-drawer-header h2 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .drawer-close {
       width: 38px;
       height: 38px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--app-line);
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.06);
-      text-decoration: none;
-      padding: 0;
+      background: #202022;
+      color: #fff;
+      font-size: 18px;
     }
 
-    .content-area {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 22px 14px 0;
+    .filter-field {
+      display: block;
+      margin-bottom: 17px;
     }
 
-    .page-content {
-      padding: 0;
-    }
-
-    .gc-page-intro {
-      padding: 22px 18px;
-      margin-bottom: 16px;
-      border-radius: 22px;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
-        rgba(18, 18, 18, 0.88);
-      border: 1px solid var(--gc-line);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
-    }
-
-    .gc-page-intro h5,
-    .gc-section-title {
-      color: #fff !important;
-    }
-
-    .gc-page-intro .text-muted,
-    .gc-page-intro p {
-      color: var(--gc-muted) !important;
-    }
-
-    .page-content > .mb-3:first-child {
-      padding: 22px 18px;
-      margin-bottom: 16px !important;
-      border-radius: 22px;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
-        rgba(18, 18, 18, 0.88);
-      border: 1px solid var(--gc-line);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
-    }
-
-    .page-content > .mb-3:first-child h5,
-    .page-content h6 {
-      color: #fff !important;
-    }
-
-    .page-content > .mb-3:first-child .text-muted {
-      color: var(--gc-muted) !important;
-    }
-
-    .status-tab {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.72);
-      background: rgba(255, 255, 255, 0.055);
-      border-radius: 999px;
-      padding: 8px 12px;
+    .filter-field span {
+      display: block;
+      margin-bottom: 7px;
+      color: #ddd;
+      font-size: 11px;
       font-weight: 600;
-      transition: all 0.15s ease;
-    }
-    .status-tab:hover {
-      color: #fff;
-    }
-    .status-tab.active {
-      background: linear-gradient(135deg, var(--gc-gold), var(--gc-gold-light));
-      color: #fff;
-      box-shadow: 0 12px 26px rgba(213, 161, 61, 0.22);
-      border-color: transparent;
-    }
-    .status-tab.active:hover {
-      color: #fff;
     }
 
-    .booking-history-card {
-      padding: 16px;
-      border-radius: 18px;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.032)),
-        rgba(22, 22, 22, 0.9);
-      border: 1px solid var(--gc-line);
+    .filter-field select,
+    .filter-field input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--app-line);
+      border-radius: 7px;
+      outline: 0;
+      background: #242426;
       color: #fff;
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+      padding: 0 12px;
+      color-scheme: dark;
+      font-size: 11px;
     }
 
-    .booking-history-card .text-primary-color,
-    .booking-history-card span {
-      color: #fff !important;
+    .filter-field select:focus,
+    .filter-field input:focus {
+      border-color: var(--app-gold-strong);
     }
 
-    .booking-history-card .text-muted {
-      color: var(--gc-muted) !important;
+    .drawer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 25px;
     }
 
-    .booking-note-box {
-      padding: 12px 14px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.055);
-      color: #fff;
-      line-height: 1.35;
-    }
-
-    .booking-history-card .action-btn {
-      border-radius: 13px;
-      font-weight: 800;
+    .drawer-action {
       min-height: 48px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 600;
     }
 
-    .booking-history-card .secondary-action-btn {
-      background: linear-gradient(135deg, var(--gc-gold), var(--gc-gold-light)) !important;
-      color: #111 !important;
-      box-shadow: 0 12px 28px rgba(213, 161, 61, 0.22);
+    .reset-filters {
+      border: 1px solid var(--app-line);
+      background: #242426;
+      color: #fff;
     }
 
-    .booking-history-card .secondary-action-btn i {
-      color: #111 !important;
-    }
-
-    .booking-history-card .danger-action-btn {
-      background: rgba(185, 45, 45, 0.22) !important;
-      color: #ff7676 !important;
-      border-color: rgba(255, 118, 118, 0.24);
-    }
-
-    .booking-history-card .danger-action-btn i {
-      color: #ff7676 !important;
-    }
-
-    .booking-history-card .danger-action-btn:disabled {
-      opacity: 0.45;
-      color: rgba(255, 255, 255, 0.55) !important;
-      background: rgba(255, 255, 255, 0.06) !important;
-    }
-
-    .booking-history-card .badge.bg-success {
-      background: #20a867 !important;
-      color: #fff !important;
-    }
-
-    .booking-history-card .badge.bg-warning {
-      background: var(--gc-gold-light) !important;
-      color: #111 !important;
-    }
-
-    .booking-history-card .badge.bg-danger {
-      background: #b92d2d !important;
-      color: #fff !important;
+    .apply-filters {
+      border: 0;
+      background: var(--app-gold-strong);
+      color: #17150e;
     }
 
     .bottom-nav {
       position: fixed;
-      left: 18px;
-      right: 18px;
-      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      left: 50% !important;
+      right: auto !important;
+      bottom: 0;
       z-index: 50;
-      height: 72px;
+      width: min(100%, 480px);
+      height: calc(64px + env(safe-area-inset-bottom, 0px));
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      align-items: center;
-      max-width: 760px;
-      margin: 0 auto;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035)),
-        rgba(22, 22, 22, 0.92);
-      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(18px);
+      grid-template-columns: repeat(4, 1fr);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      margin: 0 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 0 !important;
+      background: rgba(15, 15, 17, 0.99);
+      box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.3);
+      transform: translateX(-50%) !important;
+      backdrop-filter: blur(16px);
     }
 
     .bottom-nav .nav-item {
+      position: relative;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      min-width: 0;
-      height: 100%;
-      color: rgba(255, 255, 255, 0.48);
+      color: #c8c8ca;
       text-decoration: none;
-      font-size: 11px;
-      line-height: 1.15;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .bottom-nav .nav-item i {
-      font-size: 21px;
+      font-size: 23px;
     }
 
     .bottom-nav .nav-item.active {
-      color: var(--gc-gold-light);
+      color: var(--app-gold-strong);
     }
 
-    .favorites-sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 88vw;
-      max-width: 340px;
-      height: 100vh;
-      background: #151515;
-      color: #fff;
-      box-shadow: 2px 0 18px rgba(0, 0, 0, 0.35);
-      padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 16px;
-      transform: translateX(-100%);
-      opacity: 0;
-      transition: transform 0.25s ease, opacity 0.25s ease;
-      z-index: 2000;
-      overflow-y: auto;
-      display: none;
-      border-top-right-radius: 18px;
-      border-bottom-right-radius: 18px;
-      border-right: 1px solid var(--gc-line);
+    .bottom-nav .nav-item.active::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 7px;
+      width: 26px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--app-gold-strong);
+      transform: translateX(-50%);
     }
 
-    .favorites-sidebar.open {
-      display: block;
-      transform: translateX(0);
-      opacity: 1;
-    }
+    @media (max-width: 370px) {
+      .bookings-content {
+        padding-inline: 16px;
+      }
 
-    .favorites-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.48);
-      display: none;
-      z-index: 1500;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
+      .booking-card {
+        padding: 12px;
+      }
 
-    .favorites-overlay.show {
-      display: block;
-      opacity: 1;
+      .booking-card-top {
+        grid-template-columns: 52px minmax(0, 1fr) auto;
+        gap: 9px;
+      }
+
+      .staff-avatar {
+        width: 52px;
+        height: 52px;
+      }
+
+      .card-action {
+        width: 36px;
+        height: 36px;
+      }
+
+      .cancel-action {
+        width: 36px;
+        height: 36px;
+      }
     }
   </style>
-
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="shortcut icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-  <meta name="theme-color" content="#1a1a1a">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
 </head>
 
-<body class="gc-client-page">
+<body class="bookings-page">
+  <div class="app-shell">
+    <header class="home-header">
+      <div class="header-inner">
+        <div class="greeting-copy">
+          <h1>Ciao <span id="welcomeName">cliente</span>,</h1>
+          <div class="location-line">
+            <i class="bi bi-geo-alt"></i>
+            <span id="shopLocation">Caricamento posizione...</span>
+          </div>
+        </div>
 
-  <!-- Header -->
-  <div class="gc-header d-flex justify-content-between align-items-center">
-    <div class="gc-header-title">
-      <i class="bi bi-journal-text me-2 app-header-icon"></i>
-      <span>Prenotazioni</span>
-    </div>
-    <div class="gc-actions">
-      <button type="button" id="favoritesToggle" class="gc-action-btn" title="Preferiti"><i class="bi bi-star"></i></button>
-      <button type="button" class="gc-action-btn" onclick="refreshApp()" title="Aggiorna">
-        <i class="bi bi-arrow-clockwise"></i>
-      </button>
-      <button type="button" class="gc-action-btn" onclick="logout()" title="Logout">
-        <i class="bi bi-box-arrow-right"></i>
-      </button>
-    </div>
-  </div>
+        <div class="header-actions">
+          <button type="button" id="notificationButton" class="header-action notification" aria-label="Notifiche" aria-expanded="false">
+            <i class="bi bi-bell-fill"></i>
+          </button>
+          <button type="button" id="profileButton" class="header-action" aria-label="Profilo" aria-expanded="false">
+            <i class="bi bi-person-fill"></i>
+          </button>
 
-  <!-- MAIN CONTENT -->
-  <div class="content-area">
-    <div class="page-content">
-      <!-- Welcome Message -->
-      <div class="mb-3">
-        <h5 class="fw-bold text-primary-color">Ciao, <span id="welcomeName">Utente</span>! 👋</h5>
-        <p class="text-muted small">Qui puoi visualizzare tutte le tue prenotazioni</p>
-      </div>
+          <div id="notificationPanel" class="header-popover">
+            <strong>Notifiche</strong>
+            <p>Qui trovi tutti gli aggiornamenti sui tuoi appuntamenti.</p>
+          </div>
 
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="fw-semibold text-primary-color m-0">Prenotazioni recenti</h6>
-      </div>
-
-      <!-- Tabs filtro stato -->
-      <div class="mb-3">
-        <div class="nav nav-pills small gap-2" id="statusTabs">
-          <button class="status-tab active" data-filter="all">Tutte</button>
-          <button class="status-tab" data-filter="pending">In sospeso</button>
-          <button class="status-tab" data-filter="confirmed">Confermate</button>
-          <button class="status-tab" data-filter="completed">Concluse</button>
-          <button class="status-tab" data-filter="cancelled">Annullate</button>
+          <div id="profilePanel" class="header-popover">
+            <strong id="profileName">Il tuo profilo</strong>
+            <p id="profileEmail"></p>
+            <button type="button" class="profile-logout" onclick="logout()">
+              <i class="bi bi-box-arrow-right me-1"></i>
+              Esci dall'account
+            </button>
+          </div>
         </div>
       </div>
+    </header>
 
-      <!-- Lista prenotazioni -->
-      <div id="bookingsList" class="pb-5">
-        <div class="text-center mt-5 text-muted" id="loadingMsg">
-          <div class="spinner-border text-primary" role="status"></div>
-          <p class="mt-2">Caricamento prenotazioni...</p>
+    <main class="bookings-content">
+      <h2 class="page-title">Le mie prenotazioni</h2>
+
+      <div class="search-row">
+        <label class="search-field">
+          <i class="bi bi-search"></i>
+          <input id="bookingSearch" type="search" placeholder="Cerca per servizio..." autocomplete="off">
+        </label>
+        <button type="button" id="openFilters" class="filter-button" aria-label="Apri filtri" aria-expanded="false">
+          <i class="bi bi-funnel"></i>
+        </button>
+      </div>
+
+      <div id="statusTabs" class="status-tabs" aria-label="Filtra per stato">
+        <button type="button" class="status-tab" data-status="all">Tutte</button>
+        <button type="button" class="status-tab active" data-status="confirmed">Confermate</button>
+        <button type="button" class="status-tab" data-status="completed">Completate</button>
+        <button type="button" class="status-tab" data-status="cancelled">Annullate</button>
+      </div>
+
+      <div id="bookingsList" class="bookings-list">
+        <div class="list-message">
+          <span class="spinner-border spinner-border-sm" role="status"></span>
+          <p class="mt-2 mb-0">Caricamento prenotazioni...</p>
         </div>
       </div>
+    </main>
+  </div>
+
+  <div id="filterOverlay" class="filter-overlay"></div>
+  <aside id="filterDrawer" class="filter-drawer" aria-hidden="true">
+    <div class="filter-drawer-header">
+      <h2>Filtra prenotazioni</h2>
+      <button type="button" id="closeFilters" class="drawer-close" aria-label="Chiudi filtri">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
-  </div>
 
-  <!-- Bottom Nav -->
-  <div class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
-      <i class="bi bi-calendar-check"></i>
-      <span>Prenota</span>
-    </a>
-    <a class="nav-item active">
-      <i class="bi bi-journal-text"></i>
-      <span>Prenotazioni</span>
-    </a>
-    <a href="products.html" class="nav-item">
-      <i class="bi bi-box"></i>
-      <span>Prodotti</span>
-    </a>
-  </div>
+    <label class="filter-field">
+      <span>Barbiere</span>
+      <select id="staffFilter">
+        <option value="">Tutto lo staff</option>
+      </select>
+    </label>
 
-  <!-- Scripts -->
+    <label class="filter-field">
+      <span>Stato</span>
+      <select id="statusFilter">
+        <option value="">Tutti gli stati</option>
+        <option value="pending">In sospeso</option>
+        <option value="confirmed">Confermata</option>
+        <option value="completed">Completata</option>
+        <option value="cancelled">Annullata</option>
+        <option value="no_show">Assente</option>
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>Dal giorno</span>
+      <input id="dateFromFilter" type="date">
+    </label>
+
+    <label class="filter-field">
+      <span>Al giorno</span>
+      <input id="dateToFilter" type="date">
+    </label>
+
+    <div class="drawer-actions">
+      <button type="button" id="resetFilters" class="drawer-action reset-filters">Azzera</button>
+      <button type="button" id="applyFilters" class="drawer-action apply-filters">Applica</button>
+    </div>
+  </aside>
+
+  <nav class="bottom-nav" aria-label="Navigazione principale">
+    <a href="dashboard.html" class="nav-item" aria-label="Prenota" title="Prenota">
+      <i class="bi bi-scissors"></i>
+    </a>
+    <a href="my-bookings.html" class="nav-item active" aria-label="Le mie prenotazioni" title="Le mie prenotazioni">
+      <i class="bi bi-calendar2-check"></i>
+    </a>
+    <a href="products.html" class="nav-item" aria-label="Prodotti" title="Prodotti">
+      <i class="bi bi-bag"></i>
+    </a>
+    <a href="profile.html" class="nav-item" aria-label="Profilo" title="Profilo">
+      <i class="bi bi-person"></i>
+    </a>
+  </nav>
+
   <script src="vender/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="js/script.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="/js/favorites-drawer.js" defer></script>
-
-  <div id="favoritesSidebar" class="favorites-sidebar">
-    <div class="favorites-header d-flex justify-content-between align-items-center">
-      <h6 class="mb-0">Preferiti</h6>
-      <button class="btn btn-sm btn-outline-secondary" id="closeFavorites"><i class="bi bi-x"></i></button>
-    </div>
-    <p class="mt-2 mb-3 small text-muted">Questa e la tua lista di prodotti preferiti.</p>
-    <div id="favoritesList" class="mt-3 small"></div>
-  </div>
-  <div id="favoritesOverlay" class="favorites-overlay"></div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      requireAuth();
-
-      const token = localStorage.getItem("token");
-      const bookingsList = document.getElementById("bookingsList");
-      const loadingMsg = document.getElementById("loadingMsg");
-      const statusTabs = document.getElementById("statusTabs");
-      let currentFilter = "all";
-      let bookingsData = [];
-
-      if (!token) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      const statusTranslations = {
-        pending: "In sospeso",
-        confirmed: "Confermata",
-        cancelled: "Annullata",
-        completed: "Completata",
-        no_show: "No show",
-      };
-
-      const badgeColors = {
-        pending: "bg-warning text-dark",
-        confirmed: "bg-success text-white",
-        cancelled: "bg-danger text-white",
-        completed: "bg-info text-white",
-        no_show: "bg-secondary text-white",
-      };
-
-      const isCancellable = (status) => ['pending', 'confirmed'].includes(status);
-
-      const formatDate = (dateString) => {
-        try {
-          const d = new Date(dateString);
-          return d.toLocaleDateString("it-IT", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          });
-        } catch {
-          return dateString;
-        }
-      };
-
-      // ✅ Funzione per formattare l'orario (toglie i secondi)
-      const formatTime = (timeString) => {
-        if (!timeString) return "";
-        return timeString.slice(0, 5); // da "10:30:00" -> "10:30"
-      };
-
-      const escapeHtml = (value) => String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-      const renderBookings = () => {
-        const filtered = bookingsData.filter((b) => currentFilter === "all" || b.status === currentFilter);
-        bookingsList.innerHTML = "";
-
-        if (!filtered.length) {
-          bookingsList.innerHTML = `
-            <div class="text-center text-muted mt-5">
-              <i class="bi bi-calendar-x display-4 d-block mb-2"></i>
-              <p>Nessuna prenotazione trovata.</p>
-            </div>`;
-          return;
-        }
-
-        filtered.forEach((booking) => {
-          const translatedStatus = statusTranslations[booking.status] || booking.status;
-          const badgeClass = badgeColors[booking.status] || "bg-secondary";
-          const formattedDate = formatDate(booking.date);
-          const formattedTime = formatTime(booking.time);
-          const canCancel = isCancellable(booking.status);
-          const noteHtml = booking.note ? `
-            <div class="booking-note-box mb-3">
-              <div class="small text-muted mb-1">Nota</div>
-              <div>${escapeHtml(booking.note)}</div>
-            </div>
-          ` : '';
-
-          const item = document.createElement("div");
-          item.className = "booking-history-card mb-3";
-
-          const avatar = booking.staff_image ? `<img src="${booking.staff_image}" alt="Barbiere" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;">` : '';
-
-          item.innerHTML = `
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <div class="d-flex align-items-center">
-                ${avatar}
-                <div>
-                  <div class="fw-semibold text-primary-color">${booking.service}</div>
-                  <div class="small text-muted">${booking.staff}</div>
-                </div>
-              </div>
-              <span class="badge ${badgeClass}">${translatedStatus}</span>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-calendar3 me-2 text-muted"></i>
-                <span>${formattedDate}</span>
-              </div>
-              <div class="d-flex align-items-center">
-                <i class="bi bi-clock me-2 text-muted"></i>
-                <span>${formattedTime}</span>
-              </div>
-            </div>
-
-            ${noteHtml}
-
-            <div class="d-flex justify-content-center gap-2">
-              <button class="btn action-btn secondary-action-btn flex-grow-1 contact-btn">
-                <i class="bi bi-telephone-forward me-1"></i> Contatta il barbiere
-              </button>
-              <button class="btn action-btn danger-action-btn flex-grow-1 cancel-btn" ${canCancel ? '' : 'disabled'}>
-                <i class="bi bi-x-circle me-1"></i> Annulla
-              </button>
-            </div>
-          `;
-
-          const contactBtn = item.querySelector(".contact-btn");
-          contactBtn.addEventListener("click", () => {
-            if (booking.staff_phone) {
-              const cleanPhone = booking.staff_phone.replace(/[^\d+]/g, '').trim();
-              const phoneWithPrefix = cleanPhone.startsWith('+39') ? cleanPhone : `+39${cleanPhone}`;
-              window.location.href = `tel:${phoneWithPrefix}`;
-            } else {
-              alert("Numero di telefono non disponibile per questo barbiere.");
-            }
-          });
-
-          const cancelBtn = item.querySelector(".cancel-btn");
-          if (cancelBtn && canCancel) {
-            cancelBtn.addEventListener("click", async () => {
-              const confirmCancel = confirm("Sei sicuro di voler annullare questa prenotazione?");
-              if (!confirmCancel) return;
-
-              try {
-                setButtonLoading(cancelBtn, true);
-
-                const res = await fetch(`${API_BASE}/bookings/${booking.id}/cancel`, {
-                  method: "POST",
-                  headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Accept": "application/json",
-                  },
-                });
-
-                const cancelData = await res.json();
-                setButtonLoading(cancelBtn, false);
-
-                if (!cancelData.status) {
-                  alert(cancelData.message || "Impossibile annullare la prenotazione.");
-                  return;
-                }
-
-                booking.status = 'cancelled';
-                renderBookings();
-              } catch (err) {
-                console.error("Errore annullamento:", err);
-                setButtonLoading(cancelBtn, false);
-                alert("Errore durante l'annullamento. Riprova.");
-              }
-            });
-          } else if (cancelBtn) {
-            cancelBtn.disabled = true;
-          }
-
-          bookingsList.appendChild(item);
-        });
-      };
-
-      // Tabs filtro stato
-      if (statusTabs) {
-        statusTabs.querySelectorAll("button").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            statusTabs.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
-            currentFilter = btn.dataset.filter || "all";
-            renderBookings();
-          });
-        });
-      }
-
-      try {
-        const response = await fetch(`${API_BASE}/bookings`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/json",
-          },
-        });
-
-        const data = await response.json();
-        loadingMsg.style.display = "none";
-
-        if (!data.status || !data.bookings.length) {
-          bookingsList.innerHTML = `
-            <div class="text-center text-muted mt-5">
-              <i class="bi bi-calendar-x display-4 d-block mb-2"></i>
-              <p>Nessuna prenotazione trovata.</p>
-            </div>`;
-          return;
-        }
-
-        bookingsData = data.bookings;
-        renderBookings();
-      } catch (error) {
-        console.error("Errore nel caricamento:", error);
-        bookingsList.innerHTML = `
-          <div class="text-center text-danger mt-5">
-            <i class="bi bi-exclamation-triangle display-4 d-block mb-2"></i>
-            <p>Errore durante il caricamento delle prenotazioni.</p>
-          </div>`;
-      }
-    });
-
-    // Update welcome message with user name
-    const user = getUser();
-    if (user && user.name) {
-      document.getElementById('welcomeName').textContent = user.name;
-    }
-
-    // Registra il Service Worker per PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-        console.log('Service Worker registrato:', registration);
-      }).catch((error) => {
-        console.log('Service Worker registrazione fallita:', error);
-      });
-    }
-  </script>
-
+  <script src="/js/app-ui.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/my-bookings.js"></script>
 </body>
+
 </html>

@@ -213,6 +213,7 @@ class BookingController extends Controller
                     'staff_phone' => $booking->staff->phone,
                     'staff_image' => $booking->staff->image ? \Illuminate\Support\Facades\Storage::url($booking->staff->image) : null,
                     'service' => $booking->service->name,
+                    'service_duration' => $booking->service->duration,
                     'date' => $booking->date,
                     'time' => $booking->time,
                     'status' => $booking->status,

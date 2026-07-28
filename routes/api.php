@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\ClosedSlotController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\LoyaltyController;
+use App\Http\Controllers\Api\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +27,10 @@ use App\Http\Controllers\Api\FavoriteController;
    🔹 TEST API
 ========================= */
 Route::get('/test', fn () => response()->json(['message' => 'API working']));
+
+Route::get('/app-config', fn () => response()->json([
+    'location' => config('barbershop.location'),
+]));
 
 // Test Telegram notification
 Route::get('/test-telegram', function () {
@@ -53,7 +59,10 @@ Route::prefix('auth')->group(function () {
     // Authenticated routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::get('/me', fn (Request $request) => $request->user());
+        Route::get('/me', [ProfileController::class, 'show']);
+        Route::put('/profile', [ProfileController::class, 'update']);
+        Route::put('/password', [ProfileController::class, 'updatePassword']);
+        Route::post('/avatar', [ProfileController::class, 'updateAvatar']);
     });
 });
 
@@ -63,6 +72,8 @@ Route::prefix('auth')->group(function () {
 ========================= */
 // Tutti i servizi attivi
 Route::get('/services', [ServiceController::class, 'index']);
+
+Route::get('/services/by-staff/{staffId}', [ServiceController::class, 'byStaff']);
 
 // Dettaglio singolo servizio (se serve in futuro)
 Route::get('/services/{id}', [ServiceController::class, 'show']);
@@ -85,6 +96,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites/{product}', [FavoriteController::class, 'store']);
     Route::delete('/favorites/{product}', [FavoriteController::class, 'destroy']);
+});
+
+/* =========================
+   LOYALTY (Protette)
+========================= */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/loyalty/summary', [LoyaltyController::class, 'summary']);
+    Route::post('/loyalty/rewards/{reward}/redeem', [LoyaltyController::class, 'redeem']);
 });
 
 

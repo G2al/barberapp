@@ -1,0 +1,341 @@
+:root {
+  --app-ui-bg: #0b0b0e;
+  --app-ui-panel: #1b1b1d;
+  --app-ui-line: rgba(255, 255, 255, 0.13);
+  --app-ui-gold: #f1b954;
+  --app-ui-gold-light: #ffd77d;
+  --app-ui-text: #ffffff;
+  --app-ui-muted: #aaa7a0;
+  --app-ui-success: #5fd18b;
+  --app-ui-danger: #ef7468;
+}
+
+.app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  background: #09090b;
+  opacity: 0;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+
+.app-loader.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.app-loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 17px;
+}
+
+.app-loader-mark {
+  position: relative;
+  width: 82px;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-loader-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(241, 185, 84, 0.14);
+  border-top-color: var(--app-ui-gold);
+  border-right-color: rgba(241, 185, 84, 0.56);
+  border-radius: 50%;
+  animation: appUiSpin 1.15s linear infinite;
+}
+
+.app-loader-icon {
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--app-ui-gold);
+  font-size: 28px;
+}
+
+.app-loader-label {
+  margin: 0;
+  color: var(--app-ui-text);
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.app-toast-stack {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 11000;
+  width: min(calc(100% - 28px), 440px);
+  display: grid;
+  gap: 9px;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.app-toast {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 12px;
+  border: 1px solid var(--app-ui-line);
+  border-left: 3px solid var(--app-ui-gold);
+  border-radius: 8px;
+  background: rgba(27, 27, 29, 0.98);
+  color: var(--app-ui-text);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: auto;
+  transform: translateY(-16px) scale(0.98);
+  transition: opacity 180ms ease, transform 180ms ease;
+  backdrop-filter: blur(16px);
+}
+
+.app-toast.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.app-toast.success {
+  border-left-color: var(--app-ui-success);
+}
+
+.app-toast.error {
+  border-left-color: var(--app-ui-danger);
+}
+
+.app-toast-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(241, 185, 84, 0.13);
+  color: var(--app-ui-gold);
+  font-size: 17px;
+}
+
+.app-toast.success .app-toast-icon {
+  background: rgba(95, 209, 139, 0.13);
+  color: var(--app-ui-success);
+}
+
+.app-toast.error .app-toast-icon {
+  background: rgba(239, 116, 104, 0.13);
+  color: var(--app-ui-danger);
+}
+
+.app-toast-title,
+.app-toast-message {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  letter-spacing: 0;
+}
+
+.app-toast-title {
+  color: var(--app-ui-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.app-toast-message {
+  margin-top: 2px;
+  color: #c3beb5;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.app-toast-close {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--app-ui-muted);
+  font-size: 14px;
+}
+
+.app-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  visibility: hidden;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.76);
+  opacity: 0;
+  transition: opacity 180ms ease, visibility 180ms ease;
+  backdrop-filter: blur(8px);
+}
+
+.app-confirm-overlay.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.app-confirm {
+  width: min(100%, 440px);
+  padding: 22px;
+  border: 1px solid var(--app-ui-line);
+  border-radius: 10px;
+  background: #171719;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
+  transform: translateY(28px);
+  transition: transform 200ms ease;
+}
+
+.app-confirm-overlay.show .app-confirm {
+  transform: translateY(0);
+}
+
+.app-confirm-icon {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 17px;
+  border-radius: 50%;
+  background: rgba(241, 185, 84, 0.13);
+  color: var(--app-ui-gold);
+  font-size: 21px;
+}
+
+.app-confirm.danger .app-confirm-icon {
+  background: rgba(239, 116, 104, 0.13);
+  color: var(--app-ui-danger);
+}
+
+.app-confirm-title,
+.app-confirm-message {
+  font-family: "Poppins", Arial, sans-serif;
+  letter-spacing: 0;
+}
+
+.app-confirm-title {
+  margin: 0;
+  color: var(--app-ui-text);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.app-confirm-message {
+  margin: 8px 0 0;
+  color: var(--app-ui-muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.app-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.app-confirm-button {
+  min-height: 48px;
+  border: 1px solid var(--app-ui-line);
+  border-radius: 7px;
+  background: #242426;
+  color: var(--app-ui-text);
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.app-confirm-button.primary {
+  border-color: var(--app-ui-gold);
+  background: var(--app-ui-gold);
+  color: #17150e;
+}
+
+.app-confirm.danger .app-confirm-button.primary {
+  border-color: var(--app-ui-danger);
+  background: var(--app-ui-danger);
+  color: #150b0a;
+}
+
+.app-button-state {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 140ms ease !important;
+}
+
+.app-button-state .app-button-state-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  max-width: 100%;
+  animation: appUiButtonIn 180ms ease;
+}
+
+.app-button-state.app-button-loading {
+  cursor: wait;
+}
+
+.app-button-state.app-button-success {
+  border-color: var(--app-ui-success) !important;
+  background: var(--app-ui-success) !important;
+  color: #07150c !important;
+  box-shadow: 0 14px 30px rgba(95, 209, 139, 0.2) !important;
+}
+
+.app-button-state.app-button-error {
+  border-color: var(--app-ui-danger) !important;
+  background: var(--app-ui-danger) !important;
+  color: #190908 !important;
+  box-shadow: 0 14px 30px rgba(239, 116, 104, 0.2) !important;
+}
+
+.app-button-state.app-button-success i,
+.app-button-state.app-button-error i {
+  font-size: 17px;
+}
+
+@keyframes appUiSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes appUiButtonIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 700px) {
+  .app-confirm-overlay {
+    align-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loader-ring,
+  .app-loader-icon {
+    animation: none;
+  }
+}

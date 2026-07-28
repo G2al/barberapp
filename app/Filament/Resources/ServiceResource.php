@@ -44,6 +44,13 @@ class ServiceResource extends Resource
                 ->numeric()
                 ->required(),
 
+            Forms\Components\TextInput::make('loyalty_points')
+                ->label('Punti fidelity')
+                ->numeric()
+                ->minValue(0)
+                ->default(0)
+                ->required(),
+
             Forms\Components\Toggle::make('is_active')
                 ->label('Attivo')
                 ->default(true),
@@ -65,6 +72,12 @@ class ServiceResource extends Resource
             Tables\Columns\TextColumn::make('duration')
                 ->label('Durata')
                 ->suffix(' min')
+                ->sortable(),
+
+            Tables\Columns\TextColumn::make('loyalty_points')
+                ->label('Punti')
+                ->badge()
+                ->color('warning')
                 ->sortable(),
 
             Tables\Columns\IconColumn::make('is_active')

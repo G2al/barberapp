@@ -14,6 +14,7 @@ class Service extends Model
         'description',
         'price',
         'duration',
+        'loyalty_points',
         'is_active',
     ];
 
@@ -26,4 +27,9 @@ class Service extends Model
 {
     return $this->hasMany(Booking::class);
 }
+
+    public function loyaltyRules()
+    {
+        return $this->hasMany(LoyaltyRewardRule::class);
+    }
 }

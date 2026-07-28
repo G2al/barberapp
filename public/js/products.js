@@ -1,242 +1,323 @@
-requireAuth();
+const productsPageState = {
+    products: [],
+    category: "all",
+    search: "",
+    toastTimer: null,
+};
 
-const productsContainer = document.getElementById('productsContainer');
-const searchInput = document.getElementById('productSearch');
-const categoryTabs = document.getElementById('categoryTabs');
-const favoritesToggle = document.getElementById('favoritesToggle');
-const favoritesSidebar = document.getElementById('favoritesSidebar');
-const favoritesOverlay = document.getElementById('favoritesOverlay');
-const favoritesList = document.getElementById('favoritesList');
-const favoritesCount = document.getElementById('favoritesCount');
+document.addEventListener("DOMContentLoaded", async () => {
+    requireAuth();
 
-let allProducts = [];
-let activeCategory = 'all';
+    if (!localStorage.getItem("token")) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    hydrateUserHeader();
+    setupHeaderPanels();
+    setupProductSearch();
+    setupFavoritesDrawer();
+    window.appLoader?.show("Prepariamo il catalogo");
+    try {
+        await Promise.all([loadAppConfiguration(), loadProducts()]);
+    } finally {
+        window.appLoader?.hide();
+    }
+});
+
+function hydrateUserHeader() {
+    const user = getUser();
+    document.getElementById("welcomeName").textContent = user?.name?.trim() || "cliente";
+    document.getElementById("profileName").textContent = [user?.name, user?.surname].filter(Boolean).join(" ") || "Il tuo profilo";
+    document.getElementById("profileEmail").textContent = user?.email || "";
+}
+
+async function loadAppConfiguration() {
+    const location = document.getElementById("shopLocation");
+
+    try {
+        const response = await fetch(`${API_BASE}/app-config`, {
+            headers: { "Accept": "application/json" },
+        });
+        const config = await response.json();
+        location.textContent = config.location || "Via Toledo 156, Napoli";
+    } catch {
+        location.textContent = "Via Toledo 156, Napoli";
+    }
+}
+
+function setupHeaderPanels() {
+    const notificationButton = document.getElementById("notificationButton");
+    const profileButton = document.getElementById("profileButton");
+    const notificationPanel = document.getElementById("notificationPanel");
+    const profilePanel = document.getElementById("profilePanel");
+
+    const closePanels = () => {
+        notificationPanel.classList.remove("open");
+        profilePanel.classList.remove("open");
+        notificationButton.setAttribute("aria-expanded", "false");
+        profileButton.setAttribute("aria-expanded", "false");
+    };
+
+    notificationButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const shouldOpen = !notificationPanel.classList.contains("open");
+        closePanels();
+        notificationPanel.classList.toggle("open", shouldOpen);
+        notificationButton.setAttribute("aria-expanded", String(shouldOpen));
+    });
+
+    profileButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const shouldOpen = !profilePanel.classList.contains("open");
+        closePanels();
+        profilePanel.classList.toggle("open", shouldOpen);
+        profileButton.setAttribute("aria-expanded", String(shouldOpen));
+    });
+
+    notificationPanel.addEventListener("click", (event) => event.stopPropagation());
+    profilePanel.addEventListener("click", (event) => event.stopPropagation());
+    document.addEventListener("click", closePanels);
+}
+
+function setupProductSearch() {
+    document.getElementById("productSearch").addEventListener("input", (event) => {
+        productsPageState.search = event.target.value.trim().toLocaleLowerCase("it");
+        renderProducts();
+    });
+}
+
+function setupFavoritesDrawer() {
+    document.getElementById("openFavorites").addEventListener("click", () => {
+        renderFavoritesList();
+        setFavoritesDrawerOpen(true);
+    });
+    document.getElementById("closeFavorites").addEventListener("click", () => setFavoritesDrawerOpen(false));
+    document.getElementById("favoritesOverlay").addEventListener("click", () => setFavoritesDrawerOpen(false));
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") setFavoritesDrawerOpen(false);
+    });
+}
+
+function setFavoritesDrawerOpen(isOpen) {
+    const drawer = document.getElementById("favoritesDrawer");
+    const overlay = document.getElementById("favoritesOverlay");
+
+    drawer.classList.toggle("open", isOpen);
+    overlay.classList.toggle("open", isOpen);
+    drawer.setAttribute("aria-hidden", String(!isOpen));
+    document.getElementById("openFavorites").setAttribute("aria-expanded", String(isOpen));
+    document.body.style.overflow = isOpen ? "hidden" : "";
+}
 
 async function loadProducts() {
     try {
-        const resp = await apiGet('/products');
-        allProducts = resp.products || [];
-        renderTabs(allProducts);
-        await loadFavorites(); // marca i preferiti prima del render
+        const response = await apiGet("/products");
+        productsPageState.products = Array.isArray(response.products) ? response.products : [];
+        renderCategoryTabs();
         renderProducts();
-        searchInput.addEventListener('input', renderProducts);
-    } catch (e) {
-        productsContainer.innerHTML = `<div class="text-center text-danger mt-5">Errore nel caricamento prodotti.</div>`;
+        updateFavoritesCount();
+    } catch {
+        document.getElementById("productsContainer").innerHTML = `
+            <div class="catalog-message">
+                <i class="bi bi-exclamation-triangle"></i>
+                Impossibile caricare il catalogo. Riprova tra poco.
+            </div>`;
     }
 }
 
-function setupFavoritesUI() {
-    if (favoritesToggle) {
-        favoritesToggle.addEventListener('click', () => {
-            console.log('favorites toggle clicked');
-            openFavorites();
-        });
-    }
-    if (favoritesOverlay) {
-        favoritesOverlay.addEventListener('click', closeFavorites);
-    }
-    const closeBtn = document.getElementById('closeFavorites');
-    if (closeBtn) closeBtn.addEventListener('click', closeFavorites);
-}
+function renderCategoryTabs() {
+    const tabs = document.getElementById("categoryTabs");
+    const categories = [...new Set(productsPageState.products.map((product) => product.category).filter(Boolean))]
+        .sort((first, second) => first.localeCompare(second, "it"));
+    const items = [{ value: "all", label: "Tutti" }, ...categories.map((category) => ({ value: category, label: category }))];
 
-function openFavorites() {
-    if (favoritesSidebar) {
-        favoritesSidebar.classList.add('open');
-    }
-    if (favoritesOverlay) {
-        favoritesOverlay.classList.add('show');
-    }
-    loadFavorites();
-}
-
-function closeFavorites() {
-    if (favoritesSidebar) {
-        favoritesSidebar.classList.remove('open');
-    }
-    if (favoritesOverlay) {
-        favoritesOverlay.classList.remove('show');
-    }
-}
-
-async function loadFavorites() {
-    try {
-        const resp = await apiGet('/favorites');
-        const favorites = resp.favorites || [];
-        const favIds = favorites.map(f => f.id);
-        allProducts = allProducts.map(p => ({
-            ...p,
-            is_favorite: favIds.includes(p.id),
-        }));
-        renderProducts();
-
-        updateFavoritesCount(favorites.length);
-
-        if (!favorites.length) {
-            favoritesList.innerHTML = `<div class="text-muted small">Nessun preferito.</div>`;
-            return;
-        }
-        favoritesList.innerHTML = favorites.map(p => {
-            const img = p.image ? `<img src=\"${p.image}\" alt=\"${p.name}\" class=\"me-2 rounded\" style=\"width:40px;height:40px;object-fit:cover;\">` : '';
-            return `<div class=\"d-flex align-items-center justify-content-between mb-2 fav-item\">
-                      <div class=\"d-flex align-items-center\">${img}<div><div class=\"fw-semibold\">${p.name}</div><div class=\"text-muted small\">${p.category || ''}</div></div></div>
-                      <button class=\"btn btn-sm btn-link text-danger remove-fav\" data-product=\"${p.id}\"><i class=\"bi bi-x\"></i></button>
-                    </div>`;
-        }).join('');
-        favoritesList.querySelectorAll('.remove-fav').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const productId = btn.getAttribute('data-product');
-                const original = btn.innerHTML;
-                const item = btn.closest('.fav-item');
-                try {
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-                    await apiDelete(`/favorites/${productId}`);
-                    allProducts = allProducts.map(p => p.id == productId ? {...p, is_favorite: false} : p);
-                    renderProducts();
-                    if (item) item.remove();
-                    if (!favoritesList.querySelector('.fav-item')) {
-                        favoritesList.innerHTML = `<div class="text-muted small">Nessun preferito.</div>`;
-                        updateFavoritesCount(0);
-                    } else {
-                        const current = parseInt(favoritesCount?.textContent || '0', 10);
-                        updateFavoritesCount(Math.max(0, current - 1));
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert('Errore nel rimuovere il preferito');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = original;
-                }
-            });
-        });
-    } catch (e) {
-        favoritesList.innerHTML = `<div class="text-danger small">Errore nel caricamento preferiti.</div>`;
-    }
-}
-
-function renderTabs(products) {
-    const categories = new Set(['all']);
-    products.forEach(p => {
-        if (p.category) categories.add(p.category);
-    });
-
-    categoryTabs.innerHTML = '';
-    categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'btn cat-pill rounded-pill px-3';
-        if (cat === activeCategory) btn.classList.add('active');
-        btn.textContent = cat === 'all' ? 'Tutte' : cat;
-        btn.onclick = () => {
-            activeCategory = cat;
-            renderTabs(allProducts);
+    tabs.innerHTML = "";
+    items.forEach((item) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "category-tab";
+        button.classList.toggle("active", productsPageState.category === item.value);
+        button.textContent = item.label;
+        button.addEventListener("click", () => {
+            productsPageState.category = item.value;
+            renderCategoryTabs();
             renderProducts();
-        };
-        categoryTabs.appendChild(btn);
+        });
+        tabs.appendChild(button);
     });
 }
 
 function renderProducts() {
-    const term = searchInput.value.toLowerCase().trim();
-    let filtered = allProducts;
+    const container = document.getElementById("productsContainer");
+    const products = productsPageState.products.filter((product) => {
+        const categoryMatches = productsPageState.category === "all"
+            || product.category === productsPageState.category;
+        const searchableText = `${product.name || ""} ${product.category || ""} ${product.description || ""}`
+            .toLocaleLowerCase("it");
+        const searchMatches = !productsPageState.search || searchableText.includes(productsPageState.search);
 
-    if (activeCategory !== 'all') {
-        filtered = filtered.filter(p => (p.category || '') === activeCategory);
-    }
+        return categoryMatches && searchMatches;
+    });
 
-    if (term) {
-        filtered = filtered.filter(p =>
-            p.name.toLowerCase().includes(term) ||
-            (p.category || '').toLowerCase().includes(term) ||
-            (p.description || '').toLowerCase().includes(term)
-        );
-    }
+    container.innerHTML = "";
 
-    if (!filtered.length) {
-        productsContainer.innerHTML = `<div class="text-center text-muted mt-5">Nessun prodotto trovato.</div>`;
+    if (!products.length) {
+        container.innerHTML = `
+            <div class="catalog-message">
+                <i class="bi bi-bag-x"></i>
+                Nessun prodotto corrisponde alla ricerca.
+            </div>`;
         return;
     }
 
-    // Render a carousel-like horizontal scroller for each category block
-    const byCategory = {};
-    filtered.forEach(p => {
-        const cat = p.category || 'Senza categoria';
-        if (!byCategory[cat]) byCategory[cat] = [];
-        byCategory[cat].push(p);
+    products.forEach((product) => container.appendChild(createProductCard(product)));
+}
+
+function createProductCard(product) {
+    const card = document.createElement("article");
+    card.className = "product-card";
+    card.innerHTML = `
+        <div class="product-image">
+            ${product.image
+                ? `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || "Prodotto")}">`
+                : '<i class="bi bi-bag"></i>'}
+            <button
+                type="button"
+                class="favorite-button ${product.is_favorite ? "active" : ""}"
+                aria-label="${product.is_favorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}"
+                aria-pressed="${String(Boolean(product.is_favorite))}"
+                title="${product.is_favorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}">
+                <i class="bi ${product.is_favorite ? "bi-heart-fill" : "bi-heart"}"></i>
+            </button>
+        </div>
+        <div class="product-copy">
+            <p class="product-category">${escapeHtml(product.category || "Prodotto")}</p>
+            <h3 class="product-name">${escapeHtml(product.name || "Prodotto")}</h3>
+            ${product.description
+                ? `<p class="product-description">${escapeHtml(product.description)}</p>`
+                : ""}
+        </div>`;
+
+    card.querySelector(".favorite-button").addEventListener("click", (event) => {
+        toggleFavorite(product, event.currentTarget);
     });
 
-    let html = '';
-    Object.keys(byCategory).sort().forEach(cat => {
-        html += `<div class="d-flex justify-content-between align-items-center mt-3 mb-2">
-                    <h6 class="fw-bold text-primary-color mb-0">${cat}</h6>
-                    <span class="text-muted small">${byCategory[cat].length} prod.</span>
-                 </div>`;
-        html += `<div class="d-flex gap-3 overflow-auto pb-2">`;
-        byCategory[cat].forEach(p => {
-            const img = p.image ? `<div class="rounded-4 overflow-hidden mb-2" style="height:160px;"><img src="${p.image}" alt="${p.name}" style="width:200px;height:160px;object-fit:cover;"></div>` : '';
-            const favClass = p.is_favorite ? 'text-warning' : 'text-muted';
-            html += `
-              <div class="card shadow-sm border-0 rounded-4" style="min-width:200px;">
-                <div class="p-2">
-                  ${img}
-                  <div class="d-flex justify-content-between align-items-start">
-                    <h6 class="mb-1">${p.name}</h6>
-                    <button class="btn btn-link p-0 ${favClass}" data-product="${p.id}" title="Preferito">
-                      <i class="bi bi-star-fill"></i>
-                    </button>
-                  </div>
-                  <p class="text-muted small mb-0">${p.description || ''}</p>
-                </div>
-              </div>`;
-        });
-        html += `</div>`;
-    });
+    const image = card.querySelector(".product-image img");
+    image?.addEventListener("error", () => {
+        image.replaceWith(createFallbackIcon());
+    }, { once: true });
 
-    productsContainer.innerHTML = html;
+    return card;
+}
 
-    // bind favorite buttons
-    const favButtons = productsContainer.querySelectorAll('button[data-product]');
-    favButtons.forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const productId = btn.getAttribute('data-product');
-            const isActive = btn.classList.contains('text-warning');
-            const original = btn.innerHTML;
-            try {
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-                if (isActive) {
-                    await apiDelete(`/favorites/${productId}`);
-                    btn.classList.remove('text-warning');
-                    btn.classList.add('text-muted');
-                } else {
-                    await apiPost(`/favorites/${productId}`, {});
-                    btn.classList.remove('text-muted');
-                    btn.classList.add('text-warning');
-                    openFavorites();
-                    const current = parseInt(favoritesCount?.textContent || '0', 10);
-                    updateFavoritesCount(current + 1);
-                }
-                // update state in allProducts and favorites list
-                allProducts = allProducts.map(p => p.id == productId ? {...p, is_favorite: !isActive} : p);
-                loadFavorites();
-            } catch (err) {
-                console.error(err);
-                alert('Errore nel salvare il preferito');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = original;
-            }
+async function toggleFavorite(product, button) {
+    const wasFavorite = Boolean(product.is_favorite);
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+
+    try {
+        if (wasFavorite) {
+            await apiDelete(`/favorites/${product.id}`);
+        } else {
+            await apiPost(`/favorites/${product.id}`, {});
+        }
+
+        product.is_favorite = !wasFavorite;
+        updateFavoritesCount();
+        renderProducts();
+        renderFavoritesList();
+        showFeedback(product.is_favorite ? "Aggiunto ai preferiti" : "Rimosso dai preferiti");
+    } catch {
+        button.disabled = false;
+        button.innerHTML = `<i class="bi ${wasFavorite ? "bi-heart-fill" : "bi-heart"}"></i>`;
+        showFeedback("Impossibile aggiornare i preferiti");
+    }
+}
+
+function renderFavoritesList() {
+    const list = document.getElementById("favoritesList");
+    const favorites = productsPageState.products.filter((product) => product.is_favorite);
+    list.innerHTML = "";
+
+    if (!favorites.length) {
+        list.innerHTML = `
+            <div class="favorites-empty">
+                <i class="bi bi-heart"></i>
+                Non hai ancora aggiunto prodotti ai preferiti.
+            </div>`;
+        return;
+    }
+
+    favorites.forEach((product) => {
+        const item = document.createElement("article");
+        item.className = "favorite-list-item";
+        item.innerHTML = `
+            <div class="favorite-list-image">
+                ${product.image
+                    ? `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || "Prodotto")}">`
+                    : '<i class="bi bi-bag"></i>'}
+            </div>
+            <div class="favorite-list-copy">
+                <p class="favorite-list-category">${escapeHtml(product.category || "Prodotto")}</p>
+                <h3 class="favorite-list-name">${escapeHtml(product.name || "Prodotto")}</h3>
+            </div>
+            <button
+                type="button"
+                class="remove-favorite"
+                aria-label="Rimuovi ${escapeHtml(product.name || "prodotto")} dai preferiti"
+                title="Rimuovi dai preferiti">
+                <i class="bi bi-heart-fill"></i>
+            </button>`;
+
+        item.querySelector(".remove-favorite").addEventListener("click", (event) => {
+            toggleFavorite(product, event.currentTarget);
         });
+
+        const image = item.querySelector("img");
+        image?.addEventListener("error", () => {
+            image.replaceWith(createFallbackIcon());
+        }, { once: true });
+
+        list.appendChild(item);
     });
 }
 
-document.addEventListener('DOMContentLoaded', loadProducts);
-document.addEventListener('DOMContentLoaded', setupFavoritesUI);
+function updateFavoritesCount() {
+    const count = productsPageState.products.filter((product) => product.is_favorite).length;
+    document.getElementById("favoritesCount").textContent = String(count);
+}
 
-function updateFavoritesCount(n) {
-    if (!favoritesCount) return;
-    favoritesCount.textContent = n;
-    favoritesCount.style.display = n ? 'inline-block' : 'none';
+function showFeedback(message) {
+    if (window.appToast) {
+        const isError = /impossibile|errore/i.test(message);
+        window.appToast(message, isError ? "error" : "success");
+        return;
+    }
+
+    const toast = document.getElementById("feedbackToast");
+    window.clearTimeout(productsPageState.toastTimer);
+    toast.textContent = message;
+    toast.classList.add("show");
+    productsPageState.toastTimer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+}
+
+function createFallbackIcon() {
+    const icon = document.createElement("i");
+    icon.className = "bi bi-bag";
+    return icon;
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => null);
 }
