@@ -33,7 +33,7 @@
                     <div class="app-loader-mark">
                         <span class="app-loader-ring"></span>
                         <span class="app-loader-icon">
-                            <img src="/images/logo-512x512.png" alt="" width="72" height="72">
+                            <img src="/images/logo.png" alt="" width="160" height="160">
                         </span>
                     </div>
                     <p id="appLoaderLabel" class="app-loader-label">Stiamo aprendo l'app</p>
