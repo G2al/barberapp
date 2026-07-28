@@ -224,6 +224,249 @@
             font-weight: 700;
         }
     </style>
+    <style>
+        :root {
+            --auth-bg: #070707;
+            --auth-panel: rgba(10, 10, 10, 0.96);
+            --auth-field: rgba(24, 25, 28, 0.88);
+            --auth-line: rgba(150, 153, 160, 0.2);
+            --auth-muted: #9b9b9f;
+            --auth-gold: #d99d2d;
+            --auth-gold-light: #f1c863;
+        }
+
+        body.auth-page {
+            min-height: 100svh;
+            background: var(--auth-bg);
+        }
+
+        .auth-screen {
+            min-height: 100svh;
+            padding: 0;
+            background: #050505;
+        }
+
+        .auth-shell {
+            width: min(100%, 480px);
+            min-width: 0;
+            min-height: 100svh;
+            padding: 0;
+            overflow-x: hidden;
+            background: #080808;
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.65);
+        }
+
+        .auth-hero {
+            position: relative;
+            z-index: 0;
+            height: clamp(290px, 38svh, 620px);
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: calc(28px + env(safe-area-inset-top, 0px)) 24px 18px;
+            overflow: hidden;
+            background: url("/images/bg-login.jpg") center 38% / cover no-repeat;
+        }
+
+        .auth-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.44) 0%, rgba(0, 0, 0, 0.31) 45%, rgba(0, 0, 0, 0.76) 100%),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.2), transparent 45%, rgba(0, 0, 0, 0.2));
+        }
+
+        .auth-panel {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-width: 0;
+            margin-top: -1px;
+            padding: 34px 34px calc(42px + env(safe-area-inset-bottom, 0px));
+            border-radius: 46px 46px 0 0;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.045), transparent 32%),
+                var(--auth-panel);
+            box-shadow: 0 -22px 58px rgba(0, 0, 0, 0.42);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+
+        .back-row {
+            position: absolute;
+            z-index: 3;
+            top: calc(18px + env(safe-area-inset-top, 0px));
+            left: 18px;
+            margin: 0;
+        }
+
+        .back-btn {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 25px;
+        }
+
+        .auth-title {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            transform: translateY(20px);
+        }
+
+        .auth-title h1 {
+            font-size: clamp(37px, 10vw, 52px);
+            line-height: 1.05;
+            font-weight: 600;
+            text-shadow: 0 5px 28px rgba(0, 0, 0, 0.54);
+        }
+
+        .auth-title p {
+            margin-top: 16px;
+            color: rgba(232, 232, 232, 0.72);
+            font-size: 17px;
+            font-weight: 400;
+        }
+
+        .auth-form {
+            gap: 22px;
+        }
+
+        .auth-group {
+            display: grid;
+            gap: 10px;
+        }
+
+        .auth-label {
+            margin: 0 0 0 8px;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .auth-field {
+            min-height: 62px;
+            margin: 0;
+            overflow: hidden;
+            border: 1.5px solid var(--auth-line);
+            border-radius: 17px;
+            background: var(--auth-field);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+            transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        .auth-field:focus-within {
+            border-color: rgba(229, 174, 65, 0.72);
+            background: rgba(28, 29, 32, 0.94);
+            box-shadow: 0 0 0 3px rgba(217, 157, 45, 0.1);
+        }
+
+        .field-icon {
+            left: 20px;
+            color: rgba(187, 189, 194, 0.72);
+            font-size: 22px;
+        }
+
+        .auth-field input {
+            min-height: 60px;
+            padding: 0 22px 0 62px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .auth-field input::placeholder {
+            color: rgba(170, 171, 176, 0.62);
+            opacity: 1;
+        }
+
+        .auth-field input:-webkit-autofill,
+        .auth-field input:-webkit-autofill:hover,
+        .auth-field input:-webkit-autofill:focus,
+        .auth-field input:-webkit-autofill:active {
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            -webkit-box-shadow: 0 0 0 1000px #1c1d20 inset !important;
+            box-shadow: 0 0 0 1000px #1c1d20 inset !important;
+        }
+
+        .auth-field input:-webkit-autofill::first-line {
+            font-size: 16px !important;
+            font-weight: 400 !important;
+        }
+
+        .toggle-pass {
+            width: 44px;
+            height: 44px;
+            right: 10px;
+            color: rgba(190, 192, 197, 0.72);
+        }
+
+        .auth-submit {
+            min-height: 72px;
+            margin-top: 4px;
+            border: 1px solid #efbd50;
+            border-radius: 16px;
+            background: linear-gradient(105deg, #d99d2d 0%, #f0c760 54%, #e3ad3e 100%);
+            color: #0c0a07;
+            font-size: 20px;
+            font-weight: 600;
+            box-shadow: 0 16px 38px rgba(217, 157, 45, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+            transition: transform 150ms ease, filter 150ms ease;
+        }
+
+        .auth-submit:active {
+            transform: scale(0.985);
+            filter: brightness(0.96);
+        }
+
+        .terms-copy {
+            margin: 24px 4px 0;
+            color: rgba(255, 255, 255, 0.66);
+            font-size: 13px;
+            line-height: 1.55;
+            font-weight: 400;
+        }
+
+        .auth-link {
+            margin-top: 28px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        #alertBox .alert {
+            margin: 0 0 20px;
+            border-radius: 14px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 430px) {
+            .auth-panel {
+                padding-inline: 24px;
+            }
+
+            .auth-title h1 {
+                font-size: 36px;
+            }
+
+            .auth-title p {
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 370px) {
+            .auth-panel {
+                padding-inline: 22px;
+                border-radius: 38px 38px 0 0;
+            }
+        }
+
+        @media (min-width: 700px) {
+            .auth-shell {
+                width: min(100%, 520px);
+            }
+        }
+    </style>
     <script src="/js/app-ui.js" defer></script>
     <script src="/js/config.js" defer></script>
     <script src="/js/auth.js" defer></script>
@@ -232,48 +475,64 @@
 <body class="auth-page">
     <main class="auth-screen">
         <section class="auth-shell">
-            <div class="back-row">
-                <a href="index.html" class="back-btn" aria-label="Torna al login">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-
-            <div class="auth-content">
+            <header class="auth-hero">
+                <div class="back-row">
+                    <a href="index.html" class="back-btn" aria-label="Torna al login">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
                 <div class="auth-title">
                     <h1>Crea un account</h1>
-                    <p>Entra nel club Giovanni Cerino</p>
+                    <p>Inserisci i tuoi dati per registrarti</p>
                 </div>
+            </header>
 
+            <div class="auth-panel">
                 <div id="alertBox"></div>
 
                 <div class="auth-form">
-                    <label class="auth-field" for="name">
-                        <i class="bi bi-person field-icon" aria-hidden="true"></i>
-                        <input type="text" id="name" placeholder="Nome" autocomplete="given-name">
-                    </label>
+                    <div class="auth-group">
+                        <label class="auth-label" for="name">Nome</label>
+                        <div class="auth-field">
+                            <i class="bi bi-person field-icon" aria-hidden="true"></i>
+                            <input type="text" id="name" placeholder="Inserisci il tuo nome" autocomplete="given-name">
+                        </div>
+                    </div>
 
-                    <label class="auth-field" for="surname">
-                        <i class="bi bi-person-badge field-icon" aria-hidden="true"></i>
-                        <input type="text" id="surname" placeholder="Cognome" autocomplete="family-name">
-                    </label>
+                    <div class="auth-group">
+                        <label class="auth-label" for="surname">Cognome</label>
+                        <div class="auth-field">
+                            <i class="bi bi-person-badge field-icon" aria-hidden="true"></i>
+                            <input type="text" id="surname" placeholder="Inserisci il tuo cognome" autocomplete="family-name">
+                        </div>
+                    </div>
 
-                    <label class="auth-field" for="email">
-                        <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
-                        <input type="email" id="email" placeholder="Indirizzo email" autocomplete="email">
-                    </label>
+                    <div class="auth-group">
+                        <label class="auth-label" for="email">Email</label>
+                        <div class="auth-field">
+                            <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
+                            <input type="email" id="email" placeholder="Inserisci la tua email" autocomplete="email">
+                        </div>
+                    </div>
 
-                    <label class="auth-field" for="phone">
-                        <i class="bi bi-telephone field-icon" aria-hidden="true"></i>
-                        <input type="tel" id="phone" placeholder="Numero di telefono" autocomplete="tel">
-                    </label>
+                    <div class="auth-group">
+                        <label class="auth-label" for="phone">Numero di telefono</label>
+                        <div class="auth-field">
+                            <i class="bi bi-telephone field-icon" aria-hidden="true"></i>
+                            <input type="tel" id="phone" placeholder="Inserisci il tuo numero" autocomplete="tel">
+                        </div>
+                    </div>
 
-                    <label class="auth-field has-toggle" for="password">
-                        <i class="bi bi-lock field-icon" aria-hidden="true"></i>
-                        <input type="password" id="password" placeholder="Password" autocomplete="new-password">
-                        <button type="button" class="toggle-pass" onclick="togglePassword('password', 'toggleRegisterPass')" aria-label="Mostra password">
-                            <i id="toggleRegisterPass" class="bi bi-eye"></i>
-                        </button>
-                    </label>
+                    <div class="auth-group">
+                        <label class="auth-label" for="password">Password</label>
+                        <div class="auth-field has-toggle">
+                            <i class="bi bi-lock field-icon" aria-hidden="true"></i>
+                            <input type="password" id="password" placeholder="Crea una password" autocomplete="new-password">
+                            <button type="button" class="toggle-pass" onclick="togglePassword('password', 'toggleRegisterPass')" aria-label="Mostra password">
+                                <i id="toggleRegisterPass" class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
 
                     <button id="submitBtn" class="auth-submit" onclick="submitRegister()">Registrati</button>
                 </div>
