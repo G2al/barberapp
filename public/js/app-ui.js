@@ -198,6 +198,165 @@
         }
     }
 
+    function setupAppExperience() {
+        setupPageTransition();
+        setupBottomNavigation();
+        setupRevealAnimations();
+    }
+
+    function setupPageTransition() {
+        const shell = document.querySelector(".app-shell");
+        if (!shell) return;
+
+        let direction = "";
+        try {
+            direction = window.sessionStorage.getItem("gaetabet-navigation-direction") || "";
+            window.sessionStorage.removeItem("gaetabet-navigation-direction");
+        } catch {
+            direction = "";
+        }
+
+        document.body.classList.add("app-page-motion");
+        if (direction) document.body.classList.add(`app-enter-${direction}`);
+
+        window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => document.body.classList.add("app-page-visible"));
+        });
+    }
+
+    function setupBottomNavigation() {
+        const navigation = document.querySelector(".bottom-nav");
+        if (!navigation || navigation.dataset.appNavigationReady === "true") return;
+
+        const items = Array.from(navigation.querySelectorAll(".nav-item"));
+        const activeItem = navigation.querySelector(".nav-item.active") || items[0];
+        if (!items.length || !activeItem) return;
+
+        navigation.dataset.appNavigationReady = "true";
+        navigation.classList.add("app-bottom-nav");
+
+        const indicator = document.createElement("span");
+        indicator.className = "app-nav-indicator";
+        indicator.setAttribute("aria-hidden", "true");
+        navigation.appendChild(indicator);
+
+        items.forEach((item) => {
+            item.setAttribute("aria-current", item === activeItem ? "page" : "false");
+        });
+
+        const moveIndicator = (item, animate = true) => {
+            if (!item) return;
+
+            const indicatorWidth = 34;
+            const offset = item.offsetLeft + ((item.offsetWidth - indicatorWidth) / 2);
+            indicator.style.setProperty("--app-nav-offset", `${offset}px`);
+            indicator.classList.toggle("animate", animate);
+        };
+
+        moveIndicator(activeItem, false);
+        window.requestAnimationFrame(() => {
+            navigation.classList.add("ready");
+            moveIndicator(activeItem, false);
+        });
+
+        items.forEach((item, targetIndex) => {
+            item.addEventListener("click", (event) => {
+                if (
+                    event.defaultPrevented
+                    || event.button !== 0
+                    || event.metaKey
+                    || event.ctrlKey
+                    || event.shiftKey
+                    || event.altKey
+                ) {
+                    return;
+                }
+
+                if (document.body.classList.contains("app-page-leaving")) {
+                    event.preventDefault();
+                    return;
+                }
+
+                const currentItem = navigation.querySelector(".nav-item.active") || activeItem;
+                const currentIndex = items.indexOf(currentItem);
+
+                if (item === currentItem) {
+                    event.preventDefault();
+                    item.classList.remove("app-nav-reselect");
+                    void item.offsetWidth;
+                    item.classList.add("app-nav-reselect");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    return;
+                }
+
+                event.preventDefault();
+                const direction = targetIndex > currentIndex ? "forward" : "back";
+
+                items.forEach((navItem) => {
+                    const isActive = navItem === item;
+                    navItem.classList.toggle("active", isActive);
+                    navItem.setAttribute("aria-current", isActive ? "page" : "false");
+                });
+                moveIndicator(item);
+
+                try {
+                    window.sessionStorage.setItem("gaetabet-navigation-direction", direction);
+                } catch {
+                    // La navigazione continua anche con lo storage disabilitato.
+                }
+
+                document.body.classList.add("app-page-leaving", `app-leave-${direction}`);
+                const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 130;
+                window.setTimeout(() => window.location.assign(item.href), delay);
+            });
+        });
+
+        window.addEventListener("resize", () => {
+            moveIndicator(navigation.querySelector(".nav-item.active"), false);
+        }, { passive: true });
+    }
+
+    function setupRevealAnimations() {
+        const selector = [
+            ".booking-card",
+            ".product-card",
+            ".favorite-list-item",
+            ".profile-field",
+            ".staff-option",
+            ".service-select-option",
+            ".time-period",
+        ].join(",");
+
+        const reveal = (element) => {
+            if (!(element instanceof HTMLElement) || element.dataset.appRevealed === "true") return;
+
+            const siblings = element.parentElement
+                ? Array.from(element.parentElement.children).filter((child) => child.matches?.(selector))
+                : [];
+            const index = Math.max(0, siblings.indexOf(element));
+
+            element.dataset.appRevealed = "true";
+            element.classList.add("app-reveal-item");
+            element.style.setProperty("--app-item-index", String(Math.min(index, 7)));
+            element.style.setProperty("--app-item-delay", `${Math.min(index, 7) * 24}ms`);
+            window.requestAnimationFrame(() => element.classList.add("app-revealed"));
+        };
+
+        document.querySelectorAll(selector).forEach(reveal);
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (!(node instanceof HTMLElement)) return;
+                    if (node.matches(selector)) reveal(node);
+                    node.querySelectorAll(selector).forEach(reveal);
+                });
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
     function escapeHtml(value) {
         return String(value ?? "")
             .replace(/&/g, "&amp;")
@@ -213,9 +372,13 @@
     window.appButtonState = setButtonState;
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", mountUi, { once: true });
+        document.addEventListener("DOMContentLoaded", () => {
+            mountUi();
+            setupAppExperience();
+        }, { once: true });
     } else {
         mountUi();
+        setupAppExperience();
     }
 
     window.addEventListener("load", loaderHide, { once: true });

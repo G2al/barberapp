@@ -173,6 +173,7 @@ function renderProducts() {
 function createProductCard(product) {
     const card = document.createElement("article");
     card.className = "product-card";
+    card.dataset.productId = String(product.id);
     card.innerHTML = `
         <div class="product-image">
             ${product.image
@@ -181,6 +182,7 @@ function createProductCard(product) {
             <button
                 type="button"
                 class="favorite-button ${product.is_favorite ? "active" : ""}"
+                data-product-id="${escapeHtml(product.id)}"
                 aria-label="${product.is_favorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}"
                 aria-pressed="${String(Boolean(product.is_favorite))}"
                 title="${product.is_favorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}">
@@ -220,8 +222,8 @@ async function toggleFavorite(product, button) {
         }
 
         product.is_favorite = !wasFavorite;
+        syncFavoriteButtons(product);
         updateFavoritesCount();
-        renderProducts();
         renderFavoritesList();
         showFeedback(product.is_favorite ? "Aggiunto ai preferiti" : "Rimosso dai preferiti");
     } catch {
@@ -229,6 +231,23 @@ async function toggleFavorite(product, button) {
         button.innerHTML = `<i class="bi ${wasFavorite ? "bi-heart-fill" : "bi-heart"}"></i>`;
         showFeedback("Impossibile aggiornare i preferiti");
     }
+}
+
+function syncFavoriteButtons(product) {
+    document.querySelectorAll(`.favorite-button[data-product-id="${product.id}"]`).forEach((favoriteButton) => {
+        favoriteButton.disabled = false;
+        favoriteButton.classList.toggle("active", Boolean(product.is_favorite));
+        favoriteButton.classList.remove("favorite-pop");
+        favoriteButton.setAttribute("aria-pressed", String(Boolean(product.is_favorite)));
+        favoriteButton.setAttribute(
+            "aria-label",
+            product.is_favorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
+        );
+        favoriteButton.title = product.is_favorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti";
+        favoriteButton.innerHTML = `<i class="bi ${product.is_favorite ? "bi-heart-fill" : "bi-heart"}"></i>`;
+        void favoriteButton.offsetWidth;
+        favoriteButton.classList.add("favorite-pop");
+    });
 }
 
 function renderFavoritesList() {
@@ -281,7 +300,11 @@ function renderFavoritesList() {
 
 function updateFavoritesCount() {
     const count = productsPageState.products.filter((product) => product.is_favorite).length;
+    const total = document.getElementById("openFavorites");
     document.getElementById("favoritesCount").textContent = String(count);
+    total.classList.remove("favorite-pop");
+    void total.offsetWidth;
+    total.classList.add("favorite-pop");
 }
 
 function showFeedback(message) {

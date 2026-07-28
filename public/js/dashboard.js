@@ -349,6 +349,7 @@ function setServiceMenuOpen(isOpen) {
 function setupCalendar() {
     document.getElementById("previousMonth").addEventListener("click", () => changeCalendarWeek(-1));
     document.getElementById("nextMonth").addEventListener("click", () => changeCalendarWeek(1));
+    window.addEventListener("resize", () => syncCalendarSelection(), { passive: true });
     renderCalendar();
 }
 
@@ -362,10 +363,10 @@ function changeCalendarWeek(offset) {
     if (nextWeek < firstWeek || nextWeek > maxDate) return;
 
     bookingPageState.calendarWeekStart = nextWeek;
-    renderCalendar();
+    renderCalendar(offset);
 }
 
-function renderCalendar() {
+function renderCalendar(direction = 0, previousDate = "") {
     const grid = document.getElementById("calendarGrid");
     const monthLabel = document.getElementById("calendarMonthLabel");
     const weekStart = bookingPageState.calendarWeekStart;
@@ -381,6 +382,12 @@ function renderCalendar() {
     });
 
     grid.innerHTML = "";
+    grid.classList.remove("has-selection-indicator", "week-forward", "week-back");
+
+    const selection = document.createElement("span");
+    selection.className = "calendar-selection";
+    selection.setAttribute("aria-hidden", "true");
+    grid.appendChild(selection);
 
     for (let index = 0; index < 7; index++) {
         const date = new Date(weekStart);
@@ -410,6 +417,11 @@ function renderCalendar() {
         grid.appendChild(button);
     }
 
+    if (direction !== 0) {
+        grid.classList.add(direction > 0 ? "week-forward" : "week-back");
+    }
+    syncCalendarSelection(previousDate);
+
     const firstAllowedWeek = startOfWeek(today);
     const nextWeekStart = new Date(weekStart);
     nextWeekStart.setDate(nextWeekStart.getDate() + 7);
@@ -418,6 +430,7 @@ function renderCalendar() {
 }
 
 async function selectDate(isoDate, loadTimes = true) {
+    const previousDate = bookingPageState.selectedDate;
     bookingPageState.selectedDate = isoDate;
     bookingPageState.selectedTime = "";
     document.getElementById("dateSelect").value = isoDate;
@@ -433,7 +446,7 @@ async function selectDate(isoDate, loadTimes = true) {
         bookingPageState.calendarWeekStart = startOfWeek(date);
     }
 
-    renderCalendar();
+    renderCalendar(0, previousDate);
     updateSummary();
 
     if (loadTimes) {
@@ -476,6 +489,36 @@ async function loadAvailableTimes() {
         if (requestId !== bookingPageState.availabilityRequest) return;
         resetTimes("Impossibile caricare gli orari. Riprova.");
     }
+}
+
+function syncCalendarSelection(previousDate = "") {
+    const grid = document.getElementById("calendarGrid");
+    const selection = grid?.querySelector(".calendar-selection");
+    const activeDay = grid?.querySelector(".calendar-day.active");
+
+    if (!grid || !selection || !activeDay) {
+        grid?.classList.remove("has-selection-indicator");
+        return;
+    }
+
+    const previousDay = previousDate
+        ? Array.from(grid.querySelectorAll(".calendar-day")).find((day) => day.dataset.date === previousDate)
+        : null;
+    const setPosition = (day) => {
+        selection.style.width = `${day.offsetWidth}px`;
+        selection.style.height = `${day.offsetHeight}px`;
+        selection.style.setProperty("--calendar-x", `${day.offsetLeft}px`);
+        selection.style.setProperty("--calendar-y", `${day.offsetTop}px`);
+    };
+
+    grid.classList.add("has-selection-indicator");
+    setPosition(previousDay || activeDay);
+    selection.classList.add("visible");
+
+    window.requestAnimationFrame(() => {
+        selection.classList.add("animate");
+        setPosition(activeDay);
+    });
 }
 
 function renderTimeSlots(slots) {

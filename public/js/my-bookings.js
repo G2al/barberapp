@@ -372,7 +372,9 @@ async function cancelBooking(booking, button) {
         }
 
         booking.status = "cancelled";
-        renderBookings();
+        const card = button.closest(".booking-card");
+        card?.classList.add("app-card-removing");
+        window.setTimeout(renderBookings, card ? 190 : 0);
         window.appToast?.("La prenotazione è stata annullata.", "success");
     } catch (error) {
         button.disabled = false;
