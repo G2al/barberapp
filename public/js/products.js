@@ -1,3 +1,6 @@
+(function () {
+let lifecycleController = null;
+
 const productsPageState = {
     products: [],
     category: "all",
@@ -5,7 +8,17 @@ const productsPageState = {
     toastTimer: null,
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function mountProducts() {
+    lifecycleController?.abort();
+    lifecycleController = new AbortController();
+    const { signal } = lifecycleController;
+
+    productsPageState.products = [];
+    productsPageState.category = "all";
+    productsPageState.search = "";
+    window.clearTimeout(productsPageState.toastTimer);
+    productsPageState.toastTimer = null;
+
     requireAuth();
 
     if (!localStorage.getItem("token")) {
@@ -14,11 +27,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     hydrateUserHeader();
-    setupHeaderPanels();
+    setupHeaderPanels(signal);
     setupProductSearch();
-    setupFavoritesDrawer();
+    setupFavoritesDrawer(signal);
     await Promise.all([loadAppConfiguration(), loadProducts()]);
-});
+}
 
 function hydrateUserHeader() {
     const user = getUser();
@@ -39,7 +52,7 @@ async function loadAppConfiguration() {
     }
 }
 
-function setupHeaderPanels() {
+function setupHeaderPanels(signal) {
     const notificationButton = document.getElementById("notificationButton");
     const logoutButton = document.getElementById("logoutButton");
     const notificationPanel = document.getElementById("notificationPanel");
@@ -60,7 +73,7 @@ function setupHeaderPanels() {
     logoutButton.addEventListener("click", logout);
 
     notificationPanel.addEventListener("click", (event) => event.stopPropagation());
-    document.addEventListener("click", closePanels);
+    document.addEventListener("click", closePanels, { signal });
 }
 
 function setupProductSearch() {
@@ -70,7 +83,7 @@ function setupProductSearch() {
     });
 }
 
-function setupFavoritesDrawer() {
+function setupFavoritesDrawer(signal) {
     document.getElementById("openFavorites").addEventListener("click", () => {
         renderFavoritesList();
         setFavoritesDrawerOpen(true);
@@ -80,7 +93,7 @@ function setupFavoritesDrawer() {
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") setFavoritesDrawerOpen(false);
-    });
+    }, { signal });
 }
 
 function setFavoritesDrawerOpen(isOpen) {
@@ -327,3 +340,29 @@ function escapeHtml(value) {
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js").catch(() => null);
 }
+
+function unmountProducts() {
+    lifecycleController?.abort();
+    lifecycleController = null;
+    window.clearTimeout(productsPageState.toastTimer);
+    document.body.style.overflow = "";
+}
+
+window.AppPages = window.AppPages || {};
+window.AppPages.products = {
+    mount: mountProducts,
+    unmount: unmountProducts,
+};
+
+function autoMountProducts() {
+    if (!window.AppSpa?.active && document.body.classList.contains("products-page")) {
+        void mountProducts();
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoMountProducts, { once: true });
+} else {
+    autoMountProducts();
+}
+})();

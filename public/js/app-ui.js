@@ -232,6 +232,25 @@
             indicator.classList.toggle("animate", animate);
         };
 
+        const setActiveItem = (href, animate = true) => {
+            const targetPath = new URL(href, window.location.href).pathname;
+            const item = items.find((candidate) => (
+                new URL(candidate.href, window.location.href).pathname === targetPath
+            ));
+            if (!item) return;
+
+            items.forEach((navItem) => {
+                const isActive = navItem === item;
+                navItem.classList.toggle("active", isActive);
+                navItem.setAttribute("aria-current", isActive ? "page" : "false");
+            });
+            moveIndicator(item, animate);
+        };
+
+        window.appBottomNavigation = {
+            setActive: setActiveItem,
+        };
+
         moveIndicator(activeItem, false);
         window.requestAnimationFrame(() => {
             navigation.classList.add("ready");
@@ -271,7 +290,13 @@
                 });
                 moveIndicator(item);
 
-                window.requestAnimationFrame(() => window.location.assign(item.href));
+                window.requestAnimationFrame(() => {
+                    if (window.AppSpa?.navigate) {
+                        window.AppSpa.navigate(item.href);
+                    } else {
+                        window.location.assign(item.href);
+                    }
+                });
             });
         });
 

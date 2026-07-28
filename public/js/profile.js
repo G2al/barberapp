@@ -1,3 +1,6 @@
+(function () {
+let lifecycleController = null;
+
 const profilePageState = {
     user: null,
     loyalty: null,
@@ -12,7 +15,17 @@ const profileFieldLabels = {
     phone: "Numero di telefono",
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function mountProfile() {
+    lifecycleController?.abort();
+    lifecycleController = new AbortController();
+    const { signal } = lifecycleController;
+
+    profilePageState.user = null;
+    profilePageState.loyalty = null;
+    profilePageState.activeField = null;
+    window.clearTimeout(profilePageState.toastTimer);
+    profilePageState.toastTimer = null;
+
     requireAuth();
 
     if (!getToken()) {
@@ -20,11 +33,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    setupProfileActions();
+    setupProfileActions(signal);
     await Promise.all([loadProfile(), loadLoyalty()]);
-});
+}
 
-function setupProfileActions() {
+function setupProfileActions(signal) {
     document.querySelectorAll("[data-edit-field]").forEach((button) => {
         button.addEventListener("click", () => openFieldEditor(button.dataset.editField));
     });
@@ -41,7 +54,7 @@ function setupProfileActions() {
             setSheetOpen(false);
             setLoyaltyOpen(false);
         }
-    });
+    }, { signal });
 }
 
 async function loadProfile() {
@@ -532,3 +545,29 @@ function escapeHtml(value) {
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js").catch(() => null);
 }
+
+function unmountProfile() {
+    lifecycleController?.abort();
+    lifecycleController = null;
+    window.clearTimeout(profilePageState.toastTimer);
+    document.body.style.overflow = "";
+}
+
+window.AppPages = window.AppPages || {};
+window.AppPages.profile = {
+    mount: mountProfile,
+    unmount: unmountProfile,
+};
+
+function autoMountProfile() {
+    if (!window.AppSpa?.active && document.body.classList.contains("profile-page")) {
+        void mountProfile();
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoMountProfile, { once: true });
+} else {
+    autoMountProfile();
+}
+})();

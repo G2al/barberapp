@@ -1,3 +1,6 @@
+(function () {
+let lifecycleController = null;
+
 const bookingsPageState = {
     bookings: [],
     quickStatus: "confirmed",
@@ -18,7 +21,16 @@ const bookingStatusLabels = {
     no_show: "Assente",
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function mountBookings() {
+    lifecycleController?.abort();
+    lifecycleController = new AbortController();
+    const { signal } = lifecycleController;
+
+    bookingsPageState.bookings = [];
+    bookingsPageState.quickStatus = "confirmed";
+    bookingsPageState.search = "";
+    bookingsPageState.filters = { staff: "", status: "", from: "", to: "" };
+
     requireAuth();
 
     if (!localStorage.getItem("token")) {
@@ -27,12 +39,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     hydrateUserHeader();
-    setupHeaderPanels();
+    setupHeaderPanels(signal);
     setupSearch();
     setupStatusTabs();
-    setupFilterDrawer();
+    setupFilterDrawer(signal);
     await Promise.all([loadAppConfiguration(), loadBookings()]);
-});
+}
 
 function hydrateUserHeader() {
     const user = getUser();
@@ -53,7 +65,7 @@ async function loadAppConfiguration() {
     }
 }
 
-function setupHeaderPanels() {
+function setupHeaderPanels(signal) {
     const notificationButton = document.getElementById("notificationButton");
     const logoutButton = document.getElementById("logoutButton");
     const notificationPanel = document.getElementById("notificationPanel");
@@ -74,7 +86,7 @@ function setupHeaderPanels() {
     logoutButton.addEventListener("click", logout);
 
     notificationPanel.addEventListener("click", (event) => event.stopPropagation());
-    document.addEventListener("click", closePanels);
+    document.addEventListener("click", closePanels, { signal });
 }
 
 function setupSearch() {
@@ -98,7 +110,7 @@ function setupStatusTabs() {
     });
 }
 
-function setupFilterDrawer() {
+function setupFilterDrawer(signal) {
     document.getElementById("openFilters").addEventListener("click", () => setFilterDrawerOpen(true));
     document.getElementById("closeFilters").addEventListener("click", () => setFilterDrawerOpen(false));
     document.getElementById("filterOverlay").addEventListener("click", () => setFilterDrawerOpen(false));
@@ -107,7 +119,7 @@ function setupFilterDrawer() {
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") setFilterDrawerOpen(false);
-    });
+    }, { signal });
 }
 
 function setFilterDrawerOpen(isOpen) {
@@ -432,3 +444,28 @@ function escapeHtml(value) {
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js").catch(() => null);
 }
+
+function unmountBookings() {
+    lifecycleController?.abort();
+    lifecycleController = null;
+    document.body.style.overflow = "";
+}
+
+window.AppPages = window.AppPages || {};
+window.AppPages.bookings = {
+    mount: mountBookings,
+    unmount: unmountBookings,
+};
+
+function autoMountBookings() {
+    if (!window.AppSpa?.active && document.body.classList.contains("bookings-page")) {
+        void mountBookings();
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoMountBookings, { once: true });
+} else {
+    autoMountBookings();
+}
+})();

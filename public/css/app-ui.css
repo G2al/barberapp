@@ -313,6 +313,45 @@
   box-shadow: 0 14px 30px rgba(239, 116, 104, 0.2) !important;
 }
 
+.app-shell {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+.app-shell.spa-leave-left {
+  opacity: 0;
+  transform: translate3d(-10px, 0, 0);
+  transition: opacity 90ms ease, transform 90ms ease;
+}
+
+.app-shell.spa-leave-right {
+  opacity: 0;
+  transform: translate3d(10px, 0, 0);
+  transition: opacity 90ms ease, transform 90ms ease;
+}
+
+.app-shell.spa-enter-right {
+  opacity: 0;
+  transform: translate3d(14px, 0, 0);
+}
+
+.app-shell.spa-enter-left {
+  opacity: 0;
+  transform: translate3d(-14px, 0, 0);
+}
+
+.app-shell.spa-enter-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 190ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body.spa-is-navigating .bottom-nav {
+  transform: translateX(-50%) translateZ(0) !important;
+}
+
 .app-button-state.app-button-success i,
 .app-button-state.app-button-error i {
   font-size: 17px;
@@ -644,6 +683,16 @@
   }
 
   .app-reveal-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .app-shell.spa-leave-left,
+  .app-shell.spa-leave-right,
+  .app-shell.spa-enter-right,
+  .app-shell.spa-enter-left,
+  .app-shell.spa-enter-active {
     opacity: 1;
     transform: none;
     transition: none;

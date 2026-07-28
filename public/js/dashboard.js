@@ -1,3 +1,6 @@
+(function () {
+let lifecycleController = null;
+
 const bookingPageState = {
     staff: [],
     services: [],
@@ -9,14 +12,29 @@ const bookingPageState = {
     availabilityRequest: 0,
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function mountDashboard() {
+    lifecycleController?.abort();
+    lifecycleController = new AbortController();
+    const { signal } = lifecycleController;
+
+    Object.assign(bookingPageState, {
+        staff: [],
+        services: [],
+        selectedStaff: null,
+        selectedService: null,
+        selectedDate: "",
+        selectedTime: "",
+        calendarWeekStart: startOfWeek(new Date()),
+        availabilityRequest: bookingPageState.availabilityRequest + 1,
+    });
+
     requireAuth();
 
     const currentUser = getUser();
     hydrateUserHeader(currentUser);
-    setupHeaderPanels();
-    setupCalendar();
-    setupServiceSelect();
+    setupHeaderPanels(signal);
+    setupCalendar(signal);
+    setupServiceSelect(signal);
 
     if (currentUser?.role === "admin") {
         document.getElementById("adminNoteStep")?.classList.remove("d-none");
@@ -29,14 +47,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadAppConfiguration(),
         loadStaff(),
     ]);
-});
+}
 
 function hydrateUserHeader(user) {
     const firstName = user?.name?.trim() || "cliente";
     document.getElementById("welcomeName").textContent = firstName;
 }
 
-function setupHeaderPanels() {
+function setupHeaderPanels(signal) {
     const notificationButton = document.getElementById("notificationButton");
     const logoutButton = document.getElementById("logoutButton");
     const notificationPanel = document.getElementById("notificationPanel");
@@ -57,7 +75,7 @@ function setupHeaderPanels() {
     logoutButton.addEventListener("click", logout);
 
     notificationPanel.addEventListener("click", (event) => event.stopPropagation());
-    document.addEventListener("click", closePanels);
+    document.addEventListener("click", closePanels, { signal });
 }
 
 async function loadAppConfiguration() {
@@ -223,7 +241,7 @@ async function loadServicesForStaff(staffId) {
     }
 }
 
-function setupServiceSelect() {
+function setupServiceSelect(signal) {
     const serviceSelect = document.getElementById("serviceSelect");
     const shell = document.getElementById("serviceSelectShell");
     const trigger = document.getElementById("serviceSelectTrigger");
@@ -248,7 +266,7 @@ function setupServiceSelect() {
     });
 
     menu.addEventListener("click", (event) => event.stopPropagation());
-    document.addEventListener("click", () => setServiceMenuOpen(false));
+    document.addEventListener("click", () => setServiceMenuOpen(false), { signal });
 
     serviceSelect.addEventListener("change", async (event) => {
         const serviceId = Number(event.target.value);
@@ -334,10 +352,10 @@ function setServiceMenuOpen(isOpen) {
     trigger.setAttribute("aria-expanded", String(isOpen));
 }
 
-function setupCalendar() {
+function setupCalendar(signal) {
     document.getElementById("previousMonth").addEventListener("click", () => changeCalendarWeek(-1));
     document.getElementById("nextMonth").addEventListener("click", () => changeCalendarWeek(1));
-    window.addEventListener("resize", () => syncCalendarSelection(), { passive: true });
+    window.addEventListener("resize", () => syncCalendarSelection(), { passive: true, signal });
     renderCalendar();
 }
 
@@ -670,7 +688,11 @@ async function confirmBooking() {
             label: "Prenotazione confermata",
         });
         setTimeout(() => {
-            window.location.href = "/my-bookings.html";
+            if (window.AppSpa?.navigate) {
+                window.AppSpa.navigate("/my-bookings.html");
+            } else {
+                window.location.href = "/my-bookings.html";
+            }
         }, 1350);
     } catch (error) {
         window.appButtonState(confirmButton, "error", {
@@ -736,3 +758,29 @@ function formatLongDate(date) {
         year: "numeric",
     });
 }
+
+function unmountDashboard() {
+    lifecycleController?.abort();
+    lifecycleController = null;
+    bookingPageState.availabilityRequest += 1;
+    document.body.style.overflow = "";
+}
+
+window.AppPages = window.AppPages || {};
+window.AppPages.dashboard = {
+    mount: mountDashboard,
+    unmount: unmountDashboard,
+};
+
+function autoMountDashboard() {
+    if (!window.AppSpa?.active && document.body.classList.contains("booking-page")) {
+        void mountDashboard();
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoMountDashboard, { once: true });
+} else {
+    autoMountDashboard();
+}
+})();
