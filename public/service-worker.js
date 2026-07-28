@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'gaetabet-v54';
+const CACHE_NAME = 'gaetabet-v55';
 const ASSETS = [
   '/',
   '/manifest.json',
