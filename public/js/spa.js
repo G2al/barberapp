@@ -41,8 +41,7 @@
         const navigation = document.querySelector(".bottom-nav");
         if (!shell || !navigation) return;
 
-        pageStyle = document.head.querySelector("style");
-        if (pageStyle) pageStyle.id = "spaPageStyle";
+        pageStyle = document.head.querySelector("[data-spa-page-style]");
 
         portalHost = document.createElement("div");
         portalHost.id = "spaPagePortals";
@@ -220,7 +219,7 @@
         const parsed = new DOMParser().parseFromString(html, "text/html");
         const shell = parsed.querySelector(".app-shell");
         const navigation = parsed.querySelector(".bottom-nav");
-        const style = parsed.head.querySelector("style");
+        const style = parsed.head.querySelector("[data-spa-page-style]");
         const portals = Array.from(parsed.body.children).filter((element) => (
             element !== shell
             && element !== navigation
