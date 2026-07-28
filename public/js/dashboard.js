@@ -136,6 +136,8 @@ function renderStaff() {
 
         const avatar = document.createElement("span");
         avatar.className = "staff-avatar";
+        const avatarWrap = document.createElement("span");
+        avatarWrap.className = "staff-avatar-wrap";
         const initials = getInitials(staffMember);
 
         if (staffMember.image_url) {
@@ -151,11 +153,17 @@ function renderStaff() {
             avatar.textContent = initials;
         }
 
+        const selectedCheck = document.createElement("span");
+        selectedCheck.className = "staff-selected-check";
+        selectedCheck.setAttribute("aria-hidden", "true");
+        selectedCheck.innerHTML = '<i class="bi bi-check-lg"></i>';
+        avatarWrap.append(avatar, selectedCheck);
+
         const name = document.createElement("span");
         name.className = "staff-name";
         name.textContent = staffMember.first_name || fullName;
 
-        button.append(avatar, name);
+        button.append(avatarWrap, name);
         button.addEventListener("click", () => selectStaff(staffMember.id));
         staffGrid.appendChild(button);
     });
