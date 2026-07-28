@@ -34,21 +34,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 function hydrateUserHeader(user) {
     const firstName = user?.name?.trim() || "cliente";
     document.getElementById("welcomeName").textContent = firstName;
-    document.getElementById("profileName").textContent = [user?.name, user?.surname].filter(Boolean).join(" ") || "Il tuo profilo";
-    document.getElementById("profileEmail").textContent = user?.email || "";
 }
 
 function setupHeaderPanels() {
     const notificationButton = document.getElementById("notificationButton");
-    const profileButton = document.getElementById("profileButton");
+    const logoutButton = document.getElementById("logoutButton");
     const notificationPanel = document.getElementById("notificationPanel");
-    const profilePanel = document.getElementById("profilePanel");
 
     const closePanels = () => {
         notificationPanel.classList.remove("open");
-        profilePanel.classList.remove("open");
         notificationButton.setAttribute("aria-expanded", "false");
-        profileButton.setAttribute("aria-expanded", "false");
     };
 
     notificationButton.addEventListener("click", (event) => {
@@ -59,16 +54,9 @@ function setupHeaderPanels() {
         notificationButton.setAttribute("aria-expanded", String(shouldOpen));
     });
 
-    profileButton.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const shouldOpen = !profilePanel.classList.contains("open");
-        closePanels();
-        profilePanel.classList.toggle("open", shouldOpen);
-        profileButton.setAttribute("aria-expanded", String(shouldOpen));
-    });
+    logoutButton.addEventListener("click", logout);
 
     notificationPanel.addEventListener("click", (event) => event.stopPropagation());
-    profilePanel.addEventListener("click", (event) => event.stopPropagation());
     document.addEventListener("click", closePanels);
 }
 

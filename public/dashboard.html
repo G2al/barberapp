@@ -610,9 +610,9 @@
     .time-period-title {
       margin: 0;
       color: var(--app-gold-strong);
-      font-size: 11px;
+      font-size: 13px;
       line-height: 1.2;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .time-period-grid {
@@ -622,24 +622,24 @@
     }
 
     .time-period-grid.dense {
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 5px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
     }
 
     .time-period-grid.dense .time-slot {
-      min-height: 26px;
-      padding: 0 1px;
-      font-size: 10px;
+      min-height: 38px;
+      padding: 0 3px;
+      font-size: 13px;
     }
 
     .time-slot {
       min-width: 0;
-      min-height: 38px;
+      min-height: 42px;
       border: 1px solid rgba(232, 246, 244, 0.68);
       border-radius: 7px;
       background: rgba(255, 255, 255, 0.08);
       color: #fff;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
     }
 
@@ -789,7 +789,7 @@
       }
 
       .time-period-grid.dense {
-        grid-template-columns: repeat(8, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
       .confirm-booking-btn {
@@ -816,8 +816,8 @@
           <button type="button" id="notificationButton" class="header-action notification" aria-label="Notifiche" aria-expanded="false">
             <i class="bi bi-bell-fill"></i>
           </button>
-          <button type="button" id="profileButton" class="header-action" aria-label="Profilo" aria-expanded="false">
-            <i class="bi bi-person-fill"></i>
+          <button type="button" id="logoutButton" class="header-action logout-action" aria-label="Esci dall'account" title="Esci dall'account">
+            <i class="bi bi-box-arrow-right"></i>
           </button>
 
           <div id="notificationPanel" class="header-popover">
@@ -825,14 +825,6 @@
             <p>Le conferme e gli aggiornamenti dei tuoi appuntamenti sono disponibili nello storico.</p>
           </div>
 
-          <div id="profilePanel" class="header-popover">
-            <strong id="profileName">Il tuo profilo</strong>
-            <p id="profileEmail"></p>
-            <button type="button" class="profile-logout" onclick="logout()">
-              <i class="bi bi-box-arrow-right me-1"></i>
-              Esci dall'account
-            </button>
-          </div>
         </div>
       </div>
     </header>

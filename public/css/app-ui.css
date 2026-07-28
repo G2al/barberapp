@@ -318,36 +318,16 @@
   font-size: 17px;
 }
 
-body.app-page-motion .app-shell {
-  opacity: 0;
-  transform: translate3d(0, 6px, 0);
-  transition:
-    opacity 190ms ease,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
+@view-transition {
+  navigation: auto;
 }
 
-body.app-page-motion.app-enter-forward .app-shell {
-  transform: translate3d(14px, 0, 0);
+::view-transition-old(root) {
+  animation: appPageOut 110ms ease both;
 }
 
-body.app-page-motion.app-enter-back .app-shell {
-  transform: translate3d(-14px, 0, 0);
-}
-
-body.app-page-motion.app-page-visible .app-shell {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-body.app-page-motion.app-page-leaving.app-leave-forward .app-shell {
-  opacity: 0.25;
-  transform: translate3d(-12px, 0, 0);
-}
-
-body.app-page-motion.app-page-leaving.app-leave-back .app-shell {
-  opacity: 0.25;
-  transform: translate3d(12px, 0, 0);
+::view-transition-new(root) {
+  animation: appPageIn 170ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .bottom-nav.app-bottom-nav {
@@ -375,7 +355,7 @@ body.app-page-motion.app-page-leaving.app-leave-back .app-shell {
 }
 
 .bottom-nav.app-bottom-nav .nav-item.active i {
-  transform: translateY(-2px) scale(1.06);
+  transform: scale(1.05);
 }
 
 .bottom-nav.app-bottom-nav .nav-item:active i {
@@ -390,7 +370,7 @@ body.app-page-motion.app-page-leaving.app-leave-back .app-shell {
   --app-nav-offset: 0px;
   position: absolute;
   z-index: 3;
-  bottom: 7px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
   left: 0;
   width: 34px;
   height: 3px;
@@ -598,8 +578,18 @@ body.app-page-motion.app-page-leaving.app-leave-back .app-shell {
 }
 
 @keyframes appNavReselect {
-  0%, 100% { transform: translateY(-2px) scale(1.06); }
-  45% { transform: translateY(-5px) scale(1.12); }
+  0%, 100% { transform: scale(1.05); }
+  45% { transform: translateY(-3px) scale(1.12); }
+}
+
+@keyframes appPageOut {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0.9; transform: translate3d(-3px, 0, 0); }
+}
+
+@keyframes appPageIn {
+  from { opacity: 0.9; transform: translate3d(3px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes appSelectionPop {
@@ -635,6 +625,11 @@ body.app-page-motion.app-page-leaving.app-leave-back .app-shell {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01ms;
+  }
+
   .app-loader-ring,
   .app-loader-icon,
   .app-reveal-item,
@@ -648,8 +643,6 @@ body.app-page-motion.app-page-leaving.app-leave-back .app-shell {
     transition: none !important;
   }
 
-  body.app-page-motion .app-shell,
-  body.app-page-motion.app-page-visible .app-shell,
   .app-reveal-item {
     opacity: 1;
     transform: none;

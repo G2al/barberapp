@@ -199,29 +199,8 @@
     }
 
     function setupAppExperience() {
-        setupPageTransition();
         setupBottomNavigation();
         setupRevealAnimations();
-    }
-
-    function setupPageTransition() {
-        const shell = document.querySelector(".app-shell");
-        if (!shell) return;
-
-        let direction = "";
-        try {
-            direction = window.sessionStorage.getItem("gaetabet-navigation-direction") || "";
-            window.sessionStorage.removeItem("gaetabet-navigation-direction");
-        } catch {
-            direction = "";
-        }
-
-        document.body.classList.add("app-page-motion");
-        if (direction) document.body.classList.add(`app-enter-${direction}`);
-
-        window.requestAnimationFrame(() => {
-            window.requestAnimationFrame(() => document.body.classList.add("app-page-visible"));
-        });
     }
 
     function setupBottomNavigation() {
@@ -259,7 +238,7 @@
             moveIndicator(activeItem, false);
         });
 
-        items.forEach((item, targetIndex) => {
+        items.forEach((item) => {
             item.addEventListener("click", (event) => {
                 if (
                     event.defaultPrevented
@@ -272,13 +251,7 @@
                     return;
                 }
 
-                if (document.body.classList.contains("app-page-leaving")) {
-                    event.preventDefault();
-                    return;
-                }
-
                 const currentItem = navigation.querySelector(".nav-item.active") || activeItem;
-                const currentIndex = items.indexOf(currentItem);
 
                 if (item === currentItem) {
                     event.preventDefault();
@@ -290,7 +263,6 @@
                 }
 
                 event.preventDefault();
-                const direction = targetIndex > currentIndex ? "forward" : "back";
 
                 items.forEach((navItem) => {
                     const isActive = navItem === item;
@@ -299,15 +271,7 @@
                 });
                 moveIndicator(item);
 
-                try {
-                    window.sessionStorage.setItem("gaetabet-navigation-direction", direction);
-                } catch {
-                    // La navigazione continua anche con lo storage disabilitato.
-                }
-
-                document.body.classList.add("app-page-leaving", `app-leave-${direction}`);
-                const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 130;
-                window.setTimeout(() => window.location.assign(item.href), delay);
+                window.requestAnimationFrame(() => window.location.assign(item.href));
             });
         });
 

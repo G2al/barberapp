@@ -692,8 +692,8 @@
           <button type="button" id="notificationButton" class="header-action notification" aria-label="Notifiche" aria-expanded="false">
             <i class="bi bi-bell-fill"></i>
           </button>
-          <button type="button" id="profileButton" class="header-action" aria-label="Profilo" aria-expanded="false">
-            <i class="bi bi-person-fill"></i>
+          <button type="button" id="logoutButton" class="header-action logout-action" aria-label="Esci dall'account" title="Esci dall'account">
+            <i class="bi bi-box-arrow-right"></i>
           </button>
 
           <div id="notificationPanel" class="header-popover">
@@ -701,14 +701,6 @@
             <p>I tuoi prodotti preferiti restano salvati nel catalogo.</p>
           </div>
 
-          <div id="profilePanel" class="header-popover">
-            <strong id="profileName">Il tuo profilo</strong>
-            <p id="profileEmail"></p>
-            <button type="button" class="profile-logout" onclick="logout()">
-              <i class="bi bi-box-arrow-right me-1"></i>
-              Esci dall'account
-            </button>
-          </div>
         </div>
       </div>
     </header>
