@@ -64,7 +64,7 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
         $this->booking->loadMissing(['staff', 'service']);
 
         return (new WebPushMessage)
-            ->title('Prenotazione annullata')
+            ->title('❌ Prenotazione annullata')
             ->body(sprintf(
                 'L’appuntamento %s del %s alle %s è stato annullato.',
                 $this->booking->service->name ?? '',

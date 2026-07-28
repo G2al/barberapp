@@ -75,6 +75,32 @@
   letter-spacing: 0;
 }
 
+.app-route-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 15000;
+  visibility: hidden;
+  background: #09090b;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 230ms ease, visibility 230ms ease;
+}
+
+.app-route-transition.show {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.app-route-leaving {
+  overflow: hidden;
+}
+
+body.app-route-leaving > *:not(.app-route-transition) {
+  transform: scale(0.995);
+  transition: transform 230ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .app-toast-stack {
   position: fixed;
   top: calc(16px + env(safe-area-inset-top, 0px));
@@ -311,6 +337,23 @@
   background: var(--app-ui-danger) !important;
   color: #190908 !important;
   box-shadow: 0 14px 30px rgba(239, 116, 104, 0.2) !important;
+}
+
+.header-action.app-logout-pending {
+  cursor: wait;
+  color: var(--app-ui-gold) !important;
+}
+
+.header-action.app-logout-success {
+  border-color: var(--app-ui-success) !important;
+  color: var(--app-ui-success) !important;
+  box-shadow: 0 0 18px rgba(95, 209, 139, 0.2);
+}
+
+.header-action.app-logout-pending .spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
 }
 
 .app-shell {

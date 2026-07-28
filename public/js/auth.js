@@ -68,10 +68,56 @@ function getUser() {
     return JSON.parse(localStorage.getItem("user") || "{}");
 }
 
-function logout() {
+let logoutInProgress = false;
+
+async function logout(event) {
+    if (logoutInProgress) return;
+    logoutInProgress = true;
+
+    const button = event?.currentTarget || document.getElementById("logoutButton");
+    const originalHtml = button?.innerHTML;
+
+    if (button) {
+        button.disabled = true;
+        button.setAttribute("aria-busy", "true");
+        button.classList.add("app-logout-pending");
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    }
+
+    try {
+        await Promise.race([
+            apiLogout(),
+            new Promise((resolve) => window.setTimeout(resolve, 900)),
+        ]);
+    } catch {
+        // L'uscita locale resta sempre disponibile anche senza connessione.
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/index.html";
+
+    if (button) {
+        button.classList.remove("app-logout-pending");
+        button.classList.add("app-logout-success");
+        button.innerHTML = '<i class="bi bi-check-lg" aria-hidden="true"></i>';
+    }
+
+    window.setTimeout(() => {
+        if (window.appNavigate) {
+            window.appNavigate("/index.html");
+        } else {
+            window.location.href = "/index.html";
+        }
+    }, 220);
+
+    window.setTimeout(() => {
+        if (!button || !document.body.contains(button)) return;
+        button.innerHTML = originalHtml;
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+        button.classList.remove("app-logout-success");
+        logoutInProgress = false;
+    }, 2000);
 }
 
 function requireAuth() {
@@ -280,12 +326,32 @@ async function submitLogin() {
         password: document.getElementById("password").value.trim()
     };
 
-    setButtonLoading(submitBtn, true);
-    const res = await loginUser(data);
-    setButtonLoading(submitBtn, false);
+    if (window.appButtonState) {
+        window.appButtonState(submitBtn, "loading", { label: "Accesso in corso..." });
+    } else {
+        setButtonLoading(submitBtn, true);
+    }
+
+    let res;
+    try {
+        res = await loginUser(data);
+    } catch {
+        window.appButtonState?.(submitBtn, "error", {
+            label: "Connessione non disponibile",
+            resetAfter: 1100,
+        });
+        if (!window.appButtonState) setButtonLoading(submitBtn, false);
+        showAlert("Controlla la connessione e riprova.", "danger");
+        return;
+    }
 
     // LOGIN FALLITO
     if (res.status === false) {
+        window.appButtonState?.(submitBtn, "error", {
+            label: "Accesso non riuscito",
+            resetAfter: 1000,
+        });
+        if (!window.appButtonState) setButtonLoading(submitBtn, false);
         showAlert(res.message || "Email o password non validi", "danger");
         return;
     }
@@ -305,16 +371,29 @@ async function submitLogin() {
             saveUser(res.user);
         }
 
-        showAlert("Accesso effettuato!", "success");
+        if (window.appButtonState) {
+            window.appButtonState(submitBtn, "success", { label: "Accesso effettuato" });
+        } else {
+            setButtonLoading(submitBtn, false);
+        }
 
         setTimeout(() => {
-            window.location.href = "/dashboard.html";
-        }, 1000);
+            if (window.appNavigate) {
+                window.appNavigate("/dashboard.html");
+            } else {
+                window.location.href = "/dashboard.html";
+            }
+        }, 360);
 
         return;
     }
 
     // ERRORE GENERICO
+    window.appButtonState?.(submitBtn, "error", {
+        label: "Accesso non riuscito",
+        resetAfter: 1000,
+    });
+    if (!window.appButtonState) setButtonLoading(submitBtn, false);
     showAlert("Errore durante il login.", "danger");
 }
 

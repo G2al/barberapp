@@ -64,9 +64,9 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
         $this->booking->loadMissing(['staff', 'service']);
 
         return (new WebPushMessage)
-            ->title('Prenotazione confermata')
+            ->title('✅ Prenotazione confermata')
             ->body(sprintf(
-                '%s con %s, il %s alle %s.',
+                '💈 %s con %s, il %s alle %s. Ti aspettiamo!',
                 $this->booking->service->name ?? 'Appuntamento',
                 trim(($this->booking->staff->first_name ?? '').' '.($this->booking->staff->last_name ?? '')),
                 $this->booking->date->format('d/m/Y'),

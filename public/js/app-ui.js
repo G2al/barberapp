@@ -3,6 +3,7 @@
     const state = {
         loaderCount: launchLoaderVisible ? 1 : 0,
         confirmResolve: null,
+        routeTransitionActive: false,
     };
 
     function shouldShowLaunchLoader() {
@@ -27,6 +28,14 @@
     function mountUi() {
         if (document.getElementById("appLoader")) return;
 
+        let enterFromNavigation = false;
+        try {
+            enterFromNavigation = window.sessionStorage.getItem("gaetabet-route-transition") === "1";
+            window.sessionStorage.removeItem("gaetabet-route-transition");
+        } catch {
+            // La transizione funziona anche senza sessionStorage.
+        }
+
         document.body.insertAdjacentHTML("beforeend", `
             <div id="appLoader" class="app-loader${launchLoaderVisible ? " show" : ""}" role="status" aria-live="polite">
                 <div class="app-loader-inner">
@@ -49,6 +58,7 @@
                     </div>
                 </section>
             </div>
+            <div id="appRouteTransition" class="app-route-transition${enterFromNavigation ? " show" : ""}" aria-hidden="true"></div>
         `);
 
         document.getElementById("appConfirmCancel").addEventListener("click", () => closeConfirm(false));
@@ -59,6 +69,14 @@
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape" && state.confirmResolve) closeConfirm(false);
         });
+
+        if (enterFromNavigation) {
+            window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(() => {
+                    document.getElementById("appRouteTransition")?.classList.remove("show");
+                });
+            });
+        }
     }
 
     function loaderShow(label = "Caricamento in corso") {
@@ -196,6 +214,29 @@
                 options.onReset?.();
             }, options.resetAfter));
         }
+    }
+
+    function navigateWithTransition(url, options = {}) {
+        if (state.routeTransitionActive) return;
+
+        mountUi();
+        state.routeTransitionActive = true;
+
+        try {
+            window.sessionStorage.setItem("gaetabet-route-transition", "1");
+        } catch {
+            // Nessun dato applicativo dipende dalla transizione.
+        }
+
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const delay = reducedMotion ? 0 : (options.delay ?? 230);
+
+        document.body.classList.add("app-route-leaving");
+        document.getElementById("appRouteTransition")?.classList.add("show");
+
+        window.setTimeout(() => {
+            window.location.assign(url);
+        }, delay);
     }
 
     function setupAppExperience() {
@@ -359,6 +400,7 @@
     window.appToast = toast;
     window.appConfirm = confirmDialog;
     window.appButtonState = setButtonState;
+    window.appNavigate = navigateWithTransition;
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {

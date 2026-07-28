@@ -54,7 +54,7 @@
                 || element === navigation
                 || element === portalHost
                 || element.tagName === "SCRIPT"
-                || ["appLoader", "appToastStack", "appConfirmOverlay"].includes(element.id)
+                || ["appLoader", "appToastStack", "appConfirmOverlay", "appRouteTransition"].includes(element.id)
             ) {
                 return;
             }

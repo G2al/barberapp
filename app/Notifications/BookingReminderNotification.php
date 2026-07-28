@@ -80,15 +80,22 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         $this->booking->loadMissing(['staff', 'service']);
 
         $title = match ($this->type) {
-            '24h' => 'Ci vediamo domani',
-            '3h' => 'Il tuo appuntamento si avvicina',
-            default => 'Manca meno di un’ora',
+            '24h' => '📅 Ci vediamo domani',
+            '3h' => '⏳ Il tuo appuntamento si avvicina',
+            default => '⏰ Manca meno di un’ora',
+        };
+
+        $intro = match ($this->type) {
+            '24h' => 'Il tuo appuntamento è previsto per domani',
+            '3h' => 'Mancano meno di 3 ore al tuo appuntamento',
+            default => 'Ci siamo quasi',
         };
 
         return (new WebPushMessage)
             ->title($title)
             ->body(sprintf(
-                '%s con %s alle %s.',
+                '%s: %s con %s alle %s.',
+                $intro,
                 $this->booking->service->name ?? 'Appuntamento',
                 trim(($this->booking->staff->first_name ?? '').' '.($this->booking->staff->last_name ?? '')),
                 substr((string) $this->booking->time, 0, 5),
