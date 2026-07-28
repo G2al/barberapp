@@ -134,9 +134,46 @@
             throw new Error("Struttura della pagina non valida.");
         }
 
+        const canUsePreparedTransition = (
+            typeof document.startViewTransition === "function"
+            && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        );
+
+        if (canUsePreparedTransition) {
+            document.documentElement.dataset.spaDirection = direction;
+
+            const transition = document.startViewTransition(() => (
+                commitPage(page, targetRoute, targetPath, currentShell)
+            ));
+
+            try {
+                await transition.finished;
+            } finally {
+                delete document.documentElement.dataset.spaDirection;
+            }
+
+            return;
+        }
+
         currentShell.classList.add(direction === "forward" ? "spa-leave-left" : "spa-leave-right");
         await delay(90);
 
+        const nextShell = page.shell;
+        nextShell.classList.add(direction === "forward" ? "spa-enter-right" : "spa-enter-left");
+        await commitPage(page, targetRoute, targetPath, currentShell);
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                nextShell.classList.add("spa-enter-active");
+            });
+        });
+
+        window.setTimeout(() => {
+            nextShell.classList.remove("spa-enter-right", "spa-enter-left", "spa-enter-active");
+        }, 260);
+    }
+
+    async function commitPage(page, targetRoute, targetPath, currentShell) {
         window.AppPages?.[routes[currentPath].key]?.unmount?.();
 
         document.title = page.title;
@@ -148,23 +185,12 @@
         }
 
         const nextShell = page.shell;
-        nextShell.classList.add(direction === "forward" ? "spa-enter-right" : "spa-enter-left");
         currentShell.replaceWith(nextShell);
 
         portalHost.replaceChildren(...page.portals);
         currentPath = targetPath;
         window.scrollTo({ top: 0, left: 0, behavior: "auto" });
         window.appBottomNavigation?.setActive(targetPath);
-
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                nextShell.classList.add("spa-enter-active");
-            });
-        });
-
-        window.setTimeout(() => {
-            nextShell.classList.remove("spa-enter-right", "spa-enter-left", "spa-enter-active");
-        }, 260);
 
         await Promise.resolve(window.AppPages?.[targetRoute.key]?.mount?.()).catch((error) => {
             console.error(`Errore durante l'apertura della sezione ${targetRoute.key}:`, error);

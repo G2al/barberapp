@@ -316,6 +316,7 @@
 .app-shell {
   transform: translate3d(0, 0, 0);
   will-change: transform, opacity;
+  view-transition-name: app-content;
 }
 
 .app-shell.spa-leave-left {
@@ -361,16 +362,41 @@ body.spa-is-navigating .bottom-nav {
   navigation: auto;
 }
 
-::view-transition-old(root) {
-  animation: appPageOut 110ms ease both;
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
 }
 
-::view-transition-new(root) {
-  animation: appPageIn 170ms cubic-bezier(0.22, 1, 0.36, 1) both;
+::view-transition-group(app-content) {
+  overflow: hidden;
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-spa-direction="forward"]::view-transition-old(app-content) {
+  animation: appPreparedOutForward 220ms ease both;
+}
+
+:root[data-spa-direction="forward"]::view-transition-new(app-content) {
+  animation: appPreparedInForward 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:root[data-spa-direction="back"]::view-transition-old(app-content) {
+  animation: appPreparedOutBack 220ms ease both;
+}
+
+:root[data-spa-direction="back"]::view-transition-new(app-content) {
+  animation: appPreparedInBack 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .bottom-nav.app-bottom-nav {
   isolation: isolate;
+  view-transition-name: app-navigation;
+}
+
+::view-transition-old(app-navigation),
+::view-transition-new(app-navigation) {
+  animation: none;
 }
 
 .bottom-nav.app-bottom-nav .nav-item {
@@ -631,6 +657,26 @@ body.spa-is-navigating .bottom-nav {
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
+@keyframes appPreparedOutForward {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0.72; transform: translate3d(-18px, 0, 0); }
+}
+
+@keyframes appPreparedInForward {
+  from { opacity: 0.72; transform: translate3d(18px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes appPreparedOutBack {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0.72; transform: translate3d(18px, 0, 0); }
+}
+
+@keyframes appPreparedInBack {
+  from { opacity: 0.72; transform: translate3d(-18px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
 @keyframes appSelectionPop {
   0% { transform: scale(0.94); }
   100% { transform: scale(1); }
@@ -665,7 +711,11 @@ body.spa-is-navigating .bottom-nav {
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
-  ::view-transition-new(root) {
+  ::view-transition-new(root),
+  ::view-transition-old(app-content),
+  ::view-transition-new(app-content),
+  ::view-transition-old(app-navigation),
+  ::view-transition-new(app-navigation) {
     animation-duration: 0.01ms;
   }
 
