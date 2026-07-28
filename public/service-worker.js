@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'gaetabet-v44';
+const CACHE_NAME = 'gaetabet-v45';
 const ASSETS = [
   '/',
   '/index.html',

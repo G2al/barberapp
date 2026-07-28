@@ -24,13 +24,13 @@
     <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
     <style>
         :root {
-            --auth-bg: #080808;
-            --auth-panel: rgba(16, 18, 21, 0.88);
-            --auth-field: rgba(55, 61, 72, 0.78);
-            --auth-line: rgba(255, 255, 255, 0.1);
-            --auth-muted: rgba(255, 255, 255, 0.62);
-            --auth-gold: #d5a13d;
-            --auth-gold-light: #f0cd6d;
+            --auth-bg: #070707;
+            --auth-panel: rgba(10, 10, 10, 0.96);
+            --auth-field: rgba(24, 25, 28, 0.88);
+            --auth-line: rgba(150, 153, 160, 0.2);
+            --auth-muted: #9b9b9f;
+            --auth-gold: #d99d2d;
+            --auth-gold-light: #f1c863;
         }
 
         body.auth-page,
@@ -41,81 +41,137 @@
         }
 
         body.auth-page {
-            min-height: 100vh;
+            min-height: 100svh;
             margin: 0;
             background: var(--auth-bg);
             color: #fff;
         }
 
         .auth-screen {
-            min-height: 100vh;
+            min-height: 100svh;
             display: flex;
             justify-content: center;
             padding: 0;
-            background:
-                linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.74) 43%, #070707 74%),
-                url("/images/bg-login.jpg") top center / cover no-repeat fixed;
+            background: #050505;
         }
 
         .auth-shell {
             width: min(100%, 480px);
-            min-height: 100vh;
+            min-width: 0;
+            min-height: 100svh;
             display: flex;
             flex-direction: column;
-            padding: calc(32px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
+            background: #080808;
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.65);
         }
 
-        .auth-content {
-            flex: 1;
+        .auth-hero {
+            position: relative;
+            z-index: 0;
+            height: clamp(310px, 42svh, 690px);
+            flex: 0 0 auto;
             display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 20px;
-            padding-top: 34vh;
+            align-items: center;
+            justify-content: center;
+            padding: calc(28px + env(safe-area-inset-top, 0px)) 24px 18px;
+            overflow: hidden;
+            background: url("/images/bg-login.jpg") center 38% / cover no-repeat;
+        }
+
+        .auth-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.44) 0%, rgba(0, 0, 0, 0.31) 45%, rgba(0, 0, 0, 0.76) 100%),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.2), transparent 45%, rgba(0, 0, 0, 0.2));
+        }
+
+        .auth-panel {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-width: 0;
+            margin-top: -1px;
+            padding: 34px 34px calc(42px + env(safe-area-inset-bottom, 0px));
+            border-radius: 46px 46px 0 0;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.045), transparent 32%),
+                var(--auth-panel);
+            box-shadow: 0 -22px 58px rgba(0, 0, 0, 0.42);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
         }
 
         .auth-title {
+            position: relative;
+            z-index: 1;
             text-align: center;
+            transform: translateY(30px);
         }
 
         .auth-title h1 {
             margin: 0;
-            font-size: clamp(38px, 10vw, 52px);
-            line-height: 1;
+            font-size: clamp(48px, 13vw, 72px);
+            line-height: 1.05;
             font-weight: 600;
             letter-spacing: 0;
             color: #fff;
+            text-shadow: 0 5px 28px rgba(0, 0, 0, 0.54);
         }
 
         .auth-title p {
-            margin: 14px 0 0;
-            color: rgba(255, 255, 255, 0.74);
-            font-size: 18px;
-            font-weight: 600;
+            margin: 18px 0 0;
+            color: rgba(232, 232, 232, 0.72);
+            font-size: clamp(18px, 5vw, 25px);
+            font-weight: 400;
         }
 
         .auth-form {
             display: grid;
-            gap: 16px;
+            gap: 24px;
+        }
+
+        .auth-group {
+            display: grid;
+            gap: 11px;
+        }
+
+        .auth-label {
+            margin: 0 0 0 8px;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 16px;
+            font-weight: 500;
         }
 
         .auth-field {
             position: relative;
-            min-height: 68px;
+            min-height: 62px;
             display: flex;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 0;
+            overflow: hidden;
+            border: 1.5px solid var(--auth-line);
+            border-radius: 17px;
             background: var(--auth-field);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 26px rgba(0, 0, 0, 0.24);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+            transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        .auth-field:focus-within {
+            border-color: rgba(229, 174, 65, 0.72);
+            background: rgba(28, 29, 32, 0.94);
+            box-shadow: 0 0 0 3px rgba(217, 157, 45, 0.1);
         }
 
         .field-icon {
             position: absolute;
-            left: 22px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.58);
-            font-size: 18px;
+            color: rgba(187, 189, 194, 0.72);
+            font-size: 22px;
             pointer-events: none;
             z-index: 2;
         }
@@ -125,15 +181,15 @@
             z-index: 1;
             width: 100%;
             min-width: 0;
-            min-height: 66px;
+            min-height: 60px;
             border: 0;
             outline: 0;
             background: transparent;
             color: #fff;
-            font-size: 17px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 400;
             line-height: 1.5;
-            padding: 0 26px 0 58px;
+            padding: 0 22px 0 62px;
         }
 
         .auth-field.has-toggle input {
@@ -141,7 +197,8 @@
         }
 
         .auth-field input::placeholder {
-            color: rgba(255, 255, 255, 0.58);
+            color: rgba(170, 171, 176, 0.62);
+            opacity: 1;
         }
 
         .auth-field input:-webkit-autofill,
@@ -149,75 +206,117 @@
         .auth-field input:-webkit-autofill:focus,
         .auth-field input:-webkit-autofill:active {
             font-family: "Poppins", Arial, sans-serif !important;
-            font-size: 17px !important;
-            font-weight: 600 !important;
+            font-size: 16px !important;
+            font-weight: 400 !important;
             line-height: 1.5 !important;
             -webkit-text-fill-color: #fff !important;
             caret-color: #fff;
-            -webkit-box-shadow: 0 0 0 1000px #3b404a inset !important;
-            box-shadow: 0 0 0 1000px #3b404a inset !important;
+            -webkit-box-shadow: 0 0 0 1000px #1c1d20 inset !important;
+            box-shadow: 0 0 0 1000px #1c1d20 inset !important;
             transition: background-color 9999s ease-out 0s;
         }
 
         .auth-field input:-webkit-autofill::first-line {
             font-family: "Poppins", Arial, sans-serif !important;
-            font-size: 17px !important;
-            font-weight: 600 !important;
+            font-size: 16px !important;
+            font-weight: 400 !important;
         }
 
         .toggle-pass {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             border: 0;
             background: transparent;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(190, 192, 197, 0.72);
             position: absolute;
-            right: 9px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             z-index: 3;
         }
 
+        .auth-tools {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-top: 1px;
+        }
+
         .remember-row {
-            min-height: 34px;
+            min-height: 38px;
             display: inline-flex;
             align-items: center;
-            justify-self: start;
-            gap: 11px;
-            color: rgba(255, 255, 255, 0.78);
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.92);
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 400;
             cursor: pointer;
         }
 
         .remember-row input {
-            width: 20px;
-            height: 20px;
-            margin: 0;
-            accent-color: var(--auth-gold-light);
-            cursor: pointer;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .remember-box {
+            width: 27px;
+            height: 27px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            border: 1.5px solid var(--auth-gold);
+            border-radius: 8px;
+            color: transparent;
+            font-size: 18px;
+            transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+        }
+
+        .remember-row input:checked + .remember-box {
+            color: var(--auth-gold-light);
+            background: rgba(217, 157, 45, 0.08);
+            box-shadow: 0 0 18px rgba(217, 157, 45, 0.12);
+        }
+
+        .forgot-link {
+            color: var(--auth-gold-light);
+            font-size: 14px;
+            font-weight: 400;
+            text-decoration: none;
+            white-space: nowrap;
         }
 
         .auth-submit {
-            min-height: 66px;
-            border: 0;
-            background: linear-gradient(135deg, var(--auth-gold), var(--auth-gold-light));
-            color: #17100a;
-            font-size: 18px;
+            min-height: 72px;
+            margin-top: 4px;
+            border: 1px solid #efbd50;
+            border-radius: 16px;
+            background: linear-gradient(105deg, #d99d2d 0%, #f0c760 54%, #e3ad3e 100%);
+            color: #0c0a07;
+            font-size: 20px;
             font-weight: 600;
-            box-shadow: 0 20px 44px rgba(213, 161, 61, 0.24);
+            box-shadow: 0 16px 38px rgba(217, 157, 45, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+            transition: transform 150ms ease, filter 150ms ease;
+        }
+
+        .auth-submit:active {
+            transform: scale(0.985);
+            filter: brightness(0.96);
         }
 
         .auth-links {
-            display: grid;
-            gap: 24px;
+            margin-top: 30px;
             text-align: center;
-            color: rgba(255, 255, 255, 0.82);
-            font-size: 17px;
-            font-weight: 750;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            font-weight: 400;
         }
 
         .auth-links a {
@@ -226,19 +325,66 @@
         }
 
         #alertBox .alert {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0;
-            font-weight: 700;
+            margin: 0 0 20px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            font-weight: 600;
         }
 
         .install-guide {
-            margin-top: 20px;
+            margin-top: 72px;
             padding: 18px;
             border-radius: 20px;
             border: 1px solid var(--auth-line);
             background: rgba(15, 17, 20, 0.86);
             box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
             backdrop-filter: blur(16px);
+        }
+
+        @media (max-width: 370px) {
+            .auth-panel {
+                padding-inline: 22px;
+                border-radius: 38px 38px 0 0;
+            }
+
+            .auth-tools {
+                gap: 8px;
+            }
+
+            .remember-row,
+            .forgot-link {
+                font-size: 12px;
+            }
+
+            .remember-box {
+                width: 25px;
+                height: 25px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .auth-title h1 {
+                font-size: 42px;
+            }
+
+            .auth-title p {
+                font-size: 17px;
+            }
+
+            .auth-panel {
+                padding-inline: 24px;
+            }
+
+            .remember-row,
+            .forgot-link {
+                font-size: 13px;
+            }
+        }
+
+        @media (min-width: 700px) {
+            .auth-shell {
+                width: min(100%, 520px);
+            }
         }
 
         .install-guide-title {
@@ -348,38 +494,49 @@
 <body class="auth-page">
     <main class="auth-screen">
         <section class="auth-shell">
-            <div class="auth-content">
+            <header class="auth-hero">
                 <div class="auth-title">
                     <h1>Bentornato</h1>
                     <p>Accedi al tuo account</p>
                 </div>
+            </header>
 
+            <div class="auth-panel">
                 <div id="alertBox"></div>
 
                 <div class="auth-form">
-                    <label class="auth-field" for="email">
-                        <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
-                        <input type="email" id="email" placeholder="Email" autocomplete="email">
-                    </label>
+                    <div class="auth-group">
+                        <label class="auth-label" for="email">Email</label>
+                        <div class="auth-field">
+                            <i class="bi bi-envelope field-icon" aria-hidden="true"></i>
+                            <input type="email" id="email" placeholder="Inserisci la tua email" autocomplete="email">
+                        </div>
+                    </div>
 
-                    <label class="auth-field has-toggle" for="password">
-                        <i class="bi bi-lock field-icon" aria-hidden="true"></i>
-                        <input type="password" id="password" placeholder="Password" autocomplete="current-password">
-                        <button type="button" class="toggle-pass" onclick="togglePassword('password', 'toggleLoginPass')" aria-label="Mostra password">
-                            <i id="toggleLoginPass" class="bi bi-eye"></i>
-                        </button>
-                    </label>
+                    <div class="auth-group">
+                        <label class="auth-label" for="password">Password</label>
+                        <div class="auth-field has-toggle">
+                            <i class="bi bi-lock field-icon" aria-hidden="true"></i>
+                            <input type="password" id="password" placeholder="Inserisci la tua password" autocomplete="current-password">
+                            <button type="button" class="toggle-pass" onclick="togglePassword('password', 'toggleLoginPass')" aria-label="Mostra password">
+                                <i id="toggleLoginPass" class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
 
-                    <label class="remember-row" for="rememberLogin">
-                        <input type="checkbox" id="rememberLogin" checked>
-                        <span>Ricordami</span>
-                    </label>
+                    <div class="auth-tools">
+                        <label class="remember-row" for="rememberLogin">
+                            <input type="checkbox" id="rememberLogin" checked>
+                            <span class="remember-box" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
+                            <span>Ricordami</span>
+                        </label>
+                        <a class="forgot-link" href="forgot-password.html">Password dimenticata?</a>
+                    </div>
 
                     <button id="submitBtn" class="auth-submit" onclick="submitLogin()">Accedi</button>
                 </div>
 
                 <div class="auth-links">
-                    <a href="forgot-password.html">Password dimenticata?</a>
                     <div>Non hai un account? <a href="register.html">Registrati</a></div>
                 </div>
 
