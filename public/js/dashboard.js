@@ -35,6 +35,7 @@ async function mountDashboard() {
     setupHeaderPanels(signal);
     setupCalendar(signal);
     setupServiceSelect(signal);
+    setupBookingConfirmation(signal);
 
     if (currentUser?.role === "admin") {
         document.getElementById("adminNoteStep")?.classList.remove("d-none");
@@ -70,11 +71,11 @@ function setupHeaderPanels(signal) {
         closePanels();
         notificationPanel.classList.toggle("open", shouldOpen);
         notificationButton.setAttribute("aria-expanded", String(shouldOpen));
-    });
+    }, { signal });
 
-    logoutButton.addEventListener("click", logout);
+    logoutButton.addEventListener("click", logout, { signal });
 
-    notificationPanel.addEventListener("click", (event) => event.stopPropagation());
+    notificationPanel.addEventListener("click", (event) => event.stopPropagation(), { signal });
     document.addEventListener("click", closePanels, { signal });
 }
 
@@ -251,7 +252,7 @@ function setupServiceSelect(signal) {
         event.stopPropagation();
         if (trigger.disabled) return;
         setServiceMenuOpen(!shell.classList.contains("open"));
-    });
+    }, { signal });
 
     trigger.addEventListener("keydown", (event) => {
         if (event.key === "ArrowDown" && !trigger.disabled) {
@@ -263,9 +264,9 @@ function setupServiceSelect(signal) {
         if (event.key === "Escape") {
             setServiceMenuOpen(false);
         }
-    });
+    }, { signal });
 
-    menu.addEventListener("click", (event) => event.stopPropagation());
+    menu.addEventListener("click", (event) => event.stopPropagation(), { signal });
     document.addEventListener("click", () => setServiceMenuOpen(false), { signal });
 
     serviceSelect.addEventListener("change", async (event) => {
@@ -287,9 +288,13 @@ function setupServiceSelect(signal) {
         resetTimes("Caricamento orari...");
         updateSummary();
         await loadAvailableTimes();
-    });
+    }, { signal });
 
     renderCustomServiceSelect();
+}
+
+function setupBookingConfirmation(signal) {
+    document.getElementById("confirmBtn").addEventListener("click", confirmBooking, { signal });
 }
 
 function renderCustomServiceSelect() {
@@ -353,8 +358,8 @@ function setServiceMenuOpen(isOpen) {
 }
 
 function setupCalendar(signal) {
-    document.getElementById("previousMonth").addEventListener("click", () => changeCalendarWeek(-1));
-    document.getElementById("nextMonth").addEventListener("click", () => changeCalendarWeek(1));
+    document.getElementById("previousMonth").addEventListener("click", () => changeCalendarWeek(-1), { signal });
+    document.getElementById("nextMonth").addEventListener("click", () => changeCalendarWeek(1), { signal });
     window.addEventListener("resize", () => syncCalendarSelection(), { passive: true, signal });
     renderCalendar();
 }
@@ -781,6 +786,6 @@ function autoMountDashboard() {
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", autoMountDashboard, { once: true });
 } else {
-    autoMountDashboard();
+    window.setTimeout(autoMountDashboard, 0);
 }
 })();

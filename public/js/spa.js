@@ -166,7 +166,7 @@
             nextShell.classList.remove("spa-enter-right", "spa-enter-left", "spa-enter-active");
         }, 260);
 
-        Promise.resolve(window.AppPages?.[targetRoute.key]?.mount?.()).catch((error) => {
+        await Promise.resolve(window.AppPages?.[targetRoute.key]?.mount?.()).catch((error) => {
             console.error(`Errore durante l'apertura della sezione ${targetRoute.key}:`, error);
             window.appToast?.("Non è stato possibile caricare completamente la sezione.", "error");
         });
