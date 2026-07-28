@@ -12,17 +12,8 @@
 
         if (!isStandalone) return false;
 
-        try {
-            if (window.sessionStorage.getItem("gaetabet-launch-loader-shown") === "1") {
-                return false;
-            }
-
-            window.sessionStorage.setItem("gaetabet-launch-loader-shown", "1");
-        } catch {
-            // Il loader resta disponibile anche se lo storage del browser e' bloccato.
-        }
-
-        return true;
+        const path = window.location.pathname.replace(/\/+$/, "") || "/";
+        return path === "/" || path === "/index.html";
     }
 
     function mountUi() {
@@ -41,9 +32,11 @@
                 <div class="app-loader-inner">
                     <div class="app-loader-mark">
                         <span class="app-loader-ring"></span>
-                        <span class="app-loader-icon"><i class="bi bi-scissors"></i></span>
+                        <span class="app-loader-icon">
+                            <img src="/images/logo-512x512.png" alt="" width="72" height="72">
+                        </span>
                     </div>
-                    <p id="appLoaderLabel" class="app-loader-label">Prepariamo il tuo stile</p>
+                    <p id="appLoaderLabel" class="app-loader-label">Stiamo aprendo l'app</p>
                 </div>
             </div>
             <div id="appToastStack" class="app-toast-stack" aria-live="polite"></div>

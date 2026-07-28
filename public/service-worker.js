@@ -1,7 +1,8 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'gaetabet-v53';
+const CACHE_NAME = 'gaetabet-v54';
 const ASSETS = [
   '/',
+  '/manifest.json',
   '/index.html',
   '/dashboard.html',
   '/my-bookings.html',
@@ -23,6 +24,11 @@ const ASSETS = [
   '/js/spa.js',
   '/js/script.js',
   '/service-worker.js',
+  '/images/apple-touch-icon.png',
+  '/images/logo-192x192.png',
+  '/images/logo-512x512.png',
+  '/images/maskable-icon-192x192.png',
+  '/images/maskable-icon-512x512.png',
   '/vender/bootstrap/css/bootstrap.min.css',
   '/vender/bootstrap/js/bootstrap.bundle.min.js',
 ];
