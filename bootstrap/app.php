@@ -12,8 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Lasciamo vuoto per usare gli stack DI DEFAULT di Laravel
-        // (web, api, ecc. li gestisce lui – noi qui non tocchiamo nulla)
+        $middleware->alias([
+            'active.user' => \App\Http\Middleware\EnsureUserIsActive::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

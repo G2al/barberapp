@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\LoyaltyController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PushSubscriptionController;
+use App\Http\Controllers\Api\AiChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +47,6 @@ Route::get('/test-telegram', function () {
     return response()->json(['status' => true, 'message' => 'Telegram notification sent!']);
 });
 
-
 /* =========================
    🔹 AUTH
 ========================= */
@@ -67,7 +67,6 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-
 /* =========================
    🔹 SERVICES
 ========================= */
@@ -78,7 +77,6 @@ Route::get('/services/by-staff/{staffId}', [ServiceController::class, 'byStaff']
 
 // Dettaglio singolo servizio (se serve in futuro)
 Route::get('/services/{id}', [ServiceController::class, 'show']);
-
 
 /* =========================
    🔹 STAFF
@@ -107,12 +105,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/loyalty/rewards/{reward}/redeem', [LoyaltyController::class, 'redeem']);
 });
 
+Route::post('/ai/chat', AiChatController::class)
+    ->middleware(['auth:sanctum', 'active.user', 'throttle:ai']);
+
 Route::middleware('auth:sanctum')->prefix('push')->group(function () {
     Route::get('/config', [PushSubscriptionController::class, 'config']);
     Route::post('/subscriptions', [PushSubscriptionController::class, 'store']);
     Route::delete('/subscriptions', [PushSubscriptionController::class, 'destroy']);
 });
-
 
 /* =========================
    🔹 AVAILABILITY
@@ -122,7 +122,6 @@ Route::get('/availability/{staffId}', [AvailabilityController::class, 'getSlots'
 
 // Giorni chiusi per uno staff (PUBLIC - per il frontend)
 Route::get('/staff/{staff}/closed-slots-public', [ClosedSlotController::class, 'getByStaffAndDate']);
-
 
 /* =========================
    🔹 BOOKINGS (Protette)
@@ -137,7 +136,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Annulla una prenotazione dell'utente
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
 });
-
 
 /* =========================
    🔹 CLOSED SLOTS (Admin)
