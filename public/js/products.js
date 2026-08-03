@@ -46,9 +46,9 @@ async function loadAppConfiguration() {
             headers: { "Accept": "application/json" },
         });
         const config = await response.json();
-        location.textContent = config.location || "Via Toledo 156, Napoli";
+        location.textContent = config.location || "Via E. De Nicola 73, Trentola Ducenta (CE)";
     } catch {
-        location.textContent = "Via Toledo 156, Napoli";
+        location.textContent = "Via E. De Nicola 73, Trentola Ducenta (CE)";
     }
 }
 

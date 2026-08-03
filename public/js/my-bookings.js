@@ -59,9 +59,9 @@ async function loadAppConfiguration() {
             headers: { "Accept": "application/json" },
         });
         const config = await response.json();
-        location.textContent = config.location || "Via Toledo 156, Napoli";
+        location.textContent = config.location || "Via E. De Nicola 73, Trentola Ducenta (CE)";
     } catch {
-        location.textContent = "Via Toledo 156, Napoli";
+        location.textContent = "Via E. De Nicola 73, Trentola Ducenta (CE)";
     }
 }
 
@@ -281,7 +281,7 @@ function createBookingCard(booking) {
             ${renderStaffAvatar(booking)}
             <div class="booking-main">
                 <div class="booking-staff-line">
-                    <p class="booking-staff">${escapeHtml(booking.staff || "Barbiere")}</p>
+                    <p class="booking-staff">${escapeHtml(booking.staff || "Professionista")}</p>
                 </div>
                 <div class="booking-service-line">
                     <h3 class="booking-service">${escapeHtml(booking.service || "Servizio")}</h3>
@@ -305,8 +305,8 @@ function createBookingCard(booking) {
                 <a
                     class="card-action call-action ${phoneHref ? "" : "disabled"}"
                     href="${phoneHref || "#"}"
-                    aria-label="Chiama ${escapeHtml(booking.staff || "il barbiere")}"
-                    title="Chiama il barbiere">
+                    aria-label="Chiama ${escapeHtml(booking.staff || "la professionista")}"
+                    title="Chiama la professionista">
                     <i class="bi bi-telephone-fill"></i>
                 </a>
                 ${canCancel ? `
@@ -328,7 +328,7 @@ function createBookingCard(booking) {
 }
 
 function renderStaffAvatar(booking) {
-    const name = booking.staff || "Barbiere";
+    const name = booking.staff || "Professionista";
     const initials = name.split(/\s+/).filter(Boolean).map((part) => part.charAt(0)).join("").slice(0, 2).toUpperCase();
 
     if (!booking.staff_image) {

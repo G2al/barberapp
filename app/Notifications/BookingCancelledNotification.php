@@ -55,7 +55,7 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
                 'time' => substr($this->booking->time, 0, 5),
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
-                'heroImage' => asset('images/booking-delete.png'),
+                'heroImage' => asset('images/stile-infinito-logo-white.png'),
             ]);
     }
 

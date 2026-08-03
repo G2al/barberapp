@@ -16,8 +16,8 @@ class StaffResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Staff';
-    protected static ?string $label = 'Barbiere';
-    protected static ?string $pluralLabel = 'Barbieri';
+    protected static ?string $label = 'Professionista';
+    protected static ?string $pluralLabel = 'Professioniste';
 
     protected static ?string $navigationGroup = 'Salone';
     protected static ?int $navigationSort = 3;
@@ -32,11 +32,21 @@ class StaffResource extends Resource
 
                 Forms\Components\TextInput::make('last_name')
                     ->label('Cognome')
-                    ->required(),
+                    ->nullable()
+                    ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? trim($state) : null),
 
                 Forms\Components\TextInput::make('role')
                     ->label('Ruolo')
                     ->maxLength(50),
+
+                Forms\Components\Select::make('department')
+                    ->label('Reparto')
+                    ->options([
+                        'hair' => 'Parrucchiera',
+                        'beauty' => 'Estetica',
+                    ])
+                    ->required()
+                    ->default('hair'),
 
                 Forms\Components\TextInput::make('phone')
                     ->label('Telefono'),
@@ -44,10 +54,20 @@ class StaffResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->label('Foto')
                     ->image()
+                    ->acceptedFileTypes([
+                        'image/jpeg',
+                        'image/png',
+                        'image/webp',
+                    ])
+                    ->maxSize(10240)
+                    ->disk('public')
                     ->directory('staff')
+                    ->visibility('public')
                     ->imageEditor()
                     ->imagePreviewHeight('150')
                     ->downloadable()
+                    ->openable()
+                    ->helperText('Formati supportati: JPG, PNG e WebP. Dimensione massima: 10 MB.')
                     ->nullable(),
 
                 Forms\Components\Toggle::make('is_active')
@@ -82,11 +102,25 @@ class StaffResource extends Resource
                 Tables\Columns\TextColumn::make('role')
                     ->label('Ruolo'),
 
+                Tables\Columns\TextColumn::make('department')
+                    ->label('Reparto')
+                    ->formatStateUsing(fn ($state) => $state === 'beauty' ? 'Estetica' : 'Parrucchiera')
+                    ->badge()
+                    ->color(fn ($state) => $state === 'beauty' ? 'danger' : 'gray'),
+
                 Tables\Columns\TextColumn::make('phone'),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->label('Attivo'),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('department')
+                    ->label('Reparto')
+                    ->options([
+                        'hair' => 'Parrucchiera',
+                        'beauty' => 'Estetica',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -1,7 +1,7 @@
 {
-  "name": "Giovanni Cerino Hair Stylist - Prenota il tuo barbiere",
-  "short_name": "Giovanni Cerino",
-  "description": "App per prenotare servizi di barbiere online",
+  "name": "Stile Infinito - Parrucchiera ed Estetica",
+  "short_name": "Stile Infinito",
+  "description": "Prenota i servizi di parrucchiera ed estetica di Stile Infinito",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",

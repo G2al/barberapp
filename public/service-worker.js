@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'gaetabet-v57';
+const CACHE_NAME = 'stile-infinito-v2';
 const ASSETS = [
   '/',
   '/manifest.json',
@@ -25,7 +25,9 @@ const ASSETS = [
   '/js/script.js',
   '/service-worker.js',
   '/images/apple-touch-icon.png',
-  '/images/logo.png',
+  '/images/stile-infinito-logo.png',
+  '/images/stile-infinito-logo-white.png',
+  '/images/stile-infinito-salon.jpg',
   '/images/logo-192x192.png',
   '/images/logo-512x512.png',
   '/images/maskable-icon-192x192.png',
@@ -91,7 +93,7 @@ self.addEventListener('push', (event) => {
     body: payload.body || '',
     icon: payload.icon || '/images/logo-192x192.png',
     badge: payload.badge || '/images/maskable-icon-192x192.png',
-    tag: payload.tag || 'gaetabet-notification',
+    tag: payload.tag || 'stile-infinito-notification',
     vibrate: payload.vibrate || [150, 75, 150],
     data: {
       ...data,
@@ -100,7 +102,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || 'GaetaBet', options)
+    self.registration.showNotification(payload.title || 'Stile Infinito', options)
   );
 });
 

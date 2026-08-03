@@ -12,7 +12,7 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:760px; background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e5e5e5;">
                     <tr>
                         <td style="padding:0; background:#111111;">
-                            <img src="{{ $heroImage }}" alt="Giovanni Cerino Hair Stylist" width="760" style="display:block; width:100%; max-width:760px; height:auto; border:0;">
+                            <img src="{{ $heroImage }}" alt="Stile Infinito" width="320" style="display:block; width:320px; max-width:80%; height:auto; margin:20px auto; border:0;">
                         </td>
                     </tr>
                     <tr>
@@ -41,7 +41,7 @@
                                                 <td align="right" style="padding:0 0 14px; font-size:16px; font-weight:bold; color:#111111;">{{ $service }}</td>
                                             </tr>
                                             <tr>
-                                                <td style="padding:0; font-size:12px; color:#666666; text-transform:uppercase; letter-spacing:1px;">Barbiere</td>
+                                                <td style="padding:0; font-size:12px; color:#666666; text-transform:uppercase; letter-spacing:1px;">Professionista</td>
                                                 <td align="right" style="padding:0; font-size:16px; font-weight:bold; color:#111111;">{{ $staff }}</td>
                                             </tr>
                                         </table>
@@ -53,8 +53,8 @@
                     <tr>
                         <td style="padding:18px 34px 34px;">
                             <p style="margin:0 0 16px; font-size:15px; line-height:1.7; color:#4b4b4b;">Quando vuoi, puoi prenotare un nuovo appuntamento dall&apos;app scegliendo giorno, orario e servizio disponibili.</p>
-                            <p style="margin:0; font-size:14px; line-height:1.6; color:#666666;">Giovanni Cerino Hair Stylist</p>
-                            <p style="margin:4px 0 0; font-size:13px; line-height:1.6; color:#777777;">Via Macedonia, 114, 81030 Lusciano CE</p>
+                            <p style="margin:0; font-size:14px; line-height:1.6; color:#666666;">Stile Infinito</p>
+                            <p style="margin:4px 0 0; font-size:13px; line-height:1.6; color:#777777;">Via E. De Nicola 73, Trentola Ducenta (CE)</p>
                         </td>
                     </tr>
                 </table>

@@ -38,7 +38,7 @@ class NewBookingNotification extends Notification
         return "NUOVA PRENOTAZIONE\n\n" .
             "Cliente: {$booking->user->name}\n" .
             "Telefono: {$booking->user->phone}\n" .
-            "Barbiere: {$booking->staff->full_name}\n" .
+            "Professionista: {$booking->staff->full_name}\n" .
             "Servizio: {$booking->service->name}\n" .
             "Data: " . \Carbon\Carbon::parse($booking->date)->format('d/m/Y') . "\n" .
             "Ora: {$booking->time}\n" .

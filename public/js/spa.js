@@ -172,7 +172,7 @@
         }, 260);
     }
 
-    async function commitPage(page, targetRoute, targetPath, currentShell) {
+    function commitPage(page, targetRoute, targetPath, currentShell) {
         window.AppPages?.[routes[currentPath].key]?.unmount?.();
 
         document.title = page.title;
@@ -191,7 +191,7 @@
         window.scrollTo({ top: 0, left: 0, behavior: "auto" });
         window.appBottomNavigation?.setActive(targetPath);
 
-        await Promise.resolve(window.AppPages?.[targetRoute.key]?.mount?.()).catch((error) => {
+        Promise.resolve(window.AppPages?.[targetRoute.key]?.mount?.()).catch((error) => {
             console.error(`Errore durante l'apertura della sezione ${targetRoute.key}:`, error);
             window.appToast?.("Non è stato possibile caricare completamente la sezione.", "error");
         });
@@ -253,22 +253,24 @@
     }
 
     function schedulePrefetch() {
-        const prefetch = async () => {
-            for (const [path, route] of Object.entries(routes)) {
-                if (path === currentPath) continue;
-                await getPage(path).catch(() => null);
-                await ensureModule(route).catch(() => null);
-                await delay(60);
-            }
+        const prefetch = () => {
+            const pending = Object.entries(routes)
+                .filter(([path]) => path !== currentPath)
+                .flatMap(([path, route]) => [
+                    getPage(path).catch(() => null),
+                    ensureModule(route).catch(() => null),
+                ]);
+
+            return Promise.all(pending);
         };
 
         window.setTimeout(() => {
             if ("requestIdleCallback" in window) {
-                window.requestIdleCallback(() => void prefetch(), { timeout: 1800 });
+                window.requestIdleCallback(() => void prefetch(), { timeout: 600 });
             } else {
                 void prefetch();
             }
-        }, 900);
+        }, 120);
     }
 
     function waitForMinimumFrame() {

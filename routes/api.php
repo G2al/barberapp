@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\PushSubscriptionController;
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-| Tutte le API dell'app mobile BarberApp
+| Tutte le API dell'app Stile Infinito
 |--------------------------------------------------------------------------
 */
 
@@ -30,7 +30,9 @@ use App\Http\Controllers\Api\PushSubscriptionController;
 Route::get('/test', fn () => response()->json(['message' => 'API working']));
 
 Route::get('/app-config', fn () => response()->json([
+    'name' => config('barbershop.name'),
     'location' => config('barbershop.location'),
+    'phone' => config('barbershop.phone'),
 ]));
 
 // Test Telegram notification

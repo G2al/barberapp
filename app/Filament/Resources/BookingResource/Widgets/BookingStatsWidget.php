@@ -83,7 +83,7 @@ class BookingStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-o-calendar-days')
                 ->color('primary'),
 
-            Stat::make('Top barbieri (Oggi)', $staffToday ?: 'Nessuno')
+            Stat::make('Top professioniste (Oggi)', $staffToday ?: 'Nessuna')
                 ->description('Distribuzione del lavoro')
                 ->descriptionIcon('heroicon-o-users')
                 ->color('primary'),

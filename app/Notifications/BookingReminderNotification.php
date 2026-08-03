@@ -56,7 +56,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         };
 
         $reminderText = match ($this->type) {
-            '24h' => 'La tua prenotazione e&apos; prevista per domani. Ti aspettiamo da Giovanni Cerino Hair Stylist.',
+            '24h' => 'La tua prenotazione e prevista per domani. Ti aspettiamo da Stile Infinito.',
             '3h' => 'La tua prenotazione e&apos; in arrivo: mancano meno di 3 ore.',
             default => 'La tua prenotazione e&apos; molto vicina: mancano meno di 1 ora.',
         };
@@ -71,7 +71,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
                 'time' => substr($this->booking->time, 0, 5),
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
-                'heroImage' => asset('images/booking-reminder.png'),
+                'heroImage' => asset('images/stile-infinito-logo-white.png'),
             ]);
     }
 

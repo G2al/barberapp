@@ -12,14 +12,14 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:760px; background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e5e5e5;">
                     <tr>
                         <td style="padding:0; background:#111111;">
-                            <img src="{{ $heroImage }}" alt="Giovanni Cerino Hair Stylist" width="760" style="display:block; width:100%; max-width:760px; height:auto; border:0;">
+                            <img src="{{ $heroImage }}" alt="Stile Infinito" width="320" style="display:block; width:320px; max-width:80%; height:auto; margin:20px auto; border:0;">
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:34px 34px 10px;">
                             <div style="font-size:12px; font-weight:bold; letter-spacing:1.4px; text-transform:uppercase; color:#111111;">Accesso account</div>
                             <h1 style="margin:10px 0 12px; font-size:28px; line-height:1.2; color:#111111;">Reimposta la tua password</h1>
-                            <p style="margin:0; font-size:16px; line-height:1.7; color:#4b4b4b;">Ciao {{ $name }}, abbiamo ricevuto una richiesta per reimpostare la password del tuo account Giovanni Cerino Hair Stylist.</p>
+                            <p style="margin:0; font-size:16px; line-height:1.7; color:#4b4b4b;">Ciao {{ $name }}, abbiamo ricevuto una richiesta per reimpostare la password del tuo account Stile Infinito.</p>
                         </td>
                     </tr>
                     <tr>
@@ -38,8 +38,8 @@
                                 </tr>
                             </table>
                             <p style="margin:18px 0 0; font-size:14px; line-height:1.7; color:#666666;">Se non hai richiesto tu il reset, ignora questa email. La tua password restera&apos; invariata.</p>
-                            <p style="margin:14px 0 0; font-size:14px; line-height:1.6; color:#666666;">Giovanni Cerino Hair Stylist</p>
-                            <p style="margin:4px 0 0; font-size:13px; line-height:1.6; color:#777777;">Via Macedonia, 114, 81030 Lusciano CE</p>
+                            <p style="margin:14px 0 0; font-size:14px; line-height:1.6; color:#666666;">Stile Infinito</p>
+                            <p style="margin:4px 0 0; font-size:13px; line-height:1.6; color:#777777;">Via E. De Nicola 73, Trentola Ducenta (CE)</p>
                         </td>
                     </tr>
                 </table>

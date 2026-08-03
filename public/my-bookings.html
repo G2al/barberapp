@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#09090b">
   <meta name="color-scheme" content="dark">
   <style>html, body { background-color: #09090b; }</style>
-  <title>Le mie prenotazioni - Giovanni Cerino</title>
+  <title>Le mie prenotazioni - Stile Infinito</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
+  <meta name="apple-mobile-web-app-title" content="Stile Infinito">
 
   <style data-spa-page-style>
     :root {
@@ -31,8 +31,8 @@
       --app-line: rgba(255, 255, 255, 0.12);
       --app-text: #fff;
       --app-muted: #aaa7a0;
-      --app-gold: #ffd558;
-      --app-gold-strong: #ffda32;
+      --app-gold: #d95d7e;
+      --app-gold-strong: #b73559;
       --app-danger: #ef7468;
       --app-success: #64d68b;
     }
@@ -77,13 +77,19 @@
     .home-header {
       position: relative;
       min-height: 138px;
+      overflow: hidden;
       background:
-        linear-gradient(90deg, rgba(10, 9, 13, 0.28), rgba(13, 15, 20, 0.68)),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(11, 11, 14, 0.18)),
-        url("/images/bg-login.jpg") center 42% / cover no-repeat;
+        linear-gradient(90deg, rgba(7, 7, 8, 0.36), rgba(7, 7, 8, 0.7)),
+        url("/images/stile-infinito-salon.jpg") center 43% / cover no-repeat;
+    }
+
+    .home-header::before {
+      content: none;
     }
 
     .header-inner {
+      position: relative;
+      z-index: 1;
       min-height: 138px;
       display: flex;
       align-items: flex-end;
@@ -803,7 +809,7 @@
     </div>
 
     <label class="filter-field">
-      <span>Barbiere</span>
+      <span>Professionista</span>
       <select id="staffFilter">
         <option value="">Tutto lo staff</option>
       </select>

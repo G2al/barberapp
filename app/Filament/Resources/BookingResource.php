@@ -45,7 +45,7 @@ class BookingResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->label('Barbiere'),
+                    ->label('Professionista'),
 
                 Forms\Components\Select::make('service_id')
                     ->relationship('service', 'name')
@@ -178,7 +178,7 @@ class BookingResource extends Resource
                     ->visibleFrom('md'),
 
                 Tables\Columns\TextColumn::make('staff.full_name')
-                    ->label('Barbiere')
+                    ->label('Professionista')
                     ->searchable(['staff.first_name', 'staff.last_name'])
                     ->visibleFrom('md'),
 

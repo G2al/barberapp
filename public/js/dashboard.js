@@ -4,6 +4,7 @@ let lifecycleController = null;
 const bookingPageState = {
     staff: [],
     services: [],
+    activeDepartment: "hair",
     selectedStaff: null,
     selectedService: null,
     selectedDate: "",
@@ -20,6 +21,7 @@ async function mountDashboard() {
     Object.assign(bookingPageState, {
         staff: [],
         services: [],
+        activeDepartment: "hair",
         selectedStaff: null,
         selectedService: null,
         selectedDate: "",
@@ -33,6 +35,7 @@ async function mountDashboard() {
     const currentUser = getUser();
     hydrateUserHeader(currentUser);
     setupHeaderPanels(signal);
+    setupDepartmentTabs(signal);
     setupCalendar(signal);
     setupServiceSelect(signal);
     setupBookingConfirmation(signal);
@@ -85,9 +88,9 @@ async function loadAppConfiguration() {
 
     try {
         const config = await apiGet("/app-config");
-        locationElement.textContent = config.location || "Via Toledo 156, Napoli";
+        locationElement.textContent = config.location || "Via E. De Nicola 73, Trentola Ducenta (CE)";
     } catch (error) {
-        locationElement.textContent = "Via Toledo 156, Napoli";
+        locationElement.textContent = "Via E. De Nicola 73, Trentola Ducenta (CE)";
     }
 }
 
@@ -100,8 +103,9 @@ async function loadStaff() {
         bookingPageState.staff = Array.isArray(staff) ? staff : [];
         renderStaff();
 
-        status.textContent = bookingPageState.staff.length
-            ? `${bookingPageState.staff.length} disponibili`
+        const visibleCount = getVisibleStaff().length;
+        status.textContent = visibleCount
+            ? `${visibleCount} disponibili`
             : "Nessuno disponibile";
     } catch (error) {
         staffGrid.innerHTML = '<p class="empty-line">Impossibile caricare lo staff. Riprova tra poco.</p>';
@@ -112,16 +116,17 @@ async function loadStaff() {
 function renderStaff() {
     const staffGrid = document.getElementById("staffGrid");
     const barberSelect = document.getElementById("barberSelect");
+    const visibleStaff = getVisibleStaff();
 
     staffGrid.innerHTML = "";
-    barberSelect.innerHTML = '<option value="">Seleziona barbiere</option>';
+    barberSelect.innerHTML = '<option value="">Seleziona professionista</option>';
 
-    if (!bookingPageState.staff.length) {
-        staffGrid.innerHTML = '<p class="empty-line">Nessun barbiere disponibile al momento.</p>';
+    if (!visibleStaff.length) {
+        staffGrid.innerHTML = '<p class="empty-line">Nessuna professionista disponibile in questo reparto.</p>';
         return;
     }
 
-    bookingPageState.staff.forEach((staffMember) => {
+    visibleStaff.forEach((staffMember) => {
         const fullName = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(" ");
         const option = document.createElement("option");
         option.value = staffMember.id;
@@ -175,7 +180,42 @@ function getInitials(staffMember) {
         .filter(Boolean)
         .map((value) => value.charAt(0).toUpperCase())
         .join("")
-        .slice(0, 2) || "GC";
+        .slice(0, 2) || "SI";
+}
+
+function getVisibleStaff() {
+    return bookingPageState.staff.filter((staffMember) =>
+        (staffMember.department || "hair") === bookingPageState.activeDepartment
+    );
+}
+
+function setupDepartmentTabs(signal) {
+    document.querySelectorAll(".department-tab").forEach((button) => {
+        button.addEventListener("click", () => {
+            const department = button.dataset.department;
+            if (!department || department === bookingPageState.activeDepartment) return;
+
+            bookingPageState.activeDepartment = department;
+            bookingPageState.selectedStaff = null;
+            bookingPageState.selectedService = null;
+            bookingPageState.selectedTime = "";
+
+            document.querySelectorAll(".department-tab").forEach((tab) => {
+                const isActive = tab.dataset.department === department;
+                tab.classList.toggle("active", isActive);
+                tab.setAttribute("aria-selected", String(isActive));
+            });
+
+            renderStaff();
+            const visibleCount = getVisibleStaff().length;
+            document.getElementById("staffStepStatus").textContent = visibleCount
+                ? `${visibleCount} disponibili`
+                : "Nessuna disponibile";
+            resetServices("Seleziona prima la professionista");
+            resetTimes("Scegli professionista, servizio e data per vedere gli orari.");
+            updateSummary();
+        }, { signal });
+    });
 }
 
 async function selectStaff(staffId) {
@@ -287,7 +327,7 @@ function setupServiceSelect(signal) {
 
         if (bookingPageState.selectedService) {
             const service = bookingPageState.selectedService;
-            document.getElementById("serviceMeta").textContent = `${service.duration} minuti · ${formatPrice(service.price)}`;
+            document.getElementById("serviceMeta").textContent = `${service.duration} minuti - ${formatServicePrice(service)}`;
             document.getElementById("serviceStepStatus").textContent = `${service.duration} min`;
         } else {
             document.getElementById("serviceMeta").textContent = "Durata e prezzo appariranno qui.";
@@ -327,7 +367,7 @@ function renderCustomServiceSelect() {
 
         const meta = document.createElement("span");
         meta.className = "service-option-meta";
-        meta.textContent = `${service.duration} min - ${formatPrice(service.price)}`;
+        meta.textContent = `${service.duration} min - ${formatServicePrice(service)}`;
 
         option.append(name, meta);
         option.addEventListener("click", () => {
@@ -473,7 +513,7 @@ async function selectDate(isoDate, loadTimes = true) {
         resetTimes("Caricamento orari...");
         await loadAvailableTimes();
     } else {
-        resetTimes("Scegli barbiere, servizio e data per vedere gli orari.");
+        resetTimes("Scegli professionista, servizio e data per vedere gli orari.");
     }
 }
 
@@ -483,7 +523,7 @@ async function loadAvailableTimes() {
     const date = bookingPageState.selectedDate;
 
     if (!staffId || !serviceId || !date) {
-        resetTimes("Seleziona barbiere, servizio e data per vedere gli orari disponibili.");
+        resetTimes("Seleziona professionista, servizio e data per vedere gli orari disponibili.");
         return;
     }
 
@@ -662,7 +702,7 @@ async function confirmBooking() {
             disabledAfterReset: true,
             onReset: updateSummary,
         });
-        setBookingActionMessage("Scegli barbiere, servizio, giorno e orario prima di continuare.");
+        setBookingActionMessage("Scegli professionista, servizio, giorno e orario prima di continuare.");
         return;
     }
 
@@ -739,6 +779,15 @@ function formatPrice(price) {
         style: "currency",
         currency: "EUR",
     }).format(Number(price || 0));
+}
+
+function formatServicePrice(service) {
+    if (service.price === null || service.price === undefined || service.price === "") {
+        return "Prezzo in salone";
+    }
+
+    const formatted = formatPrice(service.price);
+    return service.price_type === "starting_from" ? `A partire da ${formatted}` : formatted;
 }
 
 function toIsoDate(date) {

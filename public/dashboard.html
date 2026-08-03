@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#09090b">
   <meta name="color-scheme" content="dark">
   <style>html, body { background-color: #09090b; }</style>
-  <title>Prenota - Giovanni Cerino</title>
+  <title>Prenota - Stile Infinito</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Giovanni Cerino">
+  <meta name="apple-mobile-web-app-title" content="Stile Infinito">
 
   <style data-spa-page-style>
     :root {
@@ -33,9 +33,9 @@
       --app-line: rgba(255, 255, 255, 0.34);
       --app-text: #f9faf7;
       --app-muted: #bdbdbf;
-      --app-gold: #ffd558;
-      --app-gold-strong: #ffda32;
-      --app-dark-text: #17150e;
+      --app-gold: #d95d7e;
+      --app-gold-strong: #b73559;
+      --app-dark-text: #ffffff;
     }
 
     * {
@@ -79,13 +79,19 @@
     .home-header {
       position: relative;
       min-height: 138px;
+      overflow: hidden;
       background:
-        linear-gradient(90deg, rgba(10, 9, 13, 0.28), rgba(13, 15, 26, 0.68)),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(16, 17, 29, 0.18)),
-        url("/images/bg-login.jpg") center 42% / cover no-repeat;
+        linear-gradient(90deg, rgba(7, 7, 8, 0.36), rgba(7, 7, 8, 0.7)),
+        url("/images/stile-infinito-salon.jpg") center 43% / cover no-repeat;
+    }
+
+    .home-header::before {
+      content: none;
     }
 
     .header-inner {
+      position: relative;
+      z-index: 1;
       min-height: 138px;
       display: flex;
       align-items: flex-end;
@@ -147,7 +153,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid rgba(240, 203, 87, 0.82);
+      border: 2px solid rgba(217, 93, 126, 0.82);
       border-radius: 50%;
       background: rgba(20, 23, 35, 0.54);
       color: #fff;
@@ -258,6 +264,38 @@
       margin-bottom: 16px;
     }
 
+    .department-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 17px;
+      padding: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 7px;
+      background: #18181b;
+    }
+
+    .department-tab {
+      min-height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: transparent;
+      color: #bdbdbf;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+    }
+
+    .department-tab.active {
+      border-color: rgba(217, 93, 126, 0.52);
+      background: #8f1d3f;
+      color: #fff;
+    }
+
     .staff-grid {
       display: grid;
       grid-auto-flow: column;
@@ -339,7 +377,7 @@
 
     .staff-option.active .staff-avatar {
       border-color: var(--app-gold-strong);
-      box-shadow: 0 0 0 2px rgba(255, 216, 66, 0.15);
+      box-shadow: 0 0 0 2px rgba(183, 53, 89, 0.22);
     }
 
     .staff-name {
@@ -394,7 +432,7 @@
     .service-select-trigger:focus,
     .custom-service-select.open .service-select-trigger {
       border-color: var(--app-gold-strong);
-      box-shadow: 0 0 0 3px rgba(255, 216, 66, 0.12);
+      box-shadow: 0 0 0 3px rgba(183, 53, 89, 0.18);
     }
 
     .service-select-trigger:disabled {
@@ -586,7 +624,7 @@
       border-color: var(--app-gold-strong);
       background: var(--app-gold-strong);
       color: var(--app-dark-text);
-      box-shadow: 0 8px 18px rgba(255, 216, 66, 0.18);
+      box-shadow: 0 8px 18px rgba(183, 53, 89, 0.22);
     }
 
     .calendar-day.today:not(.active) {
@@ -719,7 +757,8 @@
       margin-top: 14px;
       border: 0;
       border-radius: 8px;
-      background: linear-gradient(110deg, #f7d96c, #ffda20);
+      background: linear-gradient(110deg, #d95d7e, #8f1d3f);
+      color: #fff;
       color: var(--app-dark-text);
       font-size: 15px;
       font-weight: 600;
@@ -865,18 +904,28 @@
       <div id="alertBox"></div>
 
       <section class="booking-intro">
-        <p>Scegli il tuo stile</p>
+        <p>Il tuo momento di bellezza</p>
         <h2>Prenota ora</h2>
       </section>
 
       <section class="staff-section">
-        <h3 class="field-title">Scegli il barbiere</h3>
-        <div id="staffGrid" class="staff-grid" aria-label="Barbieri disponibili">
+        <div class="department-tabs" role="tablist" aria-label="Scegli il reparto">
+          <button type="button" class="department-tab active" data-department="hair" role="tab" aria-selected="true">
+            <i class="bi bi-scissors"></i>
+            <span>Parrucchiera</span>
+          </button>
+          <button type="button" class="department-tab" data-department="beauty" role="tab" aria-selected="false">
+            <i class="bi bi-stars"></i>
+            <span>Estetica</span>
+          </button>
+        </div>
+        <h3 class="field-title">Scegli la professionista</h3>
+        <div id="staffGrid" class="staff-grid" aria-label="Professioniste disponibili">
           <p class="loading-line">Caricamento staff...</p>
         </div>
         <span id="staffStepStatus" class="support-state">Caricamento...</span>
-        <select id="barberSelect" class="native-control" aria-label="Barbiere">
-          <option value="">Seleziona barbiere</option>
+        <select id="barberSelect" class="native-control" aria-label="Professionista">
+          <option value="">Seleziona professionista</option>
         </select>
       </section>
 
@@ -889,12 +938,12 @@
             aria-haspopup="listbox"
             aria-expanded="false"
             disabled>
-            <span id="serviceSelectLabel">Seleziona prima il barbiere</span>
+            <span id="serviceSelectLabel">Seleziona prima la professionista</span>
             <i class="bi bi-chevron-down"></i>
           </button>
           <div id="serviceSelectMenu" class="service-select-menu" role="listbox" aria-label="Servizi disponibili"></div>
           <select id="serviceSelect" class="native-control" aria-label="Servizio" disabled>
-            <option value="">Seleziona prima il barbiere</option>
+            <option value="">Seleziona prima la professionista</option>
           </select>
         </div>
         <span id="serviceStepStatus" class="support-state">Prima scegli lo staff</span>
@@ -929,7 +978,7 @@
             <option value="">Seleziona orario</option>
           </select>
           <div id="timeGrid" class="time-grid">
-            <p class="time-empty">Scegli barbiere, servizio e data per vedere gli orari.</p>
+            <p class="time-empty">Scegli professionista, servizio e data per vedere gli orari.</p>
           </div>
         </div>
       </section>
