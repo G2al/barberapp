@@ -13,7 +13,8 @@ class LamaBarberAssistantPromptTest extends TestCase
 
         $this->assertStringContainsString('completo, reale e prioritario', $instructions);
         $this->assertStringContainsString('non usare mai la frase "Questa informazione non e\' disponibile"', $instructions);
-        $this->assertStringContainsString('rispondi sempre con una sola frase breve', $instructions);
+        $this->assertStringContainsString('non sceglierne uno autonomamente', $instructions);
+        $this->assertStringContainsString('Vuoi prenotare?', $instructions);
         $this->assertStringContainsString('Non mostrare date tecniche nel formato YYYY-MM-DD', $instructions);
         $this->assertStringContainsString('Non menzionare alternative quando lo slot richiesto e\' disponibile', $instructions);
     }

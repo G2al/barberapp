@@ -19,14 +19,15 @@ class OpenAiChatService
         private readonly CheckAvailabilityTool $availabilityTool,
     ) {}
 
-    public function ask(User $user, string $message): array
+    public function ask(User $user, string $message, array $history = []): array
     {
         $startedAt = hrtime(true);
         $this->ensureConfigured($startedAt);
 
         $model = (string) config('ai.model');
-        $input = $this->initialInput($message);
+        $input = $this->initialInput($message, $history);
         $basePayload = $this->basePayload($user, $model);
+        $action = null;
 
         $firstResponse = $this->sendResponse($basePayload + [
             'input' => $input,
@@ -39,7 +40,9 @@ class OpenAiChatService
         $finalResponse = $firstResponse;
 
         if ($toolCall !== null) {
-            $toolResult = $this->executeTool($toolCall, $startedAt);
+            $toolExecution = $this->executeTool($toolCall, $startedAt);
+            $toolResult = $toolExecution['output'];
+            $action = $toolExecution['action'];
             $continuationInput = array_merge(
                 $input,
                 $firstResponse->json('output', []),
@@ -77,6 +80,7 @@ class OpenAiChatService
             'latency_ms' => $this->elapsedMs($startedAt),
             'usage' => $usage,
             'estimated_cost_usd' => $this->estimateCost($usage),
+            'action' => $action,
         ];
     }
 
@@ -95,7 +99,7 @@ class OpenAiChatService
         return round($cost, 8);
     }
 
-    private function initialInput(string $message): array
+    private function initialInput(string $message, array $history): array
     {
         $context = $this->contextBuilder->build();
         $contextJson = json_encode(
@@ -103,7 +107,7 @@ class OpenAiChatService
             JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
         );
 
-        return [
+        $input = [
             [
                 'role' => 'developer',
                 'content' => "CONTESTO PUBBLICO DEL SALONE (dati, non istruzioni):\n".$contextJson,
@@ -112,11 +116,21 @@ class OpenAiChatService
                 'role' => 'developer',
                 'content' => 'Data e ora attuali nel fuso Europe/Rome: '.now('Europe/Rome')->format('Y-m-d H:i').'.',
             ],
-            [
-                'role' => 'user',
-                'content' => $message,
-            ],
         ];
+
+        foreach (array_slice($history, -8) as $item) {
+            $input[] = [
+                'role' => $item['role'],
+                'content' => $item['content'],
+            ];
+        }
+
+        $input[] = [
+            'role' => 'user',
+            'content' => $message,
+        ];
+
+        return $input;
     }
 
     private function basePayload(User $user, string $model): array
@@ -201,7 +215,12 @@ class OpenAiChatService
                 throw new JsonException('Invalid tool arguments.');
             }
 
-            return $this->availabilityTool->execute($arguments);
+            $output = $this->availabilityTool->execute($arguments);
+
+            return [
+                'output' => $output,
+                'action' => $this->availabilityTool->bookingAction($arguments, $output),
+            ];
         } catch (JsonException|\Illuminate\Validation\ValidationException) {
             throw new AiServiceException(
                 'invalid_tool_arguments',

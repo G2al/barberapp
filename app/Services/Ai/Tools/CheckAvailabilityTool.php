@@ -121,6 +121,62 @@ class CheckAvailabilityTool
         );
     }
 
+    public function bookingAction(array $arguments, array $result): ?array
+    {
+        if (($result['available'] ?? false) !== true || blank($result['requested_slot'] ?? null)) {
+            return null;
+        }
+
+        $service = $this->resolveService($arguments);
+        if (! $service) {
+            return null;
+        }
+
+        $compatibleStaff = Staff::query()
+            ->where('is_active', true)
+            ->whereHas('services', fn ($query) => $query->where('services.id', $service->id))
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get(['id', 'first_name', 'last_name']);
+
+        $staff = $this->resolveStaff($compatibleStaff, $arguments);
+        if (! $staff && filled($result['professional'] ?? null)) {
+            $professional = $this->normalizeName((string) $result['professional']);
+            $staff = $compatibleStaff->first(
+                fn (Staff $member): bool => $this->normalizeName($this->staffName($member)) === $professional,
+            );
+        }
+
+        if (! $staff) {
+            return null;
+        }
+
+        $date = (string) $result['date'];
+        $time = (string) $result['requested_slot'];
+        $staffName = $this->staffName($staff);
+
+        return [
+            'type' => 'confirm_booking',
+            'label' => 'Conferma prenotazione',
+            'method' => 'POST',
+            'url' => '/api/bookings',
+            'payload' => [
+                'staff_id' => $staff->id,
+                'service_id' => $service->id,
+                'date' => $date,
+                'time' => $time,
+            ],
+            'summary' => [
+                'service' => $service->name,
+                'staff' => $staffName,
+                'date' => $date,
+                'time' => $time,
+                'duration_minutes' => (int) $service->duration,
+                'price_eur' => $service->price === null ? null : number_format((float) $service->price, 2, '.', ''),
+            ],
+        ];
+    }
+
     private function resolveService(array $arguments): ?Service
     {
         if (($arguments['service_id'] ?? null) !== null) {

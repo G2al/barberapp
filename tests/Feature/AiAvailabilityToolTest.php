@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -92,20 +93,24 @@ class AiAvailabilityToolTest extends TestCase
 
     public function test_available_slot_is_checked_with_real_availability_logic(): void
     {
-        $result = $this->tool()->execute($this->arguments(time: '15:30'));
+        $arguments = $this->arguments(time: '15:30');
+        $result = $this->tool()->execute($arguments);
 
         $this->assertTrue($result['available']);
         $this->assertSame('15:30', $result['requested_slot']);
         $this->assertSame('Mario Rossi', $result['professional']);
         $this->assertSame([], $result['alternatives']);
+        $this->assertSame('confirm_booking', $this->tool()->bookingAction($arguments, $result)['type']);
     }
 
     public function test_occupied_slot_returns_three_nearest_real_alternatives(): void
     {
-        $result = $this->tool()->execute($this->arguments(time: '15:00'));
+        $arguments = $this->arguments(time: '15:00');
+        $result = $this->tool()->execute($arguments);
 
         $this->assertFalse($result['available']);
         $this->assertSame(['15:30', '16:00', '16:30'], $result['alternatives']);
+        $this->assertNull($this->tool()->bookingAction($arguments, $result));
     }
 
     public function test_unknown_service_is_not_resolved(): void
@@ -148,9 +153,10 @@ class AiAvailabilityToolTest extends TestCase
         $this->assertSame(CheckAvailabilityTool::NAME, $this->tool()->definition()['name']);
     }
 
-    public function test_ai_executes_one_tool_and_sends_no_customer_data_to_openai(): void
+    public function test_ai_returns_confirmable_action_without_creating_booking_automatically(): void
     {
         Sanctum::actingAs($this->customer);
+        Notification::fake();
         $call = 0;
 
         Http::preventStrayRequests();
@@ -163,7 +169,7 @@ class AiAvailabilityToolTest extends TestCase
                         'type' => 'function_call',
                         'name' => CheckAvailabilityTool::NAME,
                         'call_id' => 'call_availability_1',
-                        'arguments' => json_encode($this->arguments(time: '15:00')),
+                        'arguments' => json_encode($this->arguments(time: '15:30')),
                     ]],
                     'usage' => ['input_tokens' => 100, 'output_tokens' => 20, 'total_tokens' => 120],
                 ]);
@@ -174,16 +180,32 @@ class AiAvailabilityToolTest extends TestCase
                     'type' => 'message',
                     'content' => [[
                         'type' => 'output_text',
-                        'text' => 'Alle 15:00 non c e disponibilita. Gli orari piu vicini sono 15:30, 16:00 e 16:30.',
+                        'text' => 'Si, giovedi 6 agosto alle 15:30 c e disponibilita con Mario Rossi. Vuoi prenotare?',
                     ]],
                 ]],
                 'usage' => ['input_tokens' => 130, 'output_tokens' => 30, 'total_tokens' => 160],
             ]);
         });
 
-        $this->postJson('/api/ai/chat', [
-            'message' => 'Barba Experience giovedi alle 15 e disponibile?',
-        ])->assertOk()->assertJsonPath('status', true);
+        $response = $this->postJson('/api/ai/chat', [
+            'message' => 'Barba Experience giovedi alle 15:30 e disponibile?',
+        ])->assertOk()
+            ->assertJsonPath('status', true)
+            ->assertJsonPath('action.type', 'confirm_booking')
+            ->assertJsonPath('action.method', 'POST')
+            ->assertJsonPath('action.url', '/api/bookings')
+            ->assertJsonPath('action.payload.staff_id', $this->staff->id)
+            ->assertJsonPath('action.payload.service_id', $this->service->id)
+            ->assertJsonPath('action.payload.date', '2026-08-06')
+            ->assertJsonPath('action.payload.time', '15:30');
+
+        $this->assertDatabaseCount('bookings', 1);
+
+        $this->postJson('/api/bookings', $response->json('action.payload'))
+            ->assertCreated()
+            ->assertJsonPath('status', true);
+
+        $this->assertDatabaseCount('bookings', 2);
 
         $this->assertSame(2, $call);
         Http::assertSent(function (Request $request): bool {

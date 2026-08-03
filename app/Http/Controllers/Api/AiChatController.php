@@ -19,13 +19,21 @@ class AiChatController extends Controller
         $user = $request->user();
 
         try {
-            $result = $chatService->ask($user, $request->validated('message'));
+            $result = $chatService->ask(
+                $user,
+                $request->validated('message'),
+                $request->validated('history', []),
+            );
             $requestLogger->success($user, $result);
 
             $response = [
                 'status' => true,
                 'answer' => $result['answer'],
             ];
+
+            if ($result['action'] !== null) {
+                $response['action'] = $result['action'];
+            }
 
             if ($user->role === 'admin') {
                 $response['usage'] = [
