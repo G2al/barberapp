@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AiChatRequest;
 use App\Services\Ai\AiRequestLogger;
 use App\Services\Ai\OpenAiChatService;
+use App\Services\Ai\SalonContactAction;
 use Illuminate\Http\JsonResponse;
 
 class AiChatController extends Controller
@@ -15,6 +16,7 @@ class AiChatController extends Controller
         AiChatRequest $request,
         OpenAiChatService $chatService,
         AiRequestLogger $requestLogger,
+        SalonContactAction $contactAction,
     ): JsonResponse {
         $user = $request->user();
 
@@ -33,6 +35,10 @@ class AiChatController extends Controller
 
             if ($result['action'] !== null) {
                 $response['action'] = $result['action'];
+            } elseif (str_contains(mb_strtolower($result['answer']), 'contatta il salone')) {
+                if ($action = $contactAction->make()) {
+                    $response['action'] = $action;
+                }
             }
 
             if ($user->role === 'admin') {
@@ -52,11 +58,17 @@ class AiChatController extends Controller
                 $exception->errorCode,
             );
 
-            return response()->json([
+            $response = [
                 'status' => false,
                 'message' => $exception->getMessage(),
                 'error_code' => $exception->errorCode,
-            ], $exception->httpStatus);
+            ];
+
+            if ($action = $contactAction->make()) {
+                $response['action'] = $action;
+            }
+
+            return response()->json($response, $exception->httpStatus);
         }
     }
 }

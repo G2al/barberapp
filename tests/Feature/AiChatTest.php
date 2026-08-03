@@ -35,6 +35,8 @@ class AiChatTest extends TestCase
             'ai.rate_limits.day' => 100,
             'ai.pricing.input_per_million' => 0.20,
             'ai.pricing.output_per_million' => 1.25,
+            'barbershop.whatsapp_number' => '393331112223',
+            'barbershop.whatsapp_message' => 'Ciao, ho bisogno di assistenza.',
         ]);
     }
 
@@ -205,6 +207,23 @@ class AiChatTest extends TestCase
             ->assertJsonMissingPath('usage');
     }
 
+    public function test_missing_information_fallback_includes_whatsapp_action(): void
+    {
+        Sanctum::actingAs($this->user());
+        Http::fake(['*' => Http::response($this->openAiTextResponse(
+            'Questa informazione non e disponibile. Contatta il salone.',
+        ), 200)]);
+
+        $this->postJson('/api/ai/chat', ['message' => 'Ho bisogno di assistenza'])
+            ->assertOk()
+            ->assertJsonPath('action.type', 'contact_whatsapp')
+            ->assertJsonPath('action.label', 'Contatta su WhatsApp')
+            ->assertJsonPath(
+                'action.url',
+                'https://wa.me/393331112223?text=Ciao%2C%20ho%20bisogno%20di%20assistenza.',
+            );
+    }
+
     public function test_connection_timeout_returns_safe_error_and_is_logged(): void
     {
         $user = $this->user();
@@ -256,6 +275,12 @@ class AiChatTest extends TestCase
 
         $this->postJson('/api/ai/chat', ['message' => 'Prima domanda'])->assertOk();
         $this->postJson('/api/ai/chat', ['message' => 'Seconda domanda'])->assertTooManyRequests();
+
+        $this->postJson('/api/ai/chat', ['message' => 'Terza domanda'])
+            ->assertTooManyRequests()
+            ->assertJsonPath('error_code', 'ai_rate_limited')
+            ->assertJsonPath('action.type', 'contact_whatsapp')
+            ->assertJsonStructure(['retry_after']);
     }
 
     private function user(array $attributes = []): User
@@ -270,12 +295,17 @@ class AiChatTest extends TestCase
 
     private function validOpenAiResponse(): array
     {
+        return $this->openAiTextResponse('Il taglio costa 20 euro.');
+    }
+
+    private function openAiTextResponse(string $text): array
+    {
         return [
             'output' => [[
                 'type' => 'message',
                 'content' => [[
                     'type' => 'output_text',
-                    'text' => 'Il taglio costa 20 euro.',
+                    'text' => $text,
                 ]],
             ]],
             'usage' => [

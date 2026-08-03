@@ -10,8 +10,8 @@ return [
     'context_cache_seconds' => (int) env('OPENAI_CONTEXT_CACHE_SECONDS', 120),
     'special_days_ahead' => (int) env('OPENAI_SPECIAL_DAYS_AHEAD', 30),
     'rate_limits' => [
-        'minute' => (int) env('OPENAI_RATE_LIMIT_PER_MINUTE', 3),
-        'hour' => (int) env('OPENAI_RATE_LIMIT_PER_HOUR', 30),
+        'minute' => (int) env('OPENAI_RATE_LIMIT_PER_MINUTE', 10),
+        'hour' => (int) env('OPENAI_RATE_LIMIT_PER_HOUR', 60),
         'day' => (int) env('OPENAI_RATE_LIMIT_PER_DAY', 100),
     ],
     'pricing' => [
