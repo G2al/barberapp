@@ -18,15 +18,27 @@ class BookingReminderService
             return null;
         }
 
-        if ($minutesUntilBooking <= 60 && !$booking->reminder_1h_sent) {
+        if (
+            config('booking_reminders.enabled.1h', true)
+            && $minutesUntilBooking <= 60
+            && ! $booking->reminder_1h_sent
+        ) {
             return $this->send($booking, '1h', 'reminder_1h_sent');
         }
 
-        if ($minutesUntilBooking <= 180 && !$booking->reminder_3h_sent) {
+        if (
+            config('booking_reminders.enabled.3h', false)
+            && $minutesUntilBooking <= 180
+            && ! $booking->reminder_3h_sent
+        ) {
             return $this->send($booking, '3h', 'reminder_3h_sent');
         }
 
-        if ($minutesUntilBooking <= 1440 && !$booking->reminder_24h_sent) {
+        if (
+            config('booking_reminders.enabled.24h', false)
+            && $minutesUntilBooking <= 1440
+            && ! $booking->reminder_24h_sent
+        ) {
             return $this->send($booking, '24h', 'reminder_24h_sent');
         }
 
