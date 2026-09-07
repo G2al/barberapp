@@ -69,6 +69,7 @@ const net = require('node:net');
       await page.reload();
       await page.locator('#pushToggle').waitFor();
       assert.equal(await page.locator('dialog[open]').count(), 0);
+      assert.equal(await page.locator('.gc-update').count(), 0);
       await page.locator('#pushToggle').click();
       await page.locator('.gc-push-primary').click();
       await page.waitForFunction(() => document.querySelector('#pushToggle').dataset.enabled === 'true');
@@ -77,8 +78,6 @@ const net = require('node:net');
       await page.locator('.gc-push-primary').click();
       await page.waitForFunction(() => document.querySelector('#pushToggle').dataset.enabled === 'false');
       assert.equal(deletes, 1);
-      await page.evaluate(() => navigator.serviceWorker.dispatchEvent(new Event('controllerchange')));
-      await page.locator('.gc-update').waitFor();
       for (const section of ['my-bookings', 'products']) {
         await page.goto(origin + '/' + section + '.html');
         await page.locator('#favoritesToggle + #pushToggle').waitFor();
@@ -104,7 +103,7 @@ const net = require('node:net');
     assert(cached.some(url => url.endsWith('/css/push.css?v=2')));
     assert(!cached.some(url => url.includes('/api/')));
     await context.close();
-    console.log('PASS: mobile/desktop popup, dismissal, subscribe/unsubscribe, bell, update notice, real SW cache.');
+    console.log('PASS: mobile/desktop popup, dismissal, subscribe/unsubscribe, bell, automatic PWA cache update.');
     console.log('Screenshots: ' + path.join(os.tmpdir(), 'gc-push-{375,1280}.png'));
   } finally {
     await browser.close();

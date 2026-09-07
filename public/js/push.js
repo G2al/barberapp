@@ -93,22 +93,10 @@
       buttons.forEach(button => button.disabled = false);
     }
   }
-  function updateNotice() {
-    if (document.querySelector('.gc-update')) return;
-    const notice = document.createElement('aside');
-    notice.className = 'gc-update'; notice.setAttribute('role', 'status');
-    notice.innerHTML = '<span>Una nuova versione e disponibile.</span><button type="button">Aggiorna</button>';
-    notice.querySelector('button').onclick = () => location.reload();
-    document.body.append(notice);
-  }
   async function init() {
     if (!('serviceWorker' in navigator)) return;
     const css = document.createElement('link');
     css.rel = 'stylesheet'; css.href = '/css/push.css?v=2'; document.head.append(css);
-    const controlled = !!navigator.serviceWorker.controller;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (controlled) updateNotice();
-    });
     try {
       registration = await navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' });
       registration.update().catch(() => {});
