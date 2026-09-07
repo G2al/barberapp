@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class BookingConfirmedNotification extends Notification implements ShouldQueue
 {
@@ -29,12 +31,34 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+        if (config('webpush.enabled') && $notifiable->pushSubscriptions()->exists()) {
+            $channels[] = WebPushChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Get the push representation of the notification.
      */
+    public function toWebPush(object $notifiable): WebPushMessage
+    {
+        $this->booking->loadMissing(['staff', 'service']);
+        $date = $this->booking->date->format('d/m');
+        $time = substr($this->booking->time, 0, 5);
+        $service = $this->booking->service?->name ?? 'Appuntamento';
+        $staff = trim(($this->booking->staff?->first_name ?? '').' '.($this->booking->staff?->last_name ?? ''));
+
+        return (new WebPushMessage)
+            ->title('Prenotazione confermata')
+            ->body("{$date} alle {$time}: {$service} con {$staff}.")
+            ->icon('/images/logo-192x192.png')
+            ->tag('booking-confirmed-'.$this->booking->id)
+            ->data(['url' => '/my-bookings.html'])
+            ->options(['TTL' => 3600]);
+    }
+
     public function toMail(object $notifiable): MailMessage
     {
         $this->booking->loadMissing(['staff', 'service']);

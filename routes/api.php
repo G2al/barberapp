@@ -2,6 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PushSubscriptionController;
+
+Route::middleware(['auth:sanctum', 'throttle:30,1'])->prefix('push')->group(function () {
+    Route::get('/config', [PushSubscriptionController::class, 'config']);
+    Route::post('/subscriptions', [PushSubscriptionController::class, 'store']);
+    Route::delete('/subscriptions', [PushSubscriptionController::class, 'destroy']);
+});
 
 // Controllers
 use App\Http\Controllers\Api\AuthController;

@@ -61,7 +61,8 @@ function getUser() {
     return JSON.parse(localStorage.getItem("user") || "{}");
 }
 
-function logout() {
+async function logout() {
+    try { await window.GCDisablePushOnLogout?.(); } catch { /* Logout remains available offline. */ }
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "/index.html";
