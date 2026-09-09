@@ -41,6 +41,8 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+    'frontend_enabled' => (bool) env('FRONTEND_ENABLED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL

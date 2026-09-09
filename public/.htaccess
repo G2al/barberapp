@@ -11,6 +11,10 @@
 
     RewriteEngine On
 
+    # Route customer HTML through Laravel so FRONTEND_ENABLED also applies to
+    # files that would otherwise be served directly by Apache.
+    RewriteRule ^(index|dashboard|register|forgot-password|reset-password|my-bookings|products)\.html$ index.php [L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
