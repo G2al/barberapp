@@ -3,7 +3,7 @@ const CACHE_NAME = 'mottolasfamily-admin-v1';
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cache.add('/admin/manifest.json');
+    await cache.put('/admin/manifest.json', await fetch('/admin/manifest.json', { cache: 'no-cache' }));
     await self.skipWaiting();
   })());
 });
@@ -28,6 +28,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Admin pages and resources stay network-first and are never cached.
+  // Keep Filament pages and resources online; never cache admin data.
   event.respondWith(fetch(request));
 });
