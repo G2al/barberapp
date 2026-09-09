@@ -1,0 +1,19 @@
+{
+  "name": "Admin Mottolasfamily",
+  "short_name": "Admin Mottolasfamily",
+  "description": "Pannello amministrativo Mottola's Family",
+  "start_url": "/admin",
+  "scope": "/admin/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "/images/mottola-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
