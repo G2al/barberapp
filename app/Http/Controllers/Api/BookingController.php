@@ -49,6 +49,13 @@ class BookingController extends Controller
             ], 400);
         }
 
+        if ($user->isServiceDisabledForStaff($serviceId, $staffId)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Non puoi prenotare questo servizio con lo staff selezionato.',
+            ], 403);
+        }
+
         // ✅ Log di debug per verificare i dati
         \Log::info('DEBUG BOOKING DATE-TIME', [
             'date' => $date,

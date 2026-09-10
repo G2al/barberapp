@@ -35,6 +35,13 @@ class AvailabilityController extends Controller
         $staff = Staff::findOrFail($staffId);
         $service = Service::findOrFail($serviceId);
 
+        if ($request->user()?->isServiceDisabledForStaff((int) $serviceId, (int) $staffId)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Questo servizio non è disponibile per il cliente e lo staff selezionati.',
+            ], 403);
+        }
+
         if (!$staff->services()->where('service_id', $serviceId)->exists()) {
             return response()->json([
                 'status' => false,

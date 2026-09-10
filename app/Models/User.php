@@ -57,6 +57,21 @@ class User extends Authenticatable implements FilamentUser, CanResetPassword
         return $this->belongsToMany(Product::class, 'product_favorites')->withTimestamps();
     }
 
+    public function serviceRestrictions()
+    {
+        return $this->hasMany(UserServiceRestriction::class);
+    }
+
+    public function isServiceDisabledForStaff(int $serviceId, int $staffId): bool
+    {
+        return $this->serviceRestrictions()
+            ->where('service_id', $serviceId)
+            ->where(function ($query) use ($staffId) {
+                $query->whereNull('staff_id')->orWhere('staff_id', $staffId);
+            })
+            ->exists();
+    }
+
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordLink($token));

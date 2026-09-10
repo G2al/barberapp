@@ -22,6 +22,11 @@ class Staff extends Model
     {
         return $this->belongsToMany(Service::class, 'staff_service');
     }
+
+    public function serviceRestrictions()
+    {
+        return $this->hasMany(UserServiceRestriction::class);
+    }
     
     public function bookings()
     {

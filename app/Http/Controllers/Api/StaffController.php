@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
+use Illuminate\Http\Request;
 
 class StaffController extends Controller
 {
@@ -24,13 +25,24 @@ class StaffController extends Controller
     /**
      * 🔹 Restituisce lo staff che offre un determinato servizio
      */
-    public function byService($serviceId)
+    public function byService($serviceId, Request $request)
     {
-        return Staff::where('is_active', 1)
+        $query = Staff::where('is_active', 1)
             ->whereHas('services', function ($q) use ($serviceId) {
                 $q->where('services.id', $serviceId);
-            })
-            ->orderBy('first_name')
+            });
+
+        if ($request->user()) {
+            $query->whereDoesntHave('serviceRestrictions', function ($restrictionQuery) use ($serviceId, $request) {
+                $restrictionQuery->where('service_id', $serviceId)
+                    ->where('user_id', $request->user()->id)
+                    ->where(function ($staffQuery) {
+                        $staffQuery->whereNull('staff_id')->orWhereColumn('staff_id', 'staff.id');
+                    });
+            });
+        }
+
+        return $query->orderBy('first_name')
             ->get(['id', 'first_name', 'last_name', 'role', 'phone', 'image'])
             ->map(function ($staff) {
                 $staff->image_url = $staff->image ? \Illuminate\Support\Facades\Storage::url($staff->image) : null;

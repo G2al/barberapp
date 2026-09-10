@@ -63,10 +63,10 @@ Route::prefix('auth')->group(function () {
    🔹 SERVICES
 ========================= */
 // Tutti i servizi attivi
-Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services', [ServiceController::class, 'index'])->middleware('auth:sanctum');
 
 // Dettaglio singolo servizio (se serve in futuro)
-Route::get('/services/{id}', [ServiceController::class, 'show']);
+Route::get('/services/{id}', [ServiceController::class, 'show'])->middleware('auth:sanctum');
 
 
 /* =========================
@@ -76,7 +76,7 @@ Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::get('/staff', [StaffController::class, 'index']);
 
 // Staff filtrato per servizio (barbieri che fanno quel servizio)
-Route::get('/staff/by-service/{serviceId}', [StaffController::class, 'byService']);
+Route::get('/staff/by-service/{serviceId}', [StaffController::class, 'byService'])->middleware('auth:sanctum');
 
 /* =========================
    �Y"� PRODUCTS & FAVORITES (Protette)
@@ -98,7 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
    🔹 AVAILABILITY
 ========================= */
 // Slot disponibili per uno staff in una data
-Route::get('/availability/{staffId}', [AvailabilityController::class, 'getSlots']);
+Route::get('/availability/{staffId}', [AvailabilityController::class, 'getSlots'])->middleware('auth:sanctum');
 
 // Giorni chiusi per uno staff (PUBLIC - per il frontend)
 Route::get('/staff/{staff}/closed-slots-public', [ClosedSlotController::class, 'getByStaffAndDate']);

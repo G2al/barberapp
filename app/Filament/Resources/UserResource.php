@@ -128,7 +128,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ServiceRestrictionsRelationManager::class,
         ];
     }
 
