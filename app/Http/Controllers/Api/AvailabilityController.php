@@ -52,11 +52,13 @@ class AvailabilityController extends Controller
             ->get();
 
         // 2) Orari settimanali per staff specifico
-        $staffAvailabilities = StaffAvailability::where('staff_id', $staffId)
-            ->where('weekday', $weekday)
-            ->where('is_active', true)
-            ->orderBy('start_time')
-            ->get();
+        $staffAvailabilities = $staff->uses_salon_hours
+            ? collect()
+            : StaffAvailability::where('staff_id', $staffId)
+                ->where('weekday', $weekday)
+                ->where('is_active', true)
+                ->orderBy('start_time')
+                ->get();
 
         // 3) Orari salone di default
         $salonAvailabilities = Availability::where('weekday', $weekday)

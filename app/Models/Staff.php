@@ -16,6 +16,12 @@ class Staff extends Model
         'phone',
         'image',
         'is_active',
+        'uses_salon_hours',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'uses_salon_hours' => 'boolean',
     ];
 
     public function services()
@@ -26,6 +32,11 @@ class Staff extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function availabilities()
+    {
+        return $this->hasMany(StaffAvailability::class);
     }
 
     public function closedSlots()

@@ -54,6 +54,11 @@ class StaffResource extends Resource
                     ->label('Attivo')
                     ->default(true),
 
+                Forms\Components\Toggle::make('uses_salon_hours')
+                    ->label('Usa gli orari del salone')
+                    ->helperText('Se attivo, non servono orari personali per questo staff.')
+                    ->default(true),
+
                 // 🔥 QUI SELEZIONI I SERVIZI ABILITATI PER QUESTO BARBIERE
                 Forms\Components\Select::make('services')
                     ->label('Servizi abilitati')

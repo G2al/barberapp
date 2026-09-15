@@ -17,6 +17,7 @@ class StaffSeeder extends Seeder
                 'role' => 'barber',
                 'phone' => '+39 324 099 4144',
                 'is_active' => true,
+                'uses_salon_hours' => true,
             ],
             [
                 'first_name' => 'Antonio',
@@ -24,6 +25,7 @@ class StaffSeeder extends Seeder
                 'role' => 'barber',
                 'phone' => '+39 324 563 1120',
                 'is_active' => true,
+                'uses_salon_hours' => true,
             ],
         ];
 
