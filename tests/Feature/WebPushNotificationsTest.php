@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\BookingCancelledNotification;
 use App\Notifications\BookingConfirmedNotification;
 use App\Notifications\BookingReminderNotification;
+use App\Notifications\WaitlistBookingAssignedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use NotificationChannels\WebPush\WebPushChannel;
@@ -105,8 +106,11 @@ class WebPushNotificationsTest extends TestCase
             new BookingReminderNotification($booking, '24h'),
             new BookingReminderNotification($booking, '3h'),
             new BookingReminderNotification($booking, '1h'),
+            new WaitlistBookingAssignedNotification($booking),
         ];
-        foreach ($events as $event) $this->assertSame(['mail'], $event->via($user));
+        foreach ($events as $event) {
+            $this->assertSame(['mail'], $event->via($user));
+        }
         Sanctum::actingAs($user);
         $this->postJson('/api/push/subscriptions', $this->subscription())->assertOk();
         foreach ($events as $event) {
@@ -117,6 +121,8 @@ class WebPushNotificationsTest extends TestCase
             $this->assertStringNotContainsString($user->email, json_encode($payload));
         }
         config()->set('webpush.enabled', false);
-        foreach ($events as $event) $this->assertSame(['mail'], $event->via($user));
+        foreach ($events as $event) {
+            $this->assertSame(['mail'], $event->via($user));
+        }
     }
 }

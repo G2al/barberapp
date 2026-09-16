@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PushSubscriptionController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'throttle:30,1'])->prefix('push')->group(function () {
     Route::get('/config', [PushSubscriptionController::class, 'config']);
@@ -12,14 +11,15 @@ Route::middleware(['auth:sanctum', 'throttle:30,1'])->prefix('push')->group(func
 
 // Controllers
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\StaffController;
-use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\BookingController;
-use App\Http\Controllers\ClosedSlotController;
-use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\BookingWaitlistController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\StaffController;
+use App\Http\Controllers\ClosedSlotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Route::get('/app-config', fn () => response()->json([
 // Test Telegram notification
 Route::get('/test-telegram', function () {
     $booking = \App\Models\Booking::latest()->first();
-    if (!$booking) {
+    if (! $booking) {
         return response()->json(['status' => false, 'message' => 'No bookings found']);
     }
 
@@ -53,16 +53,15 @@ Route::get('/test-telegram', function () {
     return response()->json(['status' => true, 'message' => 'Telegram notification sent!']);
 });
 
-
 /* =========================
    🔹 AUTH
 ========================= */
 Route::prefix('auth')->group(function () {
     // Login & Register
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login',    [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
-    Route::post('/reset-password',  [AuthController::class, 'resetPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
     // Authenticated routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -74,7 +73,6 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-
 /* =========================
    🔹 SERVICES
 ========================= */
@@ -85,7 +83,6 @@ Route::get('/services/by-staff/{staffId}', [ServiceController::class, 'byStaff']
 
 // Dettaglio singolo servizio (se serve in futuro)
 Route::get('/services/{id}', [ServiceController::class, 'show']);
-
 
 /* =========================
    🔹 STAFF
@@ -106,7 +103,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/favorites/{product}', [FavoriteController::class, 'destroy']);
 });
 
-
 /* =========================
    🔹 AVAILABILITY
 ========================= */
@@ -115,7 +111,6 @@ Route::get('/availability/{staffId}', [AvailabilityController::class, 'getSlots'
 
 // Giorni chiusi per uno staff (PUBLIC - per il frontend)
 Route::get('/staff/{staff}/closed-slots-public', [ClosedSlotController::class, 'getByStaffAndDate']);
-
 
 /* =========================
    🔹 BOOKINGS (Protette)
@@ -129,8 +124,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Annulla una prenotazione dell'utente
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
-});
 
+    Route::middleware('throttle:30,1')->prefix('waitlist')->group(function () {
+        Route::get('/', [BookingWaitlistController::class, 'index']);
+        Route::post('/', [BookingWaitlistController::class, 'store']);
+        Route::delete('/{entry}', [BookingWaitlistController::class, 'destroy']);
+    });
+});
 
 /* =========================
    🔹 CLOSED SLOTS (Admin)

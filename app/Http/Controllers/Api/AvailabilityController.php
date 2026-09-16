@@ -7,9 +7,9 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\ClosedSlot;
 use App\Models\Service;
+use App\Models\SpecialOpening;
 use App\Models\Staff;
 use App\Models\StaffAvailability;
-use App\Models\SpecialOpening;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -25,20 +25,20 @@ class AvailabilityController extends Controller
         $date = $request->query('date');
         $serviceId = $request->query('serviceId');
 
-        if (!$date || !$serviceId) {
+        if (! $date || ! $serviceId) {
             return response()->json([
                 'status' => false,
-                'message' => 'date e serviceId sono obbligatori'
+                'message' => 'date e serviceId sono obbligatori',
             ], 400);
         }
 
         $staff = Staff::findOrFail($staffId);
         $service = Service::findOrFail($serviceId);
 
-        if (!$staff->services()->where('service_id', $serviceId)->exists()) {
+        if (! $staff->services()->where('service_id', $serviceId)->exists()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Questo staff non offre questo servizio'
+                'message' => 'Questo staff non offre questo servizio',
             ], 400);
         }
 
@@ -76,15 +76,21 @@ class AvailabilityController extends Controller
         }
 
         if ($timeSlots->isEmpty()) {
-            return response()->json([
+            $response = [
                 'status' => true,
                 'slots' => [],
-                'message' => 'Nessun orario disponibile per questo giorno'
-            ]);
+                'message' => 'Nessun orario disponibile per questo giorno',
+            ];
+            if ($request->boolean('include_waitlist')) {
+                $response['waitlist_slots'] = [];
+            }
+
+            return response()->json($response);
         }
 
-        $bookings = Booking::where('staff_id', $staffId)
-            ->where('date', $date)
+        $bookings = Booking::with('service')
+            ->where('staff_id', $staffId)
+            ->whereDate('date', $date)
             ->whereIn('status', ['pending', 'confirmed'])
             ->orderBy('time')
             ->get();
@@ -96,6 +102,8 @@ class AvailabilityController extends Controller
 
         $serviceDuration = $service->duration;
         $allSlots = [];
+        $waitlistSlots = [];
+        $includeWaitlist = $request->boolean('include_waitlist');
 
         // Genera tutti gli slot disponibili
         foreach ($timeSlots as $slot) {
@@ -109,6 +117,8 @@ class AvailabilityController extends Controller
                 $slotEnd = $slotStart->copy()->addMinutes($serviceDuration);
 
                 $isAvailable = true;
+                $blockedByBooking = false;
+                $blockedByClosure = false;
 
                 // Controlla overlap con booking esistenti
                 foreach ($bookings as $booking) {
@@ -126,32 +136,33 @@ class AvailabilityController extends Controller
                         ($slotStart <= $bookingStart && $slotEnd >= $bookingEnd)
                     ) {
                         $isAvailable = false;
+                        $blockedByBooking = true;
                         break;
                     }
                 }
 
                 // ✅ NUOVO: Controlla se lo slot è chiuso (closed_slots)
-                if ($isAvailable) {
-                    foreach ($closedSlots as $closed) {
-                        $closedTime = $closed->time;
+                foreach ($closedSlots as $closed) {
+                    $closedTime = $closed->time;
 
-                        // Se il giorno intero è chiuso (time = null)
-                        if ($closedTime === null) {
-                            $isAvailable = false;
-                            break;
-                        }
+                    if ($closedTime === null) {
+                        $isAvailable = false;
+                        $blockedByClosure = true;
+                        break;
+                    }
 
-                        // Se un orario specifico è chiuso
-                        $closedStart = Carbon::createFromFormat('H:i', substr((string) $closedTime, 0, 5));
-                        if ($slotStart->format('H:i') === $closedStart->format('H:i')) {
-                            $isAvailable = false;
-                            break;
-                        }
+                    $closedStart = Carbon::createFromFormat('H:i', substr((string) $closedTime, 0, 5));
+                    if ($slotStart->format('H:i') === $closedStart->format('H:i')) {
+                        $isAvailable = false;
+                        $blockedByClosure = true;
+                        break;
                     }
                 }
 
                 if ($isAvailable) {
                     $allSlots[] = $slotStart->format('H:i');
+                } elseif ($includeWaitlist && $blockedByBooking && ! $blockedByClosure) {
+                    $waitlistSlots[] = $slotStart->format('H:i');
                 }
 
                 $currentTime->addMinutes($serviceDuration);
@@ -170,15 +181,24 @@ class AvailabilityController extends Controller
             $allSlots = array_filter($allSlots, function ($slot) use ($currentTime) {
                 return $slot >= $currentTime;
             });
+            $waitlistSlots = array_filter($waitlistSlots, function ($slot) use ($currentTime) {
+                return $slot >= $currentTime;
+            });
         }
 
-        return response()->json([
+        $response = [
             'status' => true,
             'slots' => array_values(array_unique($allSlots)),
             'service_duration' => $serviceDuration,
             'date' => $date,
             'staff_id' => $staffId,
             'closed_slots' => $closedSlots, // 🆕 Includi i closed slots con motivi
-        ]);
+        ];
+
+        if ($includeWaitlist) {
+            $response['waitlist_slots'] = array_values(array_unique($waitlistSlots));
+        }
+
+        return response()->json($response);
     }
 }
