@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BookingResource\Pages;
 use App\Models\Booking;
+use App\Models\BookingWaitlistEntry;
 use App\Models\Staff;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -262,6 +263,39 @@ class BookingResource extends Resource
             ->defaultPaginationPageOption(50)
             ->actions([
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('waitlist')
+                        ->label('Lista d’attesa')
+                        ->icon('heroicon-o-clock')
+                        ->color('warning')
+                        ->modalHeading('Lista d’attesa per lo slot')
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Chiudi')
+                        ->modalContent(function (Booking $record) {
+                            $entries = BookingWaitlistEntry::with(['user', 'assignedBooking'])
+                                ->where('staff_id', $record->staff_id)
+                                ->where('service_id', $record->service_id)
+                                ->whereDate('date', $record->date)
+                                ->whereTime('time', Carbon::parse($record->time)->format('H:i:s'))
+                                ->orderByRaw("CASE WHEN status = 'waiting' THEN 0 ELSE 1 END")
+                                ->orderBy('created_at')
+                                ->orderBy('id')
+                                ->get();
+                            $positions = $entries
+                                ->where('status', 'waiting')
+                                ->values()
+                                ->mapWithKeys(fn (BookingWaitlistEntry $entry, int $index) => [$entry->id => $index + 1]);
+
+                            return view('filament.resources.booking-resource.waitlist-modal', [
+                                'entries' => $entries,
+                                'positions' => $positions,
+                            ]);
+                        })
+                        ->visible(fn (Booking $record) => BookingWaitlistEntry::query()
+                            ->where('staff_id', $record->staff_id)
+                            ->where('service_id', $record->service_id)
+                            ->whereDate('date', $record->date)
+                            ->whereTime('time', Carbon::parse($record->time)->format('H:i:s'))
+                            ->exists()),
                     Tables\Actions\Action::make('call_user')
                         ->label('Chiama cliente')
                         ->icon('heroicon-o-phone')
