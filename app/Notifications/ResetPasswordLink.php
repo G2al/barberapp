@@ -28,7 +28,7 @@ class ResetPasswordLink extends Notification
             ->view('emails.reset-password', [
                 'name' => $notifiable->name,
                 'resetUrl' => $url,
-                'heroImage' => asset('images/link-reset.png'),
+                'heroImage' => asset('images/gabriele-del-piano-email-banner.png'),
             ]);
     }
 }

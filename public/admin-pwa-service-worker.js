@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mottolasfamily-admin-v1';
+const CACHE_NAME = 'gabriele-del-piano-admin-v1';
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
@@ -11,7 +11,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) {
-      if (key.startsWith('mottolasfamily-admin-') && key !== CACHE_NAME) {
+      if (key.startsWith('gabriele-del-piano-admin-') && key !== CACHE_NAME) {
         await caches.delete(key);
       }
     }

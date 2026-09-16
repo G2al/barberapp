@@ -66,10 +66,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!barberSelect.value || !option) {
             barberCardTitle.textContent = "Scegli barbiere";
-            barberCardMeta.textContent = "Giovanni Cerino Hair Stylist";
+            barberCardMeta.textContent = "Gabriele Del Piano Barber";
             barberAvatar.classList.remove("has-image");
             barberAvatarImg.removeAttribute("src");
-            if (heroBarberImg) heroBarberImg.src = "/images/logo.jpg";
+            if (heroBarberImg) heroBarberImg.src = "/images/gabriele-del-piano-logo.svg";
             return;
         }
 
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             barberAvatar.classList.remove("has-image");
             barberAvatarImg.removeAttribute("src");
-            if (heroBarberImg) heroBarberImg.src = "/images/logo.jpg";
+            if (heroBarberImg) heroBarberImg.src = "/images/gabriele-del-piano-logo.svg";
         }
     };
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title">
+  <title id="title">Gabriele Del Piano Barber</title>
+  <rect width="960" height="360" fill="#171717"/>
+  <rect x="20" y="20" width="920" height="320" rx="8" fill="none" stroke="#c6a15b" stroke-width="2"/>
+  <circle cx="480" cy="116" r="54" fill="none" stroke="#c6a15b" stroke-width="3"/>
+  <text x="480" y="132" fill="#f8f6f0" font-family="Georgia,serif" font-size="44" text-anchor="middle">GDP</text>
+  <path d="M270 206h420" stroke="#c6a15b" stroke-width="2"/>
+  <text x="480" y="260" fill="#f8f6f0" font-family="Georgia,serif" font-size="34" text-anchor="middle">GABRIELE DEL PIANO</text>
+  <text x="480" y="302" fill="#c6a15b" font-family="Arial,sans-serif" font-size="16" letter-spacing="8" text-anchor="middle">BARBER</text>
+</svg>

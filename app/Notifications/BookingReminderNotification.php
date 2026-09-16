@@ -55,7 +55,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         return (new WebPushMessage)
             ->title('Il tuo appuntamento si avvicina')
             ->body("{$date} alle {$time}: {$service} con {$staff}.")
-            ->icon('/images/logo-192x192.png')
+            ->icon('/images/gabriele-del-piano-icon-192.png')
             ->tag('booking-reminder-'.$this->booking->id.'-'.$this->type)
             ->data(['url' => '/my-bookings.html'])
             ->options(['TTL' => 3600]);
@@ -72,7 +72,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
         };
 
         $reminderText = match ($this->type) {
-            '24h' => 'La tua prenotazione e&apos; prevista per domani. Ti aspettiamo da Giovanni Cerino Hair Stylist.',
+            '24h' => 'La tua prenotazione e&apos; prevista per domani. Ti aspettiamo da Gabriele Del Piano Barber.',
             '3h' => 'La tua prenotazione e&apos; in arrivo: mancano meno di 3 ore.',
             default => 'La tua prenotazione e&apos; molto vicina: mancano meno di 1 ora.',
         };
@@ -87,7 +87,7 @@ class BookingReminderNotification extends Notification implements ShouldQueue
                 'time' => substr($this->booking->time, 0, 5),
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
-                'heroImage' => asset('images/booking-reminder.png'),
+                'heroImage' => asset('images/gabriele-del-piano-email-banner.png'),
             ]);
     }
 

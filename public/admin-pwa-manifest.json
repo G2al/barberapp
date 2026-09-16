@@ -1,7 +1,7 @@
 {
-  "name": "Admin Mottolasfamily",
-  "short_name": "Admin Mottolasfamily",
-  "description": "Pannello amministrativo Mottola's Family",
+  "name": "Admin Gabriele Del Piano",
+  "short_name": "Admin Gabriele",
+  "description": "Pannello amministrativo Gabriele Del Piano Barber",
   "start_url": "/admin",
   "scope": "/admin/",
   "display": "standalone",
@@ -10,7 +10,7 @@
   "lang": "it",
   "icons": [
     {
-      "src": "/images/mottola-icon.png",
+      "src": "/images/gabriele-del-piano-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

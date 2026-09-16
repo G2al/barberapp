@@ -35,7 +35,7 @@ class WaitlistBookingAssignedNotification extends Notification implements Should
         return (new WebPushMessage)
             ->title('Si è liberato il tuo appuntamento')
             ->body("{$date} alle {$time}: {$this->booking->service->name} con {$this->booking->staff->first_name}.")
-            ->icon('/images/logo-192x192.png')
+            ->icon('/images/gabriele-del-piano-icon-192.png')
             ->tag('waitlist-assigned-'.$this->booking->id)
             ->data(['url' => '/my-bookings.html'])
             ->options(['TTL' => 3600]);

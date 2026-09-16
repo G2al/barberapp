@@ -17,7 +17,7 @@ class GabrieleSeederTest extends TestCase
     public function test_database_seeder_loads_only_gabriele_business_data_and_is_repeatable(): void
     {
         $oldService = Service::create([
-            'name' => 'Vecchio servizio Mottola',
+            'name' => 'Servizio non incluso nel seed',
             'price' => 99,
             'duration' => 60,
             'is_active' => true,

@@ -1,6 +1,6 @@
 {
-  "name": "Giovanni Cerino Hair Stylist - Prenota il tuo barbiere",
-  "short_name": "Giovanni Cerino",
+  "name": "Gabriele Del Piano Barber - Prenota il tuo appuntamento",
+  "short_name": "Gabriele Del Piano",
   "description": "App per prenotare servizi di barbiere online",
   "start_url": "/index.html",
   "scope": "/",
@@ -10,35 +10,17 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/images/logo-192x192.png",
+      "src": "/images/gabriele-del-piano-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/images/logo-512x512.png",
+      "src": "/images/gabriele-del-piano-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/images/maskable-icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/images/maskable-icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/images/logo-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ]
+  "categories": ["beauty", "lifestyle"]
 }
