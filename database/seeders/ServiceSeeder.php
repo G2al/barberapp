@@ -10,29 +10,18 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         $services = [
-            ['name' => 'Permanente', 'price' => 35, 'duration' => 60],
-            ['name' => 'Mash con cuffia', 'price' => 20, 'duration' => 25],
-            ['name' => 'Mash con cartina', 'price' => 30, 'duration' => 40],
-            ['name' => 'Colore', 'price' => 20, 'duration' => 30],
-            ['name' => 'Tintura barba', 'price' => 10, 'duration' => 15],
-            ['name' => 'Modellatura barba', 'price' => 5, 'duration' => 15],
-            ['name' => 'Taglio bambino', 'price' => 8, 'duration' => 15],
-            ['name' => 'Taglio + shampoo bambino', 'price' => 12, 'duration' => 20],
-            ['name' => 'Taglio', 'price' => 10, 'duration' => 20],
-            ['name' => 'Taglio + shampoo', 'price' => 13, 'duration' => 30],
-            ['name' => 'Taglio + shampoo + barba', 'price' => 18, 'duration' => 40],
-            ['name' => 'Taglio + shampoo + barba + sopracciglia', 'price' => 20, 'duration' => 45],
-            ['name' => 'Sopracciglia', 'price' => 2, 'duration' => 5],
-            ['name' => 'Black mask', 'price' => 8, 'duration' => 25],
-            ['name' => 'Trattamento barba relax', 'price' => 10, 'duration' => 20],
-            ['name' => 'Decolorazione white', 'price' => 80, 'duration' => 120],
-            ['name' => 'Barba classica con rasoio monouso', 'price' => 7, 'duration' => 15],
+            ['name' => 'Barba', 'price' => 5, 'duration' => 15],
+            ['name' => 'Shampoo acconciatura', 'price' => 5, 'duration' => 10],
+            ['name' => 'Pulizia del viso', 'price' => 30, 'duration' => 45],
+            ['name' => 'Decolorazione', 'price' => 70, 'duration' => 120],
+            ['name' => 'Tintura barba', 'price' => 5, 'duration' => 30],
+            ['name' => 'Taglio e Shampoo', 'price' => 12, 'duration' => 30],
+            ['name' => 'Taglio - Shampoo - barba', 'price' => 17, 'duration' => 45],
+            ['name' => 'Sopracciglia', 'price' => 3, 'duration' => 5],
+            ['name' => 'Meches - taglio', 'price' => 50, 'duration' => 165],
+            ['name' => 'Trattamento Keratina', 'price' => 50, 'duration' => 135],
+            ['name' => 'Taglio bambino', 'price' => 10, 'duration' => 30],
         ];
-
-        foreach ($services as &$service) {
-            $service['description'] = 'Listino Mottola Style';
-        }
-        unset($service);
 
         $serviceNames = array_column($services, 'name');
 
@@ -41,7 +30,7 @@ class ServiceSeeder extends Seeder
         foreach ($services as $service) {
             Service::updateOrCreate(
                 ['name' => $service['name']],
-                $service + ['is_active' => true]
+                $service + ['description' => null, 'is_active' => true]
             );
         }
     }
