@@ -141,6 +141,93 @@ class BookingWaitlistTest extends TestCase
         Notification::assertSentTo($waitingUser, WaitlistBookingAssignedNotification::class);
     }
 
+    public function test_deleting_an_assigned_booking_removes_its_waitlist_entry_and_keeps_other_waiters(): void
+    {
+        [$staff, $service] = $this->setupSlot();
+        $assignedUser = $this->customer();
+        $waitingUser = $this->customer();
+        $assignedBooking = Booking::create([
+            'user_id' => $assignedUser->id,
+            'staff_id' => $staff->id,
+            'service_id' => $service->id,
+            'date' => '2026-09-17',
+            'time' => '15:00:00',
+            'status' => 'confirmed',
+        ]);
+
+        $assignedEntry = BookingWaitlistEntry::create([
+            'user_id' => $assignedUser->id,
+            'staff_id' => $staff->id,
+            'service_id' => $service->id,
+            'date' => '2026-09-17',
+            'time' => '15:00:00',
+            'status' => 'assigned',
+            'assigned_booking_id' => $assignedBooking->id,
+        ]);
+        $waitingEntry = BookingWaitlistEntry::create([
+            'user_id' => $waitingUser->id,
+            'staff_id' => $staff->id,
+            'service_id' => $service->id,
+            'date' => '2026-09-17',
+            'time' => '15:00:00',
+            'status' => 'waiting',
+        ]);
+
+        $assignedBooking->delete();
+
+        $this->assertDatabaseMissing('booking_waitlist_entries', ['id' => $assignedEntry->id]);
+        $this->assertDatabaseHas('booking_waitlist_entries', ['id' => $waitingEntry->id, 'status' => 'waiting']);
+
+        Sanctum::actingAs($waitingUser);
+        $this->getJson('/api/waitlist')
+            ->assertOk()
+            ->assertJsonCount(1, 'entries')
+            ->assertJsonPath('entries.0.id', $waitingEntry->id)
+            ->assertJsonPath('entries.0.status', 'waiting');
+        $this->assertDatabaseMissing('bookings', ['id' => $assignedBooking->id]);
+    }
+
+    public function test_customer_cannot_see_another_users_waitlist_entries(): void
+    {
+        [$staff, $service] = $this->setupSlot();
+        $owner = $this->customer();
+        $otherUser = $this->customer();
+        $entry = BookingWaitlistEntry::create([
+            'user_id' => $owner->id,
+            'staff_id' => $staff->id,
+            'service_id' => $service->id,
+            'date' => '2026-09-17',
+            'time' => '15:00:00',
+            'status' => 'waiting',
+        ]);
+
+        Sanctum::actingAs($otherUser);
+        $this->getJson('/api/waitlist')
+            ->assertOk()
+            ->assertJsonCount(0, 'entries');
+        $this->assertDatabaseHas('booking_waitlist_entries', ['id' => $entry->id, 'user_id' => $owner->id]);
+    }
+
+    public function test_waitlist_endpoint_hides_assigned_entries_without_a_booking(): void
+    {
+        [$staff, $service] = $this->setupSlot();
+        $customer = $this->customer();
+        BookingWaitlistEntry::create([
+            'user_id' => $customer->id,
+            'staff_id' => $staff->id,
+            'service_id' => $service->id,
+            'date' => '2026-09-17',
+            'time' => '15:00:00',
+            'status' => 'assigned',
+            'assigned_booking_id' => null,
+        ]);
+
+        Sanctum::actingAs($customer);
+        $this->getJson('/api/waitlist')
+            ->assertOk()
+            ->assertJsonCount(0, 'entries');
+    }
+
     public function test_waitlist_endpoints_require_authentication(): void
     {
         $this->getJson('/api/waitlist')->assertUnauthorized();

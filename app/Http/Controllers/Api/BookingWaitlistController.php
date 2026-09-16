@@ -13,7 +13,13 @@ class BookingWaitlistController extends Controller
     {
         $entries = BookingWaitlistEntry::with(['staff', 'service', 'assignedBooking'])
             ->where('user_id', $request->user()->id)
-            ->whereIn('status', ['waiting', 'assigned'])
+            ->where(function ($query) {
+                $query->where('status', 'waiting')
+                    ->orWhere(function ($query) {
+                        $query->where('status', 'assigned')
+                            ->whereHas('assignedBooking');
+                    });
+            })
             ->orderByDesc('created_at')
             ->get()
             ->map(function (BookingWaitlistEntry $entry) {
