@@ -43,7 +43,7 @@ self.addEventListener('push', event => {
   try { payload = event.data?.json() || {}; } catch { /* Generic notification fallback. */ }
   event.waitUntil(self.registration.showNotification(payload.title || 'Gabriele Del Piano', {
     body: payload.body || 'Hai un aggiornamento sui tuoi appuntamenti.',
-    icon: '/images/gabriele-del-piano-icon-192.png', tag: payload.tag || 'gabriele-del-piano-notification',
+    icon: '/images/logopwagabriele.jpeg', tag: payload.tag || 'gabriele-del-piano-notification',
     data: { url: '/my-bookings.html' },
   }));
 });
