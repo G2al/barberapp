@@ -1,12 +1,4 @@
 <x-filament-panels::page>
-    <style>
-        @media (max-width: 767px) {
-            .booking-resource-page > .flex > .fi-tabs {
-                display: none;
-            }
-        }
-    </style>
-
     <div class="booking-resource-page">
         <div class="flex flex-col gap-y-6">
             <x-filament-panels::resources.tabs />

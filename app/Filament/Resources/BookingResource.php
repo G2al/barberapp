@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BookingResource\Pages;
 use App\Models\Booking;
 use App\Models\BookingWaitlistEntry;
-use App\Models\Staff;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -98,13 +97,6 @@ class BookingResource extends Resource
                 ->orderBy('date')
                 ->orderBy('time')
             )
-            ->header(fn () => view('filament.resources.booking-resource.staff-switcher', [
-                'staffMembers' => Staff::query()
-                    ->where('is_active', true)
-                    ->orderBy('first_name')
-                    ->orderBy('last_name')
-                    ->get(),
-            ]))
             ->columns([
                 Tables\Columns\TextColumn::make('mobile_summary')
                     ->label('Prenotazione')
