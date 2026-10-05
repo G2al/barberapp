@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Enums\ThemeMode;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -30,6 +31,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Giovanni Iannone Barbershop')
             ->brandLogo('/images/iannonebarber-logo-with-white.png')
             ->brandLogoHeight('2.5rem')
+            ->darkMode(true, true)
+            ->defaultThemeMode(ThemeMode::Dark)
             ->renderHook(PanelsRenderHook::HEAD_START, fn (): HtmlString => new HtmlString(<<<'HTML'
                 <link rel="manifest" href="/admin/manifest.json">
                 <meta name="theme-color" content="#111111">
