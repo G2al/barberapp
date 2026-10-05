@@ -1,7 +1,7 @@
 {
-  "name": "Admin Gabriele Del Piano",
-  "short_name": "Admin Gabriele",
-  "description": "Pannello amministrativo Gabriele Del Piano Barber",
+  "name": "Admin Giovanni Iannone",
+  "short_name": "Admin Iannone",
+  "description": "Pannello amministrativo Giovanni Iannone Barbershop",
   "start_url": "/admin",
   "scope": "/admin/",
   "display": "standalone",
@@ -10,9 +10,9 @@
   "lang": "it",
   "icons": [
     {
-      "src": "/images/logopwagabriele.jpeg",
+      "src": "/images/logo-pwa-admin.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

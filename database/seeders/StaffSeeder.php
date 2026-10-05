@@ -12,8 +12,8 @@ class StaffSeeder extends Seeder
     {
         $staffMembers = [
             [
-                'first_name' => 'Gabriele',
-                'last_name' => 'Del Piano',
+                'first_name' => 'Giovanni',
+                'last_name' => 'Iannone',
                 'role' => 'barber',
                 'is_active' => true,
                 'uses_salon_hours' => true,

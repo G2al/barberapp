@@ -95,7 +95,7 @@ const net = require('node:net');
       await fetch('/api/push/config', { headers: { Authorization: 'Bearer test-only' } });
     });
     const cached = await page.evaluate(async () => {
-      const cache = await caches.open('gabriele-del-piano-client-v1');
+      const cache = await caches.open('iannonebarber-client-v1');
       return (await cache.keys()).map(request => request.url);
     });
     assert(cached.some(url => url.endsWith('/dashboard.html')));

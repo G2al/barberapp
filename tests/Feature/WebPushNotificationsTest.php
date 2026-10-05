@@ -99,7 +99,7 @@ class WebPushNotificationsTest extends TestCase
         $user = $this->user();
         $booking = new Booking(['id' => 42, 'date' => '2026-09-08', 'time' => '15:00:00']);
         $booking->setRelation('service', new Service(['name' => 'Taglio']));
-        $booking->setRelation('staff', new Staff(['first_name' => 'Gabriele', 'last_name' => 'Del Piano']));
+        $booking->setRelation('staff', new Staff(['first_name' => 'Giovanni', 'last_name' => 'Iannone']));
         $events = [
             new BookingConfirmedNotification($booking),
             new BookingCancelledNotification($booking),

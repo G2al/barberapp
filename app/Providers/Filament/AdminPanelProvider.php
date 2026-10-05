@@ -27,16 +27,16 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName('Gabriele Del Piano Barber')
-            ->brandLogo('/images/gabrielefilament.png')
+            ->brandName('Giovanni Iannone Barbershop')
+            ->brandLogo('/images/iannonebarber-logo-with-white.png')
             ->brandLogoHeight('2.5rem')
             ->renderHook(PanelsRenderHook::HEAD_START, fn (): HtmlString => new HtmlString(<<<'HTML'
                 <link rel="manifest" href="/admin/manifest.json">
                 <meta name="theme-color" content="#111111">
                 <meta name="mobile-web-app-capable" content="yes">
                 <meta name="apple-mobile-web-app-capable" content="yes">
-                <meta name="apple-mobile-web-app-title" content="Admin Gabriele Del Piano">
-                <link rel="apple-touch-icon" href="/images/logopwagabriele.jpeg">
+                <meta name="apple-mobile-web-app-title" content="Admin Iannone Barbershop">
+                <link rel="apple-touch-icon" href="/images/logo-pwa-admin.png">
                 <script>
                     if ('serviceWorker' in navigator) {
                         window.addEventListener('load', () => {

@@ -43,8 +43,8 @@ class BookingWaitlistTest extends TestCase
     private function setupSlot(): array
     {
         $staff = Staff::create([
-            'first_name' => 'Gabriele',
-            'last_name' => 'Del Piano',
+            'first_name' => 'Giovanni',
+            'last_name' => 'Iannone',
             'role' => 'barber',
             'is_active' => true,
             'uses_salon_hours' => true,

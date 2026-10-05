@@ -10,11 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 
-class GabrieleSeederTest extends TestCase
+class IannoneSeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_database_seeder_loads_only_gabriele_business_data_and_is_repeatable(): void
+    public function test_database_seeder_loads_only_iannone_business_data_and_is_repeatable(): void
     {
         $oldService = Service::create([
             'name' => 'Servizio non incluso nel seed',
@@ -33,7 +33,7 @@ class GabrieleSeederTest extends TestCase
         Artisan::call('db:seed', ['--class' => DatabaseSeeder::class, '--no-interaction' => true]);
         Artisan::call('db:seed', ['--class' => DatabaseSeeder::class, '--no-interaction' => true]);
 
-        $staff = Staff::where('first_name', 'Gabriele')->where('last_name', 'Del Piano')->firstOrFail();
+        $staff = Staff::where('first_name', 'Giovanni')->where('last_name', 'Iannone')->firstOrFail();
         $this->assertTrue($staff->is_active);
         $this->assertTrue($staff->uses_salon_hours);
         $this->assertFalse($oldStaff->fresh()->is_active);
@@ -68,6 +68,6 @@ class GabrieleSeederTest extends TestCase
             'is_active' => true,
         ]);
         $this->assertSame(0, Availability::whereIn('weekday', [0, 1])->where('is_active', true)->count());
-        $this->assertSame(1, Staff::where('first_name', 'Gabriele')->where('last_name', 'Del Piano')->count());
+        $this->assertSame(1, Staff::where('first_name', 'Giovanni')->where('last_name', 'Iannone')->count());
     }
 }

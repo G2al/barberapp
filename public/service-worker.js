@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gabriele-del-piano-client-v1';
+const CACHE_NAME = 'iannonebarber-client-v1';
 const PAGES = ['/', '/index.html', '/dashboard.html', '/my-bookings.html', '/products.html',
   '/register.html', '/forgot-password.html', '/reset-password.html'];
 self.addEventListener('install', event => {
@@ -14,7 +14,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) {
-      if (key.startsWith('gabriele-del-piano-client-') && key !== CACHE_NAME) await caches.delete(key);
+      if (key.startsWith('iannonebarber-client-') && key !== CACHE_NAME) await caches.delete(key);
     }
     await self.clients.claim();
   })());
@@ -41,9 +41,9 @@ self.addEventListener('fetch', event => {
 self.addEventListener('push', event => {
   let payload = {};
   try { payload = event.data?.json() || {}; } catch { /* Generic notification fallback. */ }
-  event.waitUntil(self.registration.showNotification(payload.title || 'Gabriele Del Piano', {
+  event.waitUntil(self.registration.showNotification(payload.title || 'Giovanni Iannone', {
     body: payload.body || 'Hai un aggiornamento sui tuoi appuntamenti.',
-    icon: '/images/logopwagabriele.jpeg', tag: payload.tag || 'gabriele-del-piano-notification',
+    icon: '/images/logo-pwa-admin.png', tag: payload.tag || 'iannonebarber-notification',
     data: { url: '/my-bookings.html' },
   }));
 });

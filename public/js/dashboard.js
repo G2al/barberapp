@@ -66,10 +66,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!barberSelect.value || !option) {
             barberCardTitle.textContent = "Scegli barbiere";
-            barberCardMeta.textContent = "Gabriele Del Piano Barber";
+            barberCardMeta.textContent = "Giovanni Iannone Barbershop";
             barberAvatar.classList.remove("has-image");
             barberAvatarImg.removeAttribute("src");
-            if (heroBarberImg) heroBarberImg.src = "/images/gabriele-del-piano-logo.svg";
+            if (heroBarberImg) heroBarberImg.src = "/images/iannonebarber-logo-with-dark.png";
             return;
         }
 
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             barberAvatar.classList.remove("has-image");
             barberAvatarImg.removeAttribute("src");
-            if (heroBarberImg) heroBarberImg.src = "/images/gabriele-del-piano-logo.svg";
+            if (heroBarberImg) heroBarberImg.src = "/images/iannonebarber-logo-with-dark.png";
         }
     };
 

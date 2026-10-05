@@ -53,7 +53,7 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
         return (new WebPushMessage)
             ->title('Prenotazione annullata')
             ->body("{$date} alle {$time}: {$service} con {$staff}.")
-            ->icon('/images/gabriele-del-piano-icon-192.png')
+            ->icon('/images/logo-pwa-admin.png')
             ->tag('booking-cancelled-'.$this->booking->id)
             ->data(['url' => '/my-bookings.html'])
             ->options(['TTL' => 3600]);
@@ -71,7 +71,7 @@ class BookingCancelledNotification extends Notification implements ShouldQueue
                 'time' => substr($this->booking->time, 0, 5),
                 'service' => $this->booking->service->name ?? 'N/A',
                 'staff' => $this->booking->staff->first_name . ' ' . $this->booking->staff->last_name,
-                'heroImage' => asset('images/gabriele-del-piano-email-banner.png'),
+                'heroImage' => asset('images/iannonebarber-logo-with-dark.png'),
             ]);
     }
 
