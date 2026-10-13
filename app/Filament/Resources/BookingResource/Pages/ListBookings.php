@@ -5,7 +5,6 @@ namespace App\Filament\Resources\BookingResource\Pages;
 use App\Filament\Resources\BookingResource;
 use App\Filament\Resources\BookingResource\Widgets\BookingStatsWidget;
 use App\Models\Booking;
-use App\Models\Staff;
 use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -18,47 +17,70 @@ class ListBookings extends ListRecords
 
     protected static string $view = 'filament.resources.booking-resource.pages.list-bookings';
 
+    public string $selectedMonth;
+
     public function mount(): void
     {
         parent::mount();
 
-        if (! request()->has('tableFilters')) {
-            $this->tableFilters = [
-                'today' => [
-                    'isActive' => true,
-                ],
-            ];
-        }
+        $this->selectedMonth = Carbon::today()->format('Y-m');
+    }
+
+    public function updatedSelectedMonth(): void
+    {
+        unset($this->cachedTabs);
+
+        $currentMonth = Carbon::today()->format('Y-m');
+        $month = Carbon::createFromFormat('Y-m', $this->selectedMonth)->startOfMonth();
+        $this->activeTab = $this->selectedMonth === $currentMonth
+            ? 'day_' . Carbon::today()->format('Y-m-d')
+            : 'day_' . $month->format('Y-m-d');
     }
 
     public function getDefaultActiveTab(): string | int | null
     {
-        $firstStaff = Staff::query()
-            ->where('is_active', true)
-            ->orderBy('first_name')
-            ->orderBy('last_name')
-            ->first();
-
-        return $firstStaff ? 'staff_' . $firstStaff->id : null;
+        return 'day_' . Carbon::today()->format('Y-m-d');
     }
 
     public function getTabs(): array
     {
         $tabs = [];
 
-        Staff::query()
-            ->where('is_active', true)
-            ->orderBy('first_name')
-            ->orderBy('last_name')
-            ->get()
-            ->each(function (Staff $staff) use (&$tabs): void {
-                $tabs['staff_' . $staff->id] = Tab::make($staff->full_name)
-                    ->badge(fn () => Booking::query()
-                        ->where('staff_id', $staff->id)
-                        ->whereDate('date', Carbon::today())
-                        ->count())
-                    ->modifyQueryUsing(fn (Builder $query) => $query->where('staff_id', $staff->id));
-            });
+        $month = Carbon::createFromFormat('Y-m', $this->selectedMonth)->startOfMonth();
+        $lastDay = $month->copy()->endOfMonth();
+        $today = Carbon::today();
+        $weekdays = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+
+        $dates = [];
+        for ($date = $month->copy(); $date->lte($lastDay); $date->addDay()) {
+            $dates[] = $date->copy();
+        }
+
+        if ($month->format('Y-m') === $today->format('Y-m')) {
+            usort($dates, fn (Carbon $left, Carbon $right) => [
+                $left->isSameDay($today) ? 0 : 1,
+                $left->lessThan($today) ? 1 : 0,
+                $left->timestamp,
+            ] <=> [
+                $right->isSameDay($today) ? 0 : 1,
+                $right->lessThan($today) ? 1 : 0,
+                $right->timestamp,
+            ]);
+        }
+
+        foreach ($dates as $date) {
+            $dateKey = $date->format('Y-m-d');
+            $label = $date->isSameDay($today)
+                ? 'Oggi'
+                : ($date->isTomorrow() ? 'Domani' : $weekdays[$date->dayOfWeek] . ' ' . $date->format('d/m'));
+
+            $tabs['day_' . $dateKey] = Tab::make($label)
+                ->badge(fn () => Booking::query()
+                    ->whereDate('date', $dateKey)
+                    ->where('status', '!=', 'cancelled')
+                    ->count())
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereDate('date', $dateKey));
+        }
 
         return $tabs;
     }

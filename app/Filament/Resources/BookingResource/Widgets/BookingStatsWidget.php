@@ -16,12 +16,17 @@ class BookingStatsWidget extends BaseWidget
         $saturday = Carbon::today()->next(Carbon::SATURDAY);
         $weekStart = Carbon::now()->startOfWeek();
         $weekEnd = Carbon::now()->endOfWeek();
+        $monthStart = Carbon::now()->startOfMonth();
+        $monthEnd = Carbon::now()->endOfMonth();
 
         // Contatori base
         $bookingsToday = Booking::whereDate('date', $today)->count();
         $bookingsTomorrow = Booking::whereDate('date', $tomorrow)->count();
         $bookingsSaturday = Booking::whereDate('date', $saturday)->count();
         $bookingsWeek = Booking::whereBetween('date', [$weekStart, $weekEnd])->count();
+        $confirmedBookingsMonth = Booking::whereBetween('date', [$monthStart, $monthEnd])
+            ->where('status', 'confirmed')
+            ->count();
 
         // Top servizi oggi (aggregato, niente hardcode)
         $servicesToday = Booking::selectRaw('service_id, count(*) as total')
@@ -51,17 +56,6 @@ class BookingStatsWidget extends BaseWidget
             })
             ->implode(' | ');
 
-        // Stati odierni
-        $statusToday = Booking::selectRaw('status, count(*) as total')
-            ->whereDate('date', $today)
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->map(function ($count, $status) {
-                return "{$status}: {$count}";
-            })
-            ->values()
-            ->implode(' | ');
-
         return [
             Stat::make('Oggi', $bookingsToday)
                 ->description($servicesToday ?: 'Nessuna prenotazione')
@@ -88,10 +82,11 @@ class BookingStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-o-users')
                 ->color('primary'),
 
-            Stat::make('Stati oggi', $statusToday ?: 'Nessuna prenotazione')
-                ->description('pending/confirmed/cancelled')
-                ->descriptionIcon('heroicon-o-rectangle-stack')
-                ->color('gray'),
+            Stat::make('Prenotazioni mensili', $confirmedBookingsMonth)
+                ->description('Confermate nel mese corrente')
+                ->descriptionIcon('heroicon-o-calendar-days')
+                ->color('success'),
+
         ];
     }
 }

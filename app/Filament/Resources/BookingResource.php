@@ -213,9 +213,19 @@ class BookingResource extends Resource
                     ->visibleFrom('md'),
             ])
             ->filters([
+                Tables\Filters\TernaryFilter::make('show_cancelled')
+                    ->label('Mostra annullate')
+                    ->trueLabel('Sì, mostra')
+                    ->falseLabel('No, nascondi')
+                    ->default(false)
+                    ->queries(
+                        true: fn ($query) => $query,
+                        false: fn ($query) => $query->where('status', '!=', 'cancelled'),
+                        blank: fn ($query) => $query->where('status', '!=', 'cancelled'),
+                    ),
+
                 Tables\Filters\Filter::make('today')
                     ->query(fn ($query) => $query->whereDate('date', Carbon::today()))
-                    ->default()
                     ->toggle()
                     ->label('Oggi'),
 
@@ -249,6 +259,10 @@ class BookingResource extends Resource
                 Tables\Filters\SelectFilter::make('service_id')
                     ->relationship('service', 'name')
                     ->label('Servizio'),
+
+                Tables\Filters\SelectFilter::make('staff_id')
+                    ->relationship('staff', 'first_name')
+                    ->label('Professionista'),
             ])
             ->poll('30s')
             ->paginated([25, 50, 100])
