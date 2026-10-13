@@ -61,6 +61,14 @@ class Booking extends Model
         return $this->belongsTo(Haircut::class);
     }
 
+    public function waitlistEntries()
+    {
+        return $this->hasMany(BookingWaitlistEntry::class, 'staff_id', 'staff_id')
+            ->whereColumn('booking_waitlist_entries.service_id', 'bookings.service_id')
+            ->whereColumn('booking_waitlist_entries.date', 'bookings.date')
+            ->whereColumn('booking_waitlist_entries.time', 'bookings.time');
+    }
+
     /**
      * Controlla se lo slot è disponibile (non è chiuso)
      */

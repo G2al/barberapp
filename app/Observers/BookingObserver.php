@@ -3,8 +3,10 @@
 namespace App\Observers;
 
 use App\Models\Booking;
+use App\Notifications\BookingCancelledTelegramNotification;
 use App\Services\BookingWaitlistService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class BookingObserver
 {
@@ -19,6 +21,9 @@ class BookingObserver
         DB::afterCommit(function () use ($bookingId) {
             $cancelledBooking = Booking::find($bookingId);
             if ($cancelledBooking) {
+                Notification::route('telegram', config('services.telegram.chat_id'))
+                    ->notify(new BookingCancelledTelegramNotification($cancelledBooking));
+
                 app(BookingWaitlistService::class)->promoteFor($cancelledBooking);
             }
         });

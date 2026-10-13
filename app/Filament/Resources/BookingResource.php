@@ -94,6 +94,9 @@ class BookingResource extends Resource
         return $table
             ->modifyQueryUsing(fn ($query) => $query
                 ->with(['user', 'staff', 'service', 'haircut'])
+                ->withExists([
+                    'waitlistEntries as has_waitlist' => fn ($query) => $query->where('status', 'waiting'),
+                ])
                 ->orderBy('date')
                 ->orderBy('time')
             )
@@ -118,6 +121,9 @@ class BookingResource extends Resource
                             'cancelled' => 'background:#fee2e2;color:#991b1b;ring-color:#fecaca;',
                             'no_show' => 'background:#f3f4f6;color:#374151;ring-color:#e5e7eb;',
                         ][$record->status] ?? 'background:#f3f4f6;color:#374151;ring-color:#e5e7eb;';
+                        $waitlistBadge = $record->has_waitlist
+                            ? '<span class="rounded-full px-2.5 py-1 text-sm font-semibold ring-1" style="background:#fef3c7;color:#92400e;ring-color:#fde68a;">In lista di attesa</span>'
+                            : '';
 
                         return new HtmlString(sprintf(
                             '<div class="space-y-2">
@@ -126,7 +132,10 @@ class BookingResource extends Resource
                                         <div class="text-base font-semibold text-gray-950 dark:text-white">%s</div>
                                         <div class="text-sm text-gray-600 dark:text-gray-400">%s</div>
                                     </div>
-                                    <span class="rounded-full px-2.5 py-1 text-sm font-semibold ring-1" style="%s">%s</span>
+                                    <div class="flex flex-wrap justify-end gap-2">
+                                        <span class="rounded-full px-2.5 py-1 text-sm font-semibold ring-1" style="%s">%s</span>
+                                        %s
+                                    </div>
                                 </div>
                                 <div class="text-sm"><span class="font-semibold">%s</span></div>
                                 <div class="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 ring-1 ring-amber-200 dark:bg-amber-950 dark:text-amber-100 dark:ring-amber-800">%s</div>
@@ -136,6 +145,7 @@ class BookingResource extends Resource
                             e(Carbon::parse($record->date)->translatedFormat('d M, D')),
                             $statusClass,
                             e($status),
+                            $waitlistBadge,
                             e($service),
                             $note,
                             e($client),
@@ -210,6 +220,12 @@ class BookingResource extends Resource
                         'danger' => 'cancelled',
                         'gray' => 'no_show',
                     ])
+                    ->visibleFrom('md'),
+
+                Tables\Columns\BadgeColumn::make('waitlist_status')
+                    ->label('Lista d’attesa')
+                    ->state(fn (Booking $record) => $record->has_waitlist ? 'In lista di attesa' : null)
+                    ->color('warning')
                     ->visibleFrom('md'),
             ])
             ->filters([
