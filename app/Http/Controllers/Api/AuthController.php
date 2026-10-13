@@ -31,6 +31,7 @@ class AuthController extends Controller
                 'email'    => 'required|email|unique:users,email',
                 'phone'    => 'required|string|max:20|unique:users,phone',
                 'password' => 'required|min:6',
+                'barber_pin' => 'required|string|max:100',
             ],
             [
                 'phone.unique' => 'Questo numero di telefono è già registrato.',
@@ -41,6 +42,17 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $configuredPin = (string) config('registration.barber_pin');
+        $providedPin = (string) $request->input('barber_pin');
+
+        // Do not allow registrations if the secret is missing or incorrect.
+        if ($configuredPin === '' || ! hash_equals($configuredPin, $providedPin)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'La parola segreta non e corretta. Se non la conosci, contatta il salone su WhatsApp.',
             ], 422);
         }
 

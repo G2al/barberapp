@@ -191,8 +191,14 @@ async function submitRegister() {
         surname: document.getElementById("surname").value.trim(),
         email: document.getElementById("email").value.trim(),
         phone: document.getElementById("phone").value.trim(),
-        password: document.getElementById("password").value.trim()
+        password: document.getElementById("password").value.trim(),
+        barber_pin: document.getElementById("barber_pin").value.trim()
     };
+
+    if (!data.barber_pin) {
+        showAlert("Inserisci la parola segreta comunicata dal salone.", "danger");
+        return;
+    }
 
     setButtonLoading(submitBtn, true);
     const res = await registerUser(data);
@@ -213,6 +219,11 @@ async function submitRegister() {
 
         if (res.errors.password) {
             showAlert(translateErrorMessage(res.errors.password[0]), "danger");
+            return;
+        }
+
+        if (res.errors.barber_pin) {
+            showAlert(translateErrorMessage(res.errors.barber_pin[0]), "danger");
             return;
         }
 
