@@ -72,15 +72,15 @@ class Booking extends Model
     /**
      * Controlla se lo slot è disponibile (non è chiuso)
      */
-    public static function isSlotAvailable($staffId, $date, $time): bool
+    public static function isSlotAvailable($staffId, $date, $time, int $duration = 1): bool
     {
+        $slotStart = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $date.' '.substr((string) $time, 0, 5));
+        $slotEnd = $slotStart->copy()->addMinutes($duration);
+
         return !ClosedSlot::appliesToStaff($staffId)
             ->coversDate($date)
-            ->where(function ($query) use ($time) {
-                $query->whereNull('time') // Giorno intero chiuso
-                    ->orWhereTime('time', substr((string) $time, 0, 5)); // Orario specifico chiuso
-            })
-            ->exists();
+            ->get()
+            ->contains(fn (ClosedSlot $closedSlot) => $closedSlot->blocksInterval($slotStart, $slotEnd));
     }
 
     /**

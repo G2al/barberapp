@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class ClosedSlot extends Model
@@ -12,6 +13,8 @@ class ClosedSlot extends Model
         'date',
         'end_date',
         'time',
+        'start_time',
+        'end_time',
         'reason',
     ];
 
@@ -20,6 +23,8 @@ class ClosedSlot extends Model
         'date' => 'date',
         'end_date' => 'date',
         'time' => 'string',
+        'start_time' => 'string',
+        'end_time' => 'string',
     ];
 
     /**
@@ -46,5 +51,21 @@ class ClosedSlot extends Model
                 $query->whereNull('end_date')
                     ->orWhereDate('end_date', '>=', $date);
             });
+    }
+
+    public function blocksInterval(Carbon $intervalStart, Carbon $intervalEnd): bool
+    {
+        if ($this->start_time !== null && $this->end_time !== null) {
+            $closedStart = Carbon::createFromFormat('H:i', substr($this->start_time, 0, 5));
+            $closedEnd = Carbon::createFromFormat('H:i', substr($this->end_time, 0, 5));
+
+            return $intervalStart->lt($closedEnd) && $intervalEnd->gt($closedStart);
+        }
+
+        if ($this->time === null) {
+            return true;
+        }
+
+        return $intervalStart->format('H:i') === substr((string) $this->time, 0, 5);
     }
 }

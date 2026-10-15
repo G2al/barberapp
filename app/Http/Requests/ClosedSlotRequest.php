@@ -18,10 +18,12 @@ class ClosedSlotRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $isGlobal = filter_var($this->input('is_global', false), FILTER_VALIDATE_BOOLEAN);
+        $hasTimeRange = filled($this->input('start_time')) || filled($this->input('end_time'));
 
         $this->merge([
             'is_global' => $isGlobal,
             'staff_id' => $isGlobal ? null : $this->input('staff_id'),
+            'time' => $hasTimeRange ? null : $this->input('time'),
         ]);
     }
 
@@ -38,6 +40,8 @@ class ClosedSlotRequest extends FormRequest
             'date' => 'required|date|date_format:Y-m-d',
             'end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:date',
             'time' => 'nullable|date_format:H:i',
+            'start_time' => 'nullable|date_format:H:i|required_with:end_time',
+            'end_time' => 'nullable|date_format:H:i|after:start_time|required_with:start_time',
             'reason' => 'required|string|max:255',
         ];
     }
@@ -54,6 +58,9 @@ class ClosedSlotRequest extends FormRequest
             'date.date' => 'La data deve essere una data valida',
             'date.date_format' => 'La data deve essere nel formato YYYY-MM-DD',
             'time.date_format' => 'L\'orario deve essere nel formato HH:MM',
+            'start_time.required_with' => 'Inserisci l\'ora di inizio della fascia.',
+            'end_time.required_with' => 'Inserisci l\'ora di fine della fascia.',
+            'end_time.after' => 'L\'ora di fine deve essere successiva all\'ora di inizio.',
             'reason.required' => 'La ragione è obbligatoria',
             'reason.max' => 'La ragione non deve superare 255 caratteri',
         ];

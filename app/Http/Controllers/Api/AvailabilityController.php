@@ -143,16 +143,7 @@ class AvailabilityController extends Controller
 
                 // ✅ NUOVO: Controlla se lo slot è chiuso (closed_slots)
                 foreach ($closedSlots as $closed) {
-                    $closedTime = $closed->time;
-
-                    if ($closedTime === null) {
-                        $isAvailable = false;
-                        $blockedByClosure = true;
-                        break;
-                    }
-
-                    $closedStart = Carbon::createFromFormat('H:i', substr((string) $closedTime, 0, 5));
-                    if ($slotStart->format('H:i') === $closedStart->format('H:i')) {
+                    if ($closed->blocksInterval($slotStart, $slotEnd)) {
                         $isAvailable = false;
                         $blockedByClosure = true;
                         break;

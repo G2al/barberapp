@@ -105,7 +105,7 @@ class BookingController extends Controller
         }
 
         // ✅ Verifica che lo slot non sia chiuso
-        if (!Booking::isSlotAvailable($staffId, $date, $time)) {
+        if (!Booking::isSlotAvailable($staffId, $date, $time, (int) $service->duration)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Questo giorno o orario è chiuso'

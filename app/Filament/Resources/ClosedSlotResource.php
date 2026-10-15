@@ -32,6 +32,36 @@ class ClosedSlotResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Radio::make('closure_type')
+                    ->label('Tipo di chiusura')
+                    ->options([
+                        'full_day' => 'Giorno/i interi',
+                        'time_range' => 'Fascia oraria',
+                        'legacy' => 'Orario singolo (record esistente)',
+                    ])
+                    ->default('full_day')
+                    ->formatStateUsing(fn (?ClosedSlot $record): string => $record?->start_time && $record?->end_time
+                        ? 'time_range'
+                        : ($record?->time ? 'legacy' : 'full_day'))
+                    ->dehydrated(false)
+                    ->inline()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, $state): void {
+                        if ($state === 'full_day') {
+                            $set('time', null);
+                            $set('start_time', null);
+                            $set('end_time', null);
+                        } elseif ($state === 'time_range') {
+                            $set('time', null);
+                            $set('end_date', null);
+                        } else {
+                            $set('start_time', null);
+                            $set('end_time', null);
+                            $set('end_date', null);
+                        }
+                    })
+                    ->required(),
+
                 Forms\Components\Radio::make('is_global')
                     ->label('Ambito chiusura')
                     ->options([
@@ -68,14 +98,31 @@ class ClosedSlotResource extends Resource
 
                 Forms\Components\DatePicker::make('end_date')
                     ->label('Data fine')
-                    ->helperText('Lascia vuoto per chiudere solo la data inizio.')
+                    ->helperText('Disponibile per la chiusura di giorni interi.')
                     ->nullable()
+                    ->visible(fn (Get $get): bool => $get('closure_type') === 'full_day')
+                    ->dehydrated(fn (Get $get): bool => $get('closure_type') === 'full_day')
                     ->minDate(fn (Get $get) => $get('date') ?: now()),
 
                 Forms\Components\TimePicker::make('time')
-                    ->label('Orario (lascia vuoto per giorno intero)')
+                    ->label('Orario singolo')
                     ->nullable()
+                    ->seconds(false)
+                    ->visible(fn (Get $get): bool => $get('closure_type') === 'legacy')
+                    ->dehydrated(fn (Get $get): bool => $get('closure_type') === 'legacy'),
+
+                Forms\Components\TimePicker::make('start_time')
+                    ->label('Ora inizio')
+                    ->required(fn (Get $get): bool => $get('closure_type') === 'time_range')
+                    ->visible(fn (Get $get): bool => $get('closure_type') === 'time_range')
                     ->seconds(false),
+
+                Forms\Components\TimePicker::make('end_time')
+                    ->label('Ora fine')
+                    ->required(fn (Get $get): bool => $get('closure_type') === 'time_range')
+                    ->visible(fn (Get $get): bool => $get('closure_type') === 'time_range')
+                    ->seconds(false)
+                    ->after('start_time'),
 
                 Forms\Components\TextInput::make('reason')
                     ->label('Motivo')
@@ -108,9 +155,11 @@ class ClosedSlotResource extends Resource
                     ->placeholder('Solo un giorno')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('time')
-                    ->label('Orario')
-                    ->default('Giorno intero')
+                Tables\Columns\TextColumn::make('closure_time')
+                    ->label('Orario / fascia')
+                    ->state(fn (ClosedSlot $record): string => $record->start_time && $record->end_time
+                        ? substr($record->start_time, 0, 5) . ' - ' . substr($record->end_time, 0, 5)
+                        : ($record->time ? substr($record->time, 0, 5) : 'Giorno intero'))
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('reason')
