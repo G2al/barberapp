@@ -94,7 +94,7 @@ class ClosedSlotResource extends Resource
                 Forms\Components\DatePicker::make('date')
                     ->label('Data inizio')
                     ->required()
-                    ->minDate(now()),
+                    ->minDate(now()->startOfDay()),
 
                 Forms\Components\DatePicker::make('end_date')
                     ->label('Data fine')
@@ -102,7 +102,7 @@ class ClosedSlotResource extends Resource
                     ->nullable()
                     ->visible(fn (Get $get): bool => $get('closure_type') === 'full_day')
                     ->dehydrated(fn (Get $get): bool => $get('closure_type') === 'full_day')
-                    ->minDate(fn (Get $get) => $get('date') ?: now()),
+                    ->minDate(fn (Get $get) => $get('date') ?: now()->startOfDay()),
 
                 Forms\Components\TimePicker::make('time')
                     ->label('Orario singolo')
@@ -115,7 +115,22 @@ class ClosedSlotResource extends Resource
                     ->label('Ora inizio')
                     ->required(fn (Get $get): bool => $get('closure_type') === 'time_range')
                     ->visible(fn (Get $get): bool => $get('closure_type') === 'time_range')
-                    ->seconds(false),
+                    ->seconds(false)
+                    ->rules([
+                        function (Get $get): \Closure {
+                            return function (string $attribute, $value, \Closure $fail) use ($get): void {
+                                $date = $get('date');
+                                if (! $date || ! $value || ! Carbon::parse($date)->isToday()) {
+                                    return;
+                                }
+
+                                $selected = Carbon::createFromFormat('Y-m-d H:i', $date.' '.substr((string) $value, 0, 5));
+                                if ($selected->lessThanOrEqualTo(now())) {
+                                    $fail('Per una chiusura di oggi, l\'ora di inizio deve essere futura.');
+                                }
+                            };
+                        },
+                    ]),
 
                 Forms\Components\TimePicker::make('end_time')
                     ->label('Ora fine')
