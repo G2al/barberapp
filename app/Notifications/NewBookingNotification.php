@@ -33,19 +33,21 @@ class NewBookingNotification extends Notification
 
     private function formatMessage(Booking $booking): string
     {
-        $note = filled($booking->note) ? "Nota: {$booking->note}\n" : '';
+        $escape = static fn ($value): string => e((string) $value);
+        $note = filled($booking->note)
+            ? "\n📝 <b>Nota:</b> {$escape($booking->note)}"
+            : '';
 
-        return "NUOVA PRENOTAZIONE\n\n" .
-            "Cliente: {$booking->user->name}\n" .
-            "Telefono: {$booking->user->phone}\n" .
-            "Barbiere: {$booking->staff->full_name}\n" .
-            "Servizio: {$booking->service->name}\n" .
-            "Data: " . \Carbon\Carbon::parse($booking->date)->format('d/m/Y') . "\n" .
-            "Ora: {$booking->time}\n" .
-            $note .
-            "Prezzo: EUR {$booking->service->price}\n" .
-            "Status: Confermata\n\n" .
-            "Vai all'admin: " . url('/admin/bookings');
+        return "✅ <b>PRENOTAZIONE CONFERMATA</b>\n\n" .
+            "👤 <b>Cliente:</b> {$escape($booking->user->name)}\n" .
+            "📞 <b>Telefono:</b> {$escape($booking->user->phone)}\n" .
+            "💈 <b>Barbiere:</b> {$escape($booking->staff->full_name)}\n" .
+            "✂️ <b>Servizio:</b> {$escape($booking->service->name)}\n" .
+            "📆 <b>Data:</b> " . $escape(\Carbon\Carbon::parse($booking->date)->format('d/m/Y')) . "\n" .
+            "🕒 <b>Ora:</b> {$escape(substr((string) $booking->time, 0, 5))}\n" .
+            $note . "\n" .
+            "💶 <b>Prezzo:</b> EUR {$escape(number_format((float) $booking->service->price, 2, '.', ''))}\n" .
+            "✅ <b>Stato:</b> Confermata";
     }
 
     private function sendTelegramMessage(string $message): void
@@ -62,6 +64,15 @@ class NewBookingNotification extends Notification
             $response = Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
                 'chat_id' => $chatId,
                 'text' => $message,
+                'parse_mode' => 'HTML',
+                'reply_markup' => json_encode([
+                    'inline_keyboard' => [[
+                        [
+                            'text' => '🔗 Apri pannello prenotazioni',
+                            'url' => 'https://admin.mottolasfamily.it/admin/bookings',
+                        ],
+                    ]],
+                ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
             ]);
 
             Log::info('Telegram response', [
