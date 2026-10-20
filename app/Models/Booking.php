@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Notifications\BookingCancelledTelegramNotification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Notification;
 
 class Booking extends Model
 {
@@ -27,6 +29,16 @@ class Booking extends Model
         'reminder_3h_sent' => 'boolean',
         'reminder_1h_sent' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::updated(function (Booking $booking): void {
+            if ($booking->wasChanged('status') && $booking->status === 'cancelled') {
+                Notification::route('telegram', config('services.telegram.chat_id'))
+                    ->notify(new BookingCancelledTelegramNotification($booking));
+            }
+        });
+    }
 
 
     /**
