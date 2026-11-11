@@ -1,5 +1,5 @@
 // Service Worker con cache aggiornata per invalidare versioni precedenti
-const CACHE_NAME = 'salvatore-napp-v14';
+const CACHE_NAME = 'salvatore-napp-v15';
 const ASSETS = [
   '/',
   '/index.html',
@@ -15,13 +15,10 @@ const ASSETS = [
   '/js/dashboard.js',
   '/js/products.js',
   '/js/script.js',
-  '/images/sfondo.jpg',
+  // Immagini pesanti (sfondo, icone 512) escluse: finiscono in cache al primo uso
+  // tramite il fetch handler, senza rallentare l'installazione su rete mobile.
   '/images/logo_barberia.png',
   '/images/logo-192x192.png',
-  '/images/logo-512x512.png',
-  '/images/maskable-icon-192x192.png',
-  '/images/maskable-icon-512x512.png',
-  '/images/apple-touch-icon.png',
   '/images/favicon-32x32.png',
   '/images/favicon-16x16.png',
   '/images/chrome.svg',
@@ -56,17 +53,11 @@ self.addEventListener('activate', (event) => {
 
       await self.clients.claim();
 
-      // iOS può mantenere visibile la pagina sospesa anche dopo l'attivazione
-      // del nuovo worker: forza una navigazione per mostrare subito la versione nuova.
-      const windows = await self.clients.matchAll({
-        type: 'window',
-        includeUncontrolled: true,
-      });
-      await Promise.all(
-        windows.map((client) =>
-          client.navigate(client.url).catch(() => null)
-        )
-      );
+      // NON forzare client.navigate(): ricaricava la pagina mentre il cliente
+      // scriveva email/password (campo svuotato, tastiera chiusa).
+      // Avvisa le pagine: decidono loro quando ricaricare in modo sicuro.
+      const windows = await self.clients.matchAll({ type: 'window' });
+      windows.forEach((client) => client.postMessage({ type: 'SW_UPDATED' }));
     })()
   );
 });

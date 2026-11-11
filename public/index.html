@@ -16,7 +16,38 @@
             min-height: 100vh;
             background:
                 linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.58)),
-                url("/images/sfondo.jpg") center / cover no-repeat fixed;
+                url("/images/sfondo.jpg") center / cover no-repeat;
+            /* niente background-attachment: fixed: su iPhone rallenta i tocchi e l'apertura della tastiera */
+            background-color: #1a1a1a;
+        }
+
+        body.login-page .whatsapp-help {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 420px;
+            margin: 16px auto 0;
+            padding: 12px 16px;
+            background: #25D366;
+            color: #fff;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.3;
+            text-align: left;
+            text-decoration: none;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+        }
+
+        body.login-page .whatsapp-help i {
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+
+        body.login-page .whatsapp-help:active {
+            transform: scale(0.98);
         }
 
         body.login-page .auth-container {
@@ -255,6 +286,14 @@
 
         </div>
 
+        <!-- Assistenza WhatsApp -->
+        <a class="whatsapp-help"
+           href="https://wa.me/393339833674?text=Ciao%20Salvatore%2C%20ho%20un%20problema%20con%20l%27app%20della%20Barberia."
+           target="_blank" rel="noopener">
+            <i class="bi bi-whatsapp"></i>
+            <span>Problemi con l'app? Scrivi a Salvatore Nappa su WhatsApp</span>
+        </a>
+
         <!-- Install Guide (solo quando accedi via browser) -->
         <div class="install-guide" id="installGuide">
             <div class="install-guide-title">Come installare la nostra App</div>
@@ -368,11 +407,31 @@
     // Registra il Service Worker per PWA
     if ('serviceWorker' in navigator) {
         let reloadingForUpdate = false;
+        // Primo avvio (nessun worker precedente): niente da aggiornare, non ricaricare.
+        const hadController = !!navigator.serviceWorker.controller;
 
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (reloadingForUpdate) return;
+        // Ricarica solo se il cliente NON sta scrivendo; altrimenti aspetta
+        // che l'app vada in background (così non si svuotano i campi).
+        function isUserTyping() {
+            const a = document.activeElement;
+            if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) return true;
+            return Array.from(document.querySelectorAll('input')).some((i) => i.value);
+        }
+        function safeReload() {
+            if (reloadingForUpdate || !hadController) return;
+            if (isUserTyping()) {
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden') safeReload();
+                }, { once: true });
+                return;
+            }
             reloadingForUpdate = true;
             window.location.reload();
+        }
+
+        navigator.serviceWorker.addEventListener('controllerchange', safeReload);
+        navigator.serviceWorker.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'SW_UPDATED') safeReload();
         });
 
         navigator.serviceWorker.register('/service-worker.js', {
