@@ -27,16 +27,14 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName('Gabriele Del Piano Barber')
-            ->brandLogo('/images/gabrielefilament.png')
-            ->brandLogoHeight('2.5rem')
+            ->brandName('Ciro Expo Barber')
             ->renderHook(PanelsRenderHook::HEAD_START, fn (): HtmlString => new HtmlString(<<<'HTML'
                 <link rel="manifest" href="/admin/manifest.json">
                 <meta name="theme-color" content="#111111">
                 <meta name="mobile-web-app-capable" content="yes">
                 <meta name="apple-mobile-web-app-capable" content="yes">
-                <meta name="apple-mobile-web-app-title" content="Admin Gabriele Del Piano">
-                <link rel="apple-touch-icon" href="/images/logopwagabriele.jpeg">
+                <meta name="apple-mobile-web-app-title" content="Admin Ciro Expo">
+                <link rel="apple-touch-icon" href="/images/ciroexpo-admin-apple-touch-icon.png">
                 <script>
                     if ('serviceWorker' in navigator) {
                         window.addEventListener('load', () => {

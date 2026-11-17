@@ -53,7 +53,7 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
         return (new WebPushMessage)
             ->title('Prenotazione confermata')
             ->body("{$date} alle {$time}: {$service} con {$staff}.")
-            ->icon('/images/gabriele-del-piano-icon-192.png')
+            ->icon('/images/ciroexpo-icon-192.png')
             ->tag('booking-confirmed-'.$this->booking->id)
             ->data(['url' => '/my-bookings.html'])
             ->options(['TTL' => 3600]);

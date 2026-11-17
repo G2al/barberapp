@@ -9,18 +9,20 @@ class ServiceSeeder extends Seeder
 {
     public function run(): void
     {
+        // Prezzi dal listino Ciro Expo ("da" = prezzo minimo).
+        // Taglio + shampoo / + barba non sono a listino: somma dei singoli (da confermare).
         $services = [
-            ['name' => 'Barba', 'price' => 5, 'duration' => 15],
-            ['name' => 'Shampoo acconciatura', 'price' => 5, 'duration' => 10],
-            ['name' => 'Pulizia del viso', 'price' => 30, 'duration' => 45],
-            ['name' => 'Decolorazione', 'price' => 70, 'duration' => 120],
-            ['name' => 'Tintura barba', 'price' => 5, 'duration' => 30],
-            ['name' => 'Taglio e Shampoo', 'price' => 12, 'duration' => 30],
-            ['name' => 'Taglio - Shampoo - barba', 'price' => 17, 'duration' => 45],
-            ['name' => 'Sopracciglia', 'price' => 3, 'duration' => 5],
-            ['name' => 'Meches - taglio', 'price' => 50, 'duration' => 165],
-            ['name' => 'Trattamento Keratina', 'price' => 50, 'duration' => 135],
-            ['name' => 'Taglio bambino', 'price' => 10, 'duration' => 30],
+            ['name' => 'Barba', 'price' => 5, 'duration' => 30],
+            ['name' => 'Shampoo + styling', 'price' => 5, 'duration' => 20],
+            ['name' => 'Barba color', 'price' => 7, 'duration' => 40],
+            ['name' => 'Hair color', 'price' => 10, 'duration' => 30],
+            ['name' => 'Decolorazione', 'price' => 50, 'duration' => 70],
+            ['name' => 'Sistema ondulante', 'price' => 35, 'duration' => 30],
+            ['name' => 'Barba relax', 'price' => 10, 'duration' => 20],
+            ['name' => 'Trattamento antiforfora', 'price' => 3, 'duration' => 10],
+            ['name' => 'Maschera specifica', 'price' => 3, 'duration' => 15],
+            ['name' => 'Taglio + shampoo', 'price' => 18, 'duration' => 50],
+            ['name' => 'Taglio + shampoo + barba', 'price' => 23, 'duration' => 60],
         ];
 
         $serviceNames = array_column($services, 'name');

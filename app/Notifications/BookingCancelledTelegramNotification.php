@@ -65,7 +65,7 @@ class BookingCancelledTelegramNotification extends Notification
                     'inline_keyboard' => [[
                         [
                             'text' => '🔗 Apri pannello prenotazioni',
-                            'url' => 'https://admin.gabrieledelpianobarber.it/admin/bookings',
+                            'url' => 'https://admin.ciroexpoapp.it/admin/bookings',
                         ],
                     ]],
                 ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),

@@ -11,11 +11,11 @@ class AdminUserSeeder extends Seeder
     {
         User::updateOrCreate(
             [
-                'email' => 'admin@barberapp.com',
+                'email' => 'admin@ciroexpoapp.it',
             ],
             [
                 'name'      => 'Admin',
-                'surname'   => 'Master',
+                'surname'   => 'Ciro Expo',
                 'phone'     => '9999999999',
                 'password'  => 'password',   // Verrà criptata automaticamente
                 'role'      => 'admin',

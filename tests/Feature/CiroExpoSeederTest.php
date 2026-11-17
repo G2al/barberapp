@@ -5,16 +5,18 @@ namespace Tests\Feature;
 use App\Models\Availability;
 use App\Models\Service;
 use App\Models\Staff;
+use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class GabrieleSeederTest extends TestCase
+class CiroExpoSeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_database_seeder_loads_only_gabriele_business_data_and_is_repeatable(): void
+    public function test_database_seeder_loads_only_ciro_expo_business_data_and_is_repeatable(): void
     {
         $oldService = Service::create([
             'name' => 'Servizio non incluso nel seed',
@@ -33,41 +35,41 @@ class GabrieleSeederTest extends TestCase
         Artisan::call('db:seed', ['--class' => DatabaseSeeder::class, '--no-interaction' => true]);
         Artisan::call('db:seed', ['--class' => DatabaseSeeder::class, '--no-interaction' => true]);
 
-        $staff = Staff::where('first_name', 'Gabriele')->where('last_name', 'Del Piano')->firstOrFail();
+        $admin = User::where('email', 'admin@ciroexpoapp.it')->firstOrFail();
+        $this->assertSame('admin', $admin->role);
+        $this->assertTrue(Hash::check('password', $admin->password));
+
+        $staff = Staff::where('first_name', 'Mario')->where('last_name', 'Mango')->firstOrFail();
         $this->assertTrue($staff->is_active);
         $this->assertTrue($staff->uses_salon_hours);
+        $this->assertSame('+393317189966', $staff->phone);
         $this->assertFalse($oldStaff->fresh()->is_active);
         $this->assertFalse((bool) $oldService->fresh()->is_active);
         $this->assertSame(11, Service::where('is_active', true)->count());
         $this->assertSame(11, $staff->services()->count());
 
         $this->assertDatabaseHas('services', [
-            'name' => 'Meches - taglio',
+            'name' => 'Decolorazione',
             'price' => 50,
-            'duration' => 165,
+            'duration' => 70,
             'is_active' => true,
         ]);
         $this->assertDatabaseHas('services', [
-            'name' => 'Tintura barba',
-            'price' => 5,
-            'duration' => 30,
+            'name' => 'Taglio + shampoo + barba',
+            'price' => 23,
+            'duration' => 60,
             'is_active' => true,
         ]);
 
-        $activeHours = Availability::where('is_active', true)
-            ->orderBy('weekday')
-            ->orderBy('slot_type')
-            ->get(['weekday', 'slot_type', 'start_time', 'end_time']);
-
-        $this->assertCount(10, $activeHours);
+        $this->assertCount(10, Availability::where('is_active', true)->get());
         $this->assertDatabaseHas('availabilities', [
-            'weekday' => 5,
+            'weekday' => 6,
             'slot_type' => 'afternoon',
-            'start_time' => '14:30',
-            'end_time' => '21:30',
+            'start_time' => '14:00',
+            'end_time' => '19:00',
             'is_active' => true,
         ]);
         $this->assertSame(0, Availability::whereIn('weekday', [0, 1])->where('is_active', true)->count());
-        $this->assertSame(1, Staff::where('first_name', 'Gabriele')->where('last_name', 'Del Piano')->count());
+        $this->assertSame(1, Staff::where('first_name', 'Mario')->where('last_name', 'Mango')->count());
     }
 }
