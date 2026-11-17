@@ -28,6 +28,11 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('Ciro Expo Barber')
+            // Logo bianco su trasparente: versione scura per il tema chiaro, bianca per il tema scuro
+            ->brandLogo(asset('images/ciroexpo-logo-dark.png'))
+            ->darkModeBrandLogo(asset('images/ciroexpo-logo-white.png'))
+            ->brandLogoHeight('4rem')
+            ->favicon(asset('images/ciroexpo-favicon-32.png'))
             ->renderHook(PanelsRenderHook::HEAD_START, fn (): HtmlString => new HtmlString(<<<'HTML'
                 <link rel="manifest" href="/admin/manifest.json">
                 <meta name="theme-color" content="#111111">
